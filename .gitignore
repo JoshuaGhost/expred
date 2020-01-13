@@ -1,0 +1,13 @@
+*deprecat*
+*cache*
+log_files*
+model_checkpoints/*
+__pycache__
+.ipynb_checkpoints/*
+.venv
+*.swp
+eraserbenchmark/data/*
+eraserbenchmark/results/*
+eraserbenchmark/outputs/*
+output_data/*
+bert_as_tfkeras_layer*py
