@@ -1,5 +1,6 @@
 from config import *
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior()
 import tensorflow_hub as hub
 from bert_with_ration import convert_ids_to_token_list
 

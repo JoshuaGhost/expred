@@ -1,5 +1,6 @@
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior()
 from tensorflow.keras import backend as K
-import tensorflow as tf
 from config import *
 
 def precision_wrapper(exp_output):
