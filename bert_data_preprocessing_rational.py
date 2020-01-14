@@ -16,7 +16,11 @@ def create_tokenizer_from_hub_module():
     with tf.Graph().as_default(): # basically useless, but good practice to specify the graph using, even it sets the default graph as the default graph
         bert_module = hub.Module(BERT_MODEL_HUB)
         tokenization_info = bert_module(signature="tokenization_info", as_dict=True)
-        with tf.Session() as sess: # create a new session, with session we can setup even remote computation
+        config = tf.ConfigProto()
+        config.gpu_options.allow_growth = True
+        config.gpu_options.visible_device_list = '0'
+        config.graph_options.optimizer_options.global_jit_level = tf.OptimizerOptions.ON_1
+        with tf.Session(config=config) as sess: # create a new session, with session we can setup even remote computation
             vocab_file, do_lower_case = sess.run([tokenization_info["vocab_file"],
                                                 tokenization_info["do_lower_case"]])
 

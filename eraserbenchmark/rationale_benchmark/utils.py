@@ -99,7 +99,8 @@ def write_jsonl(jsonl, output_file):
             of.write(as_str)
             of.write('\n')
 
-def annotations_from_jsonl(fp: str) -> List[Annotation]:
+#def annotations_from_jsonl(fp: str) -> List[Annotation]:
+def annotations_from_jsonl(fp: str):
     ret = []
     with open(fp, 'r') as inf:
         for line in inf:
