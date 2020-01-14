@@ -5,9 +5,9 @@ from sklearn.metrics import accuracy_score, auc, average_precision_score, \
                             classification_report, precision_recall_curve, \
                             roc_auc_score
 
-from rationale import Rationale
-from position_scored_document import PositionScoredDocument
-from rationale_benchmark.utils import (
+from eraserbenchmark.rationale import Rationale
+from eraserbenchmark.position_scored_document import PositionScoredDocument
+from eraserbenchmark.rationale_benchmark.utils import (
     Annotation,
     Evidence,
     annotations_from_jsonl,
@@ -44,10 +44,11 @@ def partial_match_score(truth: List[Rationale], pred: List[Rationale], threshold
     instance (annotation + document) precisions and recalls, averaging those,
     and finally computing an F1 of the resulting average.
     """
+    
     ann_to_rat = _keyed_rationale_from_list(truth)
     pred_to_rat = _keyed_rationale_from_list(pred)
-
     num_classifications = {k:len(v) for k,v in pred_to_rat.items()}
+    #print(num_classifications)
     num_truth = {k:len(v) for k,v in ann_to_rat.items()}
     ious = defaultdict(dict)
     for k in set(ann_to_rat.keys()) | set(pred_to_rat.keys()):
@@ -66,12 +67,12 @@ def partial_match_score(truth: List[Rationale], pred: List[Rationale], threshold
         for k, vs in ious.items():
             threshold_tps[k] = sum(int(x >= threshold) for x in vs.values())
         micro_r = sum(threshold_tps.values()) / sum(num_truth.values())
-        micro_p = sum(threshold_tps.values()) / sum(num_classifications.values())
+        micro_p = sum(threshold_tps.values()) / (sum(num_classifications.values()) + np.finfo(np.float).eps)
         micro_f1 = _f1(micro_r, micro_p)
         macro_rs = list(threshold_tps.get(k, 0.0) / n for k, n in num_truth.items())
         macro_ps = list(threshold_tps.get(k, 0.0) / n for k, n in num_classifications.items())
         macro_r = sum(macro_rs) / len(macro_rs)
-        macro_p = sum(macro_ps) / len(macro_ps)
+        macro_p = sum(macro_ps) / (len(macro_ps) + np.finfo(np.float).eps)
         macro_f1 = _f1(macro_r, macro_p)
         scores.append({'threshold': threshold,
                        'micro': {
@@ -93,7 +94,7 @@ def score_hard_rationale_predictions(truth: List[Rationale], pred: List[Rational
     scores = dict()
     truth = set(truth)
     pred = set(pred)
-    micro_prec = len(truth & pred) / len(pred)
+    micro_prec = len(truth & pred) / (len(pred) + np.finfo(np.float).eps)
     micro_rec = len(truth & pred) / len(truth)
     micro_f1 = _f1(micro_prec, micro_rec)
 

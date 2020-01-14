@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from typing import Any, Callable, Dict, List, Tuple
 from itertools import chain
 
-from rationale_benchmark.utils import (
+from eraserbenchmark.rationale_benchmark.utils import (
     Annotation,
     Evidence,
     annotations_from_jsonl,

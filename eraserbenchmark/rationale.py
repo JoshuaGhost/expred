@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import List
 
-from rationale_benchmark.utils import (
+from eraserbenchmark.rationale_benchmark.utils import (
     Annotation,
     Evidence,
     annotations_from_jsonl,
