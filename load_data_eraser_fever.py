@@ -47,12 +47,13 @@ def load_dataset(docs_folder, dataset_fname):
     with open(dataset_fname, 'r') as fin:
         d = fin.readlines()
     ret = {'passage': [], 'query': [],
-           'classification': [], 'annotation_id': []}
+           'classification': [], 'annotation_id': [], "docids": []}
     for a in d:
         annotation = json.loads(a)
         ret['annotation_id'].append(annotation['annotation_id'])
         classification = 1 if annotation['classification'] == 'SUPPORTS' else 0
         ret['classification'].append(classification)
+        ret["docids"].append(annotation['docids'])
         doc_fname = os.path.join(
             docs_folder, annotation['docids'][0])
         try:
