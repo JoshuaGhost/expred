@@ -9,9 +9,9 @@ from collections import Counter, defaultdict, namedtuple
 from dataclasses import dataclass
 from itertools import chain
 from typing import Any, Callable, Dict, List, Tuple
+from copy import deepcopy
 
 import numpy as np
-import torch
 
 from eraserbenchmark.rationale_benchmark.utils import (
     Annotation,
@@ -22,6 +22,7 @@ from eraserbenchmark.rationale_benchmark.utils import (
     load_flattened_documents
 )
 
+from eraserbenchmark.eraser_utils import extract_doc_ids_from_annotations
 from eraserbenchmark.scoring import *
 from eraserbenchmark.position_scored_document import PositionScoredDocument
 from eraserbenchmark.verify_instances import _has_classifications, \
@@ -34,24 +35,25 @@ import pickle
 logging.basicConfig(level=logging.DEBUG,
                     format='%(relativeCreated)6d %(threadName)s %(message)s')
 
-dataset_name = 'fever'
-data_dir = '/home/zzhang/.keras/datasets/{}/'.format(dataset_name)
+dataset_name = 'movies'
+
 split_name = 'test'
 
 strict = True
 strict = False
 
-iou_thresholds = [0.5]                        
+iou_thresholds = [0.5]
 
-
-def evaluate(model_name):
+        
+def evaluate(model_name, dataset=dataset_name):
+    data_dir = '/home/zzhang/.keras/datasets/{}/'.format(dataset)
     annotation_fname = data_dir + split_name + '.jsonl'
     results_fname = 'eraserbenchmark/annotated_by_exp/{}.jsonl'.format(model_name+'_'+split_name)
     score_file = 'eraserbenchmark/outputs/{}.txt'.format(model_name+'_'+split_name)
     results = None
     with open(results_fname+'pkl3', 'rb') as fin:
         results = pickle.load(fin)
-
+    '''
     for i in range(len(results)):
         for j in range(len(results[i]['rationales'])):
             results[i]['rationales'][j]['docid'] = results[i]['rationales'][j]['docids'][0]
@@ -60,12 +62,8 @@ def evaluate(model_name):
             results[i][s]['True'] = results[i][s]['POS']
             results[i][s]['False'] = results[i][s]['NEG']
     #print(results[0])
-    if dataset_name == 'fever':
-        docids = set(chain.from_iterable(
-            [rat['docid'] for rat in res['rationales']] for res in results))
-    elif dataset_name == 'movie':
-        docids = set(chain.from_iterable(
-            [rat['docid'] for rat in res['rationales']] for res in results))
+    '''
+    docids = set(chain.from_iterable([rat['docid'] for rat in res['rationales']] for res in results))
     docs = load_flattened_documents(data_dir, docids)
     verify_instances(results, docs)
     # load truth
@@ -137,9 +135,15 @@ def evaluate(model_name):
     else:
         print(
             "No classification scores detected, skipping classification")
-
+    
+    if 'classification_scores' in scores:
+        if 'comprehensiveness' in scores['classification_scores'] and 'sufficiency' in scores['classification_scores']:
+            scores['classification_scores']['cs_f1'] = 2/(1/(scores['classification_scores']['comprehensiveness'] + 0.000000001)+ 1/(scores['classification_scores']['sufficiency'] + 0.000000001))
+            
     pprint.pprint(scores)
 
     if score_file:
         with open(score_file, 'w') as of:
             json.dump(str(scores), of, indent=4, sort_keys=True)
+
+ 

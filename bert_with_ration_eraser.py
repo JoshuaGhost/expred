@@ -145,6 +145,7 @@ def convert_single_rational_example(ex_index, example, label_list, max_seq_lengt
     assert len(rations) == max_seq_length
 
     label_id = label_map[example.label]
+    '''
     if ex_index < 5:
         tf.logging.info("*** Example ***")
         tf.logging.info("guid: %s" % (example.guid))
@@ -156,7 +157,7 @@ def convert_single_rational_example(ex_index, example, label_list, max_seq_lengt
         tf.logging.info("rations: %s" % " ".join([str(x) for x in rations]))
         tf.logging.info('')
         tf.logging.info("label: %s (id = %d)" % (example.label, label_id))
-    
+    '''
     feature = InputRationalFeatures(
                 input_ids=input_ids,
                 input_mask=input_mask,

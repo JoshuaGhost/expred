@@ -1,8 +1,12 @@
 IRRATIONAL = 0
 RATIONAL   = 1
 
-import tensorflow.compat.v1 as tf
-tf.disable_v2_behavior()
+import tensorflow
+if tensorflow.__version__.startswith('2'):
+    import tensorflow.compat.v1 as tf
+    tf.disable_v2_behavior()
+else:
+    import tensorflow as tf
 
 from bert.tokenization import FullTokenizer, BasicTokenizer, WordpieceTokenizer,\
                               convert_to_unicode, whitespace_tokenize, convert_ids_to_tokens
