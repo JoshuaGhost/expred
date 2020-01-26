@@ -15,14 +15,14 @@ from eraserbenchmark.rationale_benchmark.utils import Evidence
 from copy import deepcopy
 
 
-def create_tokenizer_from_hub_module():
+def create_tokenizer_from_hub_module(gpu_id):
     """Get the vocab file and casing info from the Hub module."""
     with tf.Graph().as_default(): # basically useless, but good practice to specify the graph using, even it sets the default graph as the default graph
         bert_module = hub.Module(BERT_MODEL_HUB)
         tokenization_info = bert_module(signature="tokenization_info", as_dict=True)
         config = tf.ConfigProto()
         config.gpu_options.allow_growth = True
-        config.gpu_options.visible_device_list = '0'
+        config.gpu_options.visible_device_list = gpu_id
         config.graph_options.optimizer_options.global_jit_level = tf.OptimizerOptions.ON_1
         with tf.Session(config=config) as sess: # create a new session, with session we can setup even remote computation
             vocab_file, do_lower_case = sess.run([tokenization_info["vocab_file"],
@@ -30,8 +30,8 @@ def create_tokenizer_from_hub_module():
     return FullTokenizerWithRations(vocab_file=vocab_file, do_lower_case=do_lower_case)
 
     
-def load_bert_features(data, docs, label_list, max_seq_length, merge_evidences):
-    tokenizer = create_tokenizer_from_hub_module()
+def load_bert_features(data, docs, label_list, max_seq_length, merge_evidences, gpu_id):
+    tokenizer = create_tokenizer_from_hub_module(gpu_id)
     input_examples = []
     for ann in data:
         text_a = ann.query
@@ -115,8 +115,8 @@ def convert_bert_features(features, with_label_id, with_rations, exp_output='gru
     return rets
 
 
-def preprocess(data, docs, label_list, dataset_name, max_seq_length, exp_output, merge_evidences):
-    features = load_bert_features(data, docs, label_list, max_seq_length, merge_evidences)
+def preprocess(data, docs, label_list, dataset_name, max_seq_length, exp_output, merge_evidences, gpu_id='0'):
+    features = load_bert_features(data, docs, label_list, max_seq_length, merge_evidences, gpu_id)
 
     with_rations = ('cls' not in dataset_name)
     with_lable_id = ('seq' not in dataset_name)

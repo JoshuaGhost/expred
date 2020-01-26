@@ -37,7 +37,8 @@ logging.basicConfig(level=logging.DEBUG,
 
 dataset_name = 'movies'
 
-split_name = 'test'
+#split_name = 'test'
+#split_name = 'val'
 
 strict = True
 strict = False
@@ -45,7 +46,7 @@ strict = False
 iou_thresholds = [0.5]
 
         
-def evaluate(model_name, dataset=dataset_name):
+def evaluate(model_name, dataset=dataset_name, split_name='test', train_on_portion=0):
     data_dir = '/home/zzhang/.keras/datasets/{}/'.format(dataset)
     annotation_fname = data_dir + split_name + '.jsonl'
     results_fname = 'eraserbenchmark/annotated_by_exp/{}.jsonl'.format(model_name+'_'+split_name)
@@ -68,6 +69,8 @@ def evaluate(model_name, dataset=dataset_name):
     verify_instances(results, docs)
     # load truth
     annotations = annotations_from_jsonl(annotation_fname)
+    if train_on_portion != 0 and split_name == 'train':
+        annotations = annotations[:int(len(annotations)*train_on_portion)]
     docids |= set(
         chain.from_iterable(
             (ev.docid for ev in chain.from_iterable(ann.evidences))

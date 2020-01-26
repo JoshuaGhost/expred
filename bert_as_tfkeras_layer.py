@@ -61,6 +61,8 @@ parser.add_argument('--exp_benchmark', action='store_true')
 parser.add_argument('--exp_structure', type=str, default='gru', choices='gru rnr'.split()) # gru, rnr
 parser.add_argument('--delete_checkpoints', action='store_true')
 parser.add_argument('--merge_evidences', action='store_true')
+parser.add_argument('--benchmark_split', type=str, default='test', choices='test train val'.split()) # gru, rnr
+parser.add_argument('--train_on_portion', type=float, default=0)
 
 args = ['--par_lambda', '0.01', 
         '--gpu_id', '0', 
@@ -75,7 +77,7 @@ args = ['--par_lambda', '0.01',
         '--merge_evidences']
 
 args = parser.parse_args(args)
-#args = parser.parse_args()
+args = parser.parse_args()
 
 BATCH_SIZE = args.batch_size
 par_lambda = args.par_lambda
@@ -90,6 +92,8 @@ evaluate = args.evaluate
 exp_visualize = args.exp_visualize
 exp_benchmark = args.exp_benchmark
 merge_evidences = args.merge_evidences
+BENCHMARK_SPLIT_NAME = args.benchmark_split
+train_on_portion = args.train_on_portion
 
 LEARNING_RATE = 1e-5
 
@@ -140,6 +144,8 @@ suffix = ''
 OUTPUT_DIR = ['bert_{}_seqlen_{}_{}_exp_output_{}'.format(
     bert_size, MAX_SEQ_LENGTH, dataset, EXP_OUTPUT)]
 OUTPUT_DIR.append('merged_evidences' if merge_evidences else 'separated_evidences')
+if train_on_portion != 0:
+    OUTPUT_DIR += ['train_on_portion', str(train_on_portion)]
 DATASET_CACHE_NAME = '_'.join(OUTPUT_DIR) + '_inputdata_cache'
 if par_lambda is None:
     OUTPUT_DIR.append('no_weight')
@@ -175,81 +181,6 @@ else:
 print('***** Model output directory: {} *****'.format(OUTPUT_DIR))
 
 
-# In[ ]:
-
-
-# data loading and preprocessing
-'''
-if dataset == 'semeval18':
-    from load_data_semeval18 import download_and_load_datasets
-    DATA_COLUMNS = 'Tweet text'
-    LABEL_COLUMN = 'Label'
-elif dataset == 'eraser_multirc':
-    from load_data_eraser_multirc import download_and_load_datasets
-    DATA_COLUMNS = ['query', 'passage']
-    LABEL_COLUMN = 'classification'
-elif dataset == 'eraser_fever':
-    from load_data_eraser_fever import download_and_load_datasets
-    DATA_COLUMNS = ['query', 'passage']
-    LABEL_COLUMN = 'classification'
-else:
-    if dataset == 'acl_imdb' or dataset == 'acl_imdb_cls':
-        from load_data_acl_imdb import download_and_load_datasets
-    if dataset == 'semeval16' or dataset == 'semeval16_cls':
-        from load_data_semeval16 import download_and_load_datasets
-    if dataset == 'zaidan07_cls':
-        from load_data_imdb_zaidan07_cls import download_and_load_datasets
-    if dataset == 'zaidan07_seq' or dataset == 'zaidan07_mtl':
-        from load_data_imdb_zaidan07_seq import download_and_load_datasets
-    if dataset == 'eraser_movie_mtl':
-        from load_data_imdb_zaidan07_eraser import download_and_load_datasets
-    DATA_COLUMNS = ['sentence']
-    LABEL_COLUMN = 'polarity'
-
-ret = download_and_load_datasets()
-if len(ret) == 3:
-    train, val, test = ret
-else:
-    train, test = ret
-    val = train.sample(frac=0.2)
-    train = pd.merge(train, val, how='outer', indicator=True)
-    train = train.loc[train._merge == 'left_only', ['sentence', 'polarity']]
-label_list = [0, 1]
-
-# data preprocessing
-from bert_data_preprocessing_rational import load_bert_features, convert_bert_features
-
-
-def preprocess(data, label_list, dataset_name):
-    features = load_bert_features(
-        data, label_list, MAX_SEQ_LENGTH, DATA_COLUMNS, LABEL_COLUMN)
-
-    with_rations = ('cls' not in dataset_name)
-    with_lable_id = ('seq' not in dataset_name)
-
-    return convert_bert_features(features, with_lable_id, with_rations, EXP_OUTPUT)
-
-
-@cache_decorator(os.path.join('cache', DATASET_NAME))
-def preprocess_wrapper(*data_inputs):
-    ret = []
-    for data in data_inputs:
-        ret.append(preprocess(data, label_list, dataset))
-    return ret
-
-
-rets_train, rets_val, rets_test = preprocess_wrapper(train, val, test)
-
-train_input_ids, train_input_masks, train_segment_ids, train_rations, train_labels = rets_train
-val_input_ids, val_input_masks, val_segment_ids, val_rations, val_labels = rets_val
-test_input_ids, test_input_masks, test_segment_ids, test_rations, test_labels = rets_test
-'''
-pass
-
-
-# In[ ]:
-
-
 # initializing graph and session
 graph = tf.get_default_graph()
 config = tf.ConfigProto()
@@ -277,6 +208,9 @@ elif dataset == 'fever':
 
 data_dir = f'/home/zzhang/.keras/datasets/{dataset}/'
 train, val, test = load_datasets(data_dir)
+if train_on_portion != 0:
+    train = train[:int(len(train) * train_on_portion)]
+print(train[-1])
 #train, val, test = [expand_on_evidences(data) for data in [train, val, test]]
 docids = set(chain.from_iterable(extract_doc_ids_from_annotations(d) for d in [train, val, test]))
 docs = load_documents(data_dir, docids)
@@ -286,7 +220,7 @@ from bert_data_preprocessing_rational_eraser import preprocess
 def preprocess_wrapper(*data_inputs, docs=docs):
     ret = []
     for data in data_inputs:
-        ret.append(preprocess(data, docs, label_list, dataset, MAX_SEQ_LENGTH, EXP_OUTPUT, merge_evidences))
+        ret.append(preprocess(data, docs, label_list, dataset, MAX_SEQ_LENGTH, EXP_OUTPUT, merge_evidences, gpu_id=gpu_id))
     return ret
 
 rets_train, rets_val, rets_test = preprocess_wrapper(train, val, test, docs=docs)
@@ -429,7 +363,6 @@ checkpoint_path = os.path.join(OUTPUT_DIR, 'cp-{epoch:04d}.ckpt')
 checkpoint_dir = os.path.dirname(checkpoint_path)
 cls_output_file = os.path.join(OUTPUT_DIR, 'output.txt')
 
-BENCHMARK_SPLIT_NAME = 'test'
 RES_FOR_BENCHMARK_FNAME = MODEL_NAME + '_' + BENCHMARK_SPLIT_NAME
 
 with graph.as_default():
@@ -561,9 +494,9 @@ with graph.as_default():
                    for i in range(len(pred[0]))]
         pred_softmax = np.hstack([1-pred[0], pred[0]])
         c_pred_softmax = get_cls_score(
-            model, results, docs, label_list, dataset, remove_rations, MAX_SEQ_LENGTH, EXP_OUTPUT)
+            model, results, docs, label_list, dataset, remove_rations, MAX_SEQ_LENGTH, EXP_OUTPUT, gpu_id=gpu_id)
         s_pred_softmax = get_cls_score(
-            model, results, docs, label_list, dataset, extract_rations, MAX_SEQ_LENGTH, EXP_OUTPUT)
+            model, results, docs, label_list, dataset, extract_rations, MAX_SEQ_LENGTH, EXP_OUTPUT, gpu_id=gpu_id)
 
         results = [add_cls_scores(res, cls_score, c_cls_score, s_cls_score, label_list) for res, cls_score,
                    c_cls_score, s_cls_score in zip(results, pred_softmax, c_pred_softmax, s_pred_softmax)]
@@ -576,7 +509,7 @@ with graph.as_default():
         with open(result_fname+'pkl3', "wb+") as pfout:
             pickle.dump(real_results, pfout)
         from eraserbenchmark.eraser import evaluate
-        evaluate(MODEL_NAME, dataset)
+        evaluate(MODEL_NAME, dataset, BENCHMARK_SPLIT_NAME, train_on_portion)
 
     with open(cls_output_file, 'a+') as fw:
         fw.write('/////////////////experiment ends//////////////////\n\n\n')

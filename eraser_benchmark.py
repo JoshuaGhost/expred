@@ -35,8 +35,8 @@ def extract_rations(sentence, rationale):
     return ' '.join(ret)
 
 
-def ce_load_bert_features(rationales, docs, label_list, decorate, max_seq_length):
-    tokenizer = create_tokenizer_from_hub_module()
+def ce_load_bert_features(rationales, docs, label_list, decorate, max_seq_length, gpu_id):
+    tokenizer = create_tokenizer_from_hub_module(gpu_id)
     input_examples = []
     for r_idx, rational in enumerate(rationales):
         text_a = rational['query']
@@ -56,8 +56,8 @@ def ce_load_bert_features(rationales, docs, label_list, decorate, max_seq_length
     return features
 
 
-def ce_preprocess(rationales, docs, label_list, dataset_name, decorate, max_seq_length, exp_output):
-    features = ce_load_bert_features(rationales, docs, label_list, decorate, max_seq_length)
+def ce_preprocess(rationales, docs, label_list, dataset_name, decorate, max_seq_length, exp_output, gpu_id):
+    features = ce_load_bert_features(rationales, docs, label_list, decorate, max_seq_length, gpu_id)
 
     with_rations = ('cls' not in dataset_name)
     with_lable_id = ('seq' not in dataset_name)
@@ -65,8 +65,8 @@ def ce_preprocess(rationales, docs, label_list, dataset_name, decorate, max_seq_
     return convert_bert_features(features, with_lable_id, with_rations, exp_output)
 
 
-def get_cls_score(model, rationales, docs, label_list, dataset, decorate, max_seq_length, exp_output):
-    rets = ce_preprocess(rationales, docs, label_list, dataset, decorate, max_seq_length, exp_output)
+def get_cls_score(model, rationales, docs, label_list, dataset, decorate, max_seq_length, exp_output, gpu_id):
+    rets = ce_preprocess(rationales, docs, label_list, dataset, decorate, max_seq_length, exp_output, gpu_id)
     _input_ids, _input_masks, _segment_ids, _rations, _labels = rets
 
     _inputs = [_input_ids, _input_masks, _segment_ids]
