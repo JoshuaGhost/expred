@@ -1,8 +1,8 @@
 #!/bin/bash
 
-lambdas=( 5 )
-gpu_id=1
-batch_size=16
+lambdas=( 5. )
+gpu_id=2
+batch_size=4
 num_epochs=10
 dataset='fever'
 exp_structure='gru'

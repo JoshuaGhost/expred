@@ -1,17 +1,12 @@
 #!/bin/bash
 
-gpu_id=$1
-l0='0.1,0.2,0.5'
-l1='1,2,5'
-l2='10,20,50'
-l3='100,200,500'
-lambdas=( $l0 $l1 $l2 $l3 )
-IFS=',' read -r -a lambdas<<<${lambdas[$gpu_id]}
-batch_size=5
+lambdas=( 0.05 ) 
+gpu_id=0
+batch_size=4
 num_epochs=10
-dataset='movies'
-exp_structure='gru'
-benchmark_split='val'
+dataset='multirc'
+exp_structure='rnr'
+benchmark_split='test'
 train_on_portion='0'
 
 for par_lambda in ${lambdas[@]}; do
