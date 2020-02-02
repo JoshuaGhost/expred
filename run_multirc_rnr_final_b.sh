@@ -1,12 +1,12 @@
 #!/bin/bash
 
-lambdas=( 0.1 0.2 0.5 1 2 5 10 20 50 100 200 500 )
-gpu_id=1
-batch_size=16
+lambdas=( 0.1 ) 
+gpu_id=0
+batch_size=4
 num_epochs=10
-dataset='movies'
-exp_structure='gru'
-benchmark_split='val'
+dataset='multirc'
+exp_structure='rnr'
+benchmark_split='test'
 train_on_portion='0'
 
 for par_lambda in ${lambdas[@]}; do

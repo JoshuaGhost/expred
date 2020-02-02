@@ -1,11 +1,11 @@
 #!/bin/bash
 
-lambdas=( 1. ) 
-gpu_id=0
-batch_size=16
+lambdas=( 100. 5. ) 
+gpu_id=1
+batch_size=4
 num_epochs=10
-dataset='multirc'
-exp_structure='rnr'
+dataset='movies'
+exp_structure='gru'
 benchmark_split='test'
 train_on_portion='0'
 

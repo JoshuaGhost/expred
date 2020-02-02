@@ -1,8 +1,13 @@
 #!/bin/bash
 
-lambdas=( 0.001 0.002 0.005 0.01 0.02 0.05 0.1 0.2 0.5 1. 2. 5. )
-gpu_id=0
-batch_size=16
+gpu_id=$1
+l0='0.001,0.002,0.005'
+l1='0.01,0.02,0.05'
+l2='0.1,0.2,0.5'
+l3='1.,2.,5.'
+lambdas=( $l0 $l1 $l2 $l3 )
+IFS=',' read -r -a lambdas<<<${lambdas[$gpu_id]}
+batch_size=5
 num_epochs=10
 dataset='fever'
 exp_structure='rnr'

@@ -1,8 +1,8 @@
 #!/bin/bash
 
-lambdas=( 100 200 )
-gpu_id=0
-batch_size=16
+lambdas=( 2. )
+gpu_id=3
+batch_size=4
 num_epochs=10
 dataset='multirc'
 exp_structure='gru'
