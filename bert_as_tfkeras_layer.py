@@ -58,6 +58,10 @@ parser.add_argument("--do_train", action='store_true')
 parser.add_argument('--exp_visualize', action='store_true')
 parser.add_argument('--evaluate', action='store_true')
 parser.add_argument('--exp_benchmark', action='store_true')
+parser.add_argument('--freeze_cls', action='store_true')
+parser.add_argument('--freeze_exp', action='store_true')
+parser.add_argument('--train_cls_first', action='store_true')
+parser.add_argument('--train_exp_first', action='store_true')
 parser.add_argument('--exp_structure', type=str, default='gru', choices='gru rnr'.split()) # gru, rnr
 parser.add_argument('--delete_checkpoints', action='store_true')
 parser.add_argument('--merge_evidences', action='store_true')
@@ -94,6 +98,14 @@ exp_benchmark = args.exp_benchmark
 merge_evidences = args.merge_evidences
 BENCHMARK_SPLIT_NAME = args.benchmark_split
 train_on_portion = args.train_on_portion
+freeze_cls = args.freeze_cls
+freeze_exp = args.freeze_exp
+train_cls_first = args.train_cls_first
+train_exp_first = args.train_exp_first
+
+assert (not (freeze_cls and freeze_exp))
+assert (not (train_exp_first and train_cls_first))
+assert not ((freeze_cls or freeze_exp) and (train_exp_first or train_cls_first))# can't freeze both in the same time
 
 LEARNING_RATE = 1e-5
 
@@ -136,13 +148,18 @@ if EXP_OUTPUT == 'gru':
 elif EXP_OUTPUT == 'rnr':
     loss_function = rnr_matrix_loss
     
-suffix = ''
-#suffix = 'cls_only'
-#suffix = 'transfer_cls_to_exp'
-#suffix = 'transfer_exp_to_cls'
+if freeze_cls:
+    suffix = 'freeze_cls'
+elif freeze_exp:
+    suffix = 'freeze_exp'
+elif train_cls_first:
+    suffix = 'train_cls_first'
+elif train_exp_first:
+    suffix = 'train_exp_first'
+else:
+    suffix = ''
 
-OUTPUT_DIR = ['bert_{}_seqlen_{}_{}_exp_output_{}'.format(
-    bert_size, MAX_SEQ_LENGTH, dataset, EXP_OUTPUT)]
+OUTPUT_DIR = ['bert_{}_seqlen_{}_{}_exp_output_{}'.format(bert_size, MAX_SEQ_LENGTH, dataset, EXP_OUTPUT)]
 OUTPUT_DIR.append('merged_evidences' if merge_evidences else 'separated_evidences')
 if train_on_portion != 0:
     OUTPUT_DIR += ['train_on_portion', str(train_on_portion)]
@@ -180,7 +197,6 @@ else:
     tf.gfile.MakeDirs(OUTPUT_DIR)
 print('***** Model output directory: {} *****'.format(OUTPUT_DIR))
 
-
 # initializing graph and session
 graph = tf.get_default_graph()
 config = tf.ConfigProto()
@@ -189,10 +205,6 @@ config.gpu_options.visible_device_list = gpu_id
 config.graph_options.optimizer_options.global_jit_level = tf.OptimizerOptions.ON_1
 sess = tf.Session(config=config)
 set_session(sess)
-
-
-# In[ ]:
-
 
 # data loading and preprocessing from eraser
 from eraserbenchmark.rationale_benchmark.utils import load_datasets, load_documents
@@ -210,7 +222,7 @@ data_dir = f'/home/zzhang/.keras/datasets/{dataset}/'
 train, val, test = load_datasets(data_dir)
 if train_on_portion != 0:
     train = train[:int(len(train) * train_on_portion)]
-print(train[-1])
+#print(train[-1])
 #train, val, test = [expand_on_evidences(data) for data in [train, val, test]]
 docids = set(chain.from_iterable(extract_doc_ids_from_annotations(d) for d in [train, val, test]))
 docs = load_documents(data_dir, docids)
@@ -243,26 +255,14 @@ def expand_on_evidences(data):
     return expanded_data
 #expanded_test = expand_on_evidences(test)
 
-
-# In[ ]:
-
-
 # hyper-parameters of BERT's
 WARMUP_PROPORTION = 0.1
 
 num_train_steps = int(len(train_input_ids) / BATCH_SIZE * float(NUM_EPOCHS))
 num_warmup_steps = int(num_train_steps * WARMUP_PROPORTION)
 
-
-# In[ ]:
-
-
 from bert_utils import get_vocab
 vocab = get_vocab(config)
-
-
-# In[ ]:
-
 
 # building models
 from model import BertLayer
@@ -270,7 +270,7 @@ from tensorflow.keras.layers import CuDNNGRU, CuDNNLSTM
 from tensorflow.keras.layers import Bidirectional
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.models import Model
-from tensorflow.keras.layers import Input, Dense, Reshape, Multiply, Concatenate, RepeatVector, Dot, Lambda, Add
+from tensorflow.keras.layers import Input, Dense, Reshape, Multiply, Concatenate, RepeatVector, Dot, Lambda, Add, Softmax
 
 from metrices import sp_precision_wrapper, sp_recall_wrapper
 
@@ -286,34 +286,40 @@ def build_model(par_lambda=None):
     bert_inputs = [in_id, in_mask, in_segment]
 
     bert_cls_output, bert_exp_output = BertLayer(
-        n_fine_tune_layers=10)(bert_inputs)
+        n_fine_tune_layers=10, name='bert')(bert_inputs)
 
     outputs = []
     if 'seq' not in dataset:
         # Classifier output
-        dense = Dense(DIM_DENSE_CLS, activation='tanh')(bert_cls_output)
-        cls = Dense(1, activation='sigmoid', name='cls_output')(dense)
-        outputs.append(cls)
+        dense = Dense(DIM_DENSE_CLS, activation='tanh', name='cls_dense')(bert_cls_output)
+        cls_output = Dense(1, activation='sigmoid', name='cls_output')(dense)
+        outputs.append(cls_output)
     if 'cls' not in dataset:
         # Explainer output
         if EXP_OUTPUT == 'gru':
             gru = CuDNNGRU(
-                NUM_GRU_UNITS_BERT_SEQ, kernel_initializer='random_uniform', return_sequences=True)(bert_exp_output)
-            exp = Dense(1, activation='sigmoid')(gru)
-            output_mask = Reshape((512, 1))(in_mask)
+                NUM_GRU_UNITS_BERT_SEQ, kernel_initializer='random_uniform', return_sequences=True, name='exp_gru_gru')(bert_exp_output)
+            exp = Dense(1, activation='sigmoid', name='exp_gru_dense')(gru)
+            output_mask = Reshape((MAX_SEQ_LENGTH, 1), name='exp_gru_reshape')(in_mask)
             exp_outputs = Multiply(name='exp_output')([output_mask, exp])
         elif EXP_OUTPUT == 'rnr':
-            M1 = Bidirectional(layer=CuDNNLSTM(NUM_INTERVAL_LSTM_WIDTH, return_sequences=True),
-                               merge_mode='concat')(bert_exp_output)
-            p_starts = Dense(1, activation='sigmoid')(Concatenate(axis=-1)([bert_exp_output, M1]))
-
+            M1 = Bidirectional(layer=CuDNNLSTM(NUM_INTERVAL_LSTM_WIDTH, return_sequences=True, name='exp_rnr_lstm1'),
+                               merge_mode='concat', name='exp_rnr_bidirectional1')(bert_exp_output)
+            p_starts = Dense(1, activation='sigmoid', name='exp_rnr_starts')(Concatenate(axis=-1)([bert_exp_output, M1]))
+            start_mask = Reshape((MAX_SEQ_LENGTH, 1))(in_mask)
+            p_starts = Multiply()([p_starts, start_mask])
+            
             m1_tilde = Dot(axes=-2)([p_starts, M1])
             M1_tilde = Lambda(lambda x: tf.tile(x, (1, MAX_SEQ_LENGTH, 1)))(m1_tilde)
             x = Multiply()([M1, M1_tilde])
-            M2 = Bidirectional(layer=CuDNNLSTM(NUM_INTERVAL_LSTM_WIDTH, return_sequences=True),
-                               merge_mode='concat')(Concatenate(axis=-1)([bert_exp_output, M1, M1_tilde, x]))
-            p_end_given_start = Dense(MAX_SEQ_LENGTH, activation='softmax')(Concatenate(axis=-1)([bert_exp_output, M2]))
+            M2 = Bidirectional(layer=CuDNNLSTM(NUM_INTERVAL_LSTM_WIDTH, return_sequences=True, name='exp_rnr_lstm2'),
+                               merge_mode='concat', name='exp_rnr_bidirecitonal2')(Concatenate(axis=-1)([bert_exp_output, M1, M1_tilde, x]))
+            p_end_given_start = Dense(MAX_SEQ_LENGTH, activation='linear', name='exp_rnr_end')(Concatenate(axis=-1)([bert_exp_output, M2]))
+            end_mask = Lambda(lambda x: tf.tile(x, (1, MAX_SEQ_LENGTH, 1)))(Reshape((1, MAX_SEQ_LENGTH))(in_mask))
+            p_end_given_start = Multiply()([p_end_given_start, end_mask])
             p_end_given_start = Lambda(lambda x: tf.linalg.band_part(x, 0, -1))(p_end_given_start)
+            p_end_given_start = Softmax(axis=-1)(p_end_given_start)
+            
             exp_outputs = Concatenate(axis=-1, name='exp_output')([p_starts, p_end_given_start])
             #exp_outputs = Lambda(lambda x: tf.reduce_sum(x, axis=-1, keepdims=True), name='exp_output')(p_dist)
         outputs.append(exp_outputs)
@@ -342,13 +348,17 @@ def build_model(par_lambda=None):
                               recall_wrapper(EXP_OUTPUT)]
     loss = loss_function()
     '''
-    model.compile(loss=loss, optimizer=optimizer, metrics=metrics)
+    model.compile(loss=loss, loss_weights=loss_weights, optimizer=optimizer, metrics=metrics)
 
     model_exp = Model(inputs=bert_inputs, outputs=exp_outputs)
     optimizer = Adam(LEARNING_RATE)
-    model_exp.compile(loss=loss_function(), optimizer=optimizer)
+    model_exp.compile(loss=loss['exp_output'], optimizer=optimizer, metrics=[metrics['exp_output']])
+    
+    model_cls = Model(inputs=bert_inputs, outputs=cls_output)
+    optimizer = Adam(LEARNING_RATE)
+    model_cls.compile(loss=loss['cls_output'], optimizer=optimizer, metrics=[metrics['cls_output']])
 
-    return model, model_exp
+    return model, model_cls, model_exp
 
 
 # In[ ]:
@@ -367,7 +377,7 @@ RES_FOR_BENCHMARK_FNAME = MODEL_NAME + '_' + BENCHMARK_SPLIT_NAME
 
 with graph.as_default():
     set_session(sess)
-    model, model_exp = build_model(par_lambda)
+    model, model_cls, model_exp = build_model(par_lambda)
     model.summary()
     sess.run(tf.local_variables_initializer())
     sess.run(tf.global_variables_initializer())
@@ -420,22 +430,113 @@ with graph.as_default():
 
         with open(cls_output_file, 'a+') as fw:
             fw.write("=============== {} ===============\n".format(datetime.now()))
+        if train_cls_first or train_exp_first:
+            if train_cls_first:
+                model_phase1 = model_cls
+                model_phase2 = model_exp
+                training_outputs_phase1, val_outputs_phase1 = training_outputs['cls_output'], val_outputs['cls_output']
+                training_outputs_phase2, val_outputs_phase2 = training_outputs['exp_output'], val_outputs['exp_output']
+            elif train_exp_first:
+                model_phase1 = model_exp
+                model_phase2 = model_cls
+                training_outputs_phase1, val_outputs_phase1 = training_outputs['exp_output'], val_outputs['exp_output']
+                training_outputs_phase2, val_outputs_phase2 = training_outputs['cls_output'], val_outputs['cls_output']
+            history = model_phase1.fit(
+                training_inputs,
+                training_outputs_phase1,
+                validation_data=(val_inputs, val_outputs_phase1),
+                epochs=NUM_EPOCHS,
+                batch_size=BATCH_SIZE,
+                callbacks=[cp_callback, es_callback], 
+                initial_epochs=initial_epoch
+            )
+            with open(cls_output_file, 'a+') as fw:
+                fw.write("{}:\n".format(datetime.now()))
+                fw.write(str(history.history) + '\n')
+            evaluation_res = model.evaluate(x=test_inputs,
+                                            y=test_outputs,
+                                            batch_size=BATCH_SIZE,
+                                            verbose=1)
+            with open(cls_output_file, 'a+') as fw:
+                fw.write("{}:\n".format(datetime.now()))
+                fw.write(str(evaluation_res) + '\n')
+            history = model_phase2.fit(
+                training_inputs,
+                training_outputs_phase2,
+                validation_data=(val_inputs, val_outputs_phase2),
+                epochs=NUM_EPOCHS,
+                batch_size=BATCH_SIZE,
+                callbacks=[cp_callback, es_callback], 
+                initial_epochs=initial_epoch
+            )
+            with open(cls_output_file, 'a+') as fw:
+                fw.write("{}:\n".format(datetime.now()))
+                fw.write(str(history.history) + '\n')
+            evaluation_res = model.evaluate(x=test_inputs,
+                                            y=test_outputs,
+                                            batch_size=BATCH_SIZE,
+                                            verbose=1)
+            with open(cls_output_file, 'a+') as fw:
+                fw.write("{}:\n".format(datetime.now()))
+                fw.write(str(evaluation_res) + '\n')
+        elif freeze_cls or freeze_exp:
+            if freeze_cls:
+                phases = ['cls', 'exp']
+            elif freeze_exp:
+                phases = ['exp', 'cls']
+            for layer in model.layers:
+                if layer.name.startswith(phases[1]):
+                    layer.trainable = False
+            print(f'trainable variables: {[v.name for v in model.trainable_variables]}')
+            history = model.fit(
+                training_inputs,
+                training_outputs,
 
-        history = model.fit(
-            training_inputs,
-            training_outputs,
+                validation_data=(val_inputs,
+                                 val_outputs),
+                epochs=NUM_EPOCHS,
+                batch_size=BATCH_SIZE,
+                callbacks=[cp_callback, es_callback],
+                initial_epoch=initial_epoch
+            )
+            with open(cls_output_file, 'a+') as fw:
+                fw.write("{}:\n".format(datetime.now()))
+                fw.write(str(history.history) + '\n')
+            for layer in model.layers:
+                if layer.name == 'bert' or layer.name.startswith(phases[0]):
+                    layer.trainable = False
+                elif layer.name.startswith(phases[1]):
+                    layer.trainable = True
+            print(f'trainable variables: {[v.name for v in model.trainable_variables]}')
+            history = model.fit(
+                training_inputs,
+                training_outputs,
 
-            validation_data=(val_inputs,
-                             val_outputs),
-            epochs=NUM_EPOCHS,
-            batch_size=BATCH_SIZE,
-            callbacks=[cp_callback, es_callback],
-            initial_epoch=initial_epoch
-        )
+                validation_data=(val_inputs,
+                                 val_outputs),
+                epochs=NUM_EPOCHS + NUM_EPOCHS,
+                batch_size=BATCH_SIZE,
+                callbacks=[cp_callback, es_callback],
+            )
+            with open(cls_output_file, 'a+') as fw:
+                fw.write("{}:\n".format(datetime.now()))
+                fw.write(str(history.history) + '\n')
+        else:
+            history = model.fit(
+                training_inputs,
+                training_outputs,
 
-        with open(cls_output_file, 'a+') as fw:
-            fw.write("{}:\n".format(datetime.now()))
-            fw.write(str(history.history) + '\n')
+                validation_data=(val_inputs,
+                                 val_outputs),
+                epochs=NUM_EPOCHS,
+                batch_size=BATCH_SIZE,
+                callbacks=[cp_callback, es_callback],
+                initial_epoch=initial_epoch
+            )
+            with open(cls_output_file, 'a+') as fw:
+                fw.write("{}:\n".format(datetime.now()))
+                fw.write(str(history.history) + '\n')
+        
 
     if evaluate:
         evaluation_res = model.evaluate(x=test_inputs,
