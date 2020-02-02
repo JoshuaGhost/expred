@@ -1,7 +1,7 @@
 #!/bin/bash
 
 par_lambda=1.
-gpu_id=1
+gpu_id=0
 train_first=( exp cls )
 batch_size=16
 num_epochs=5
