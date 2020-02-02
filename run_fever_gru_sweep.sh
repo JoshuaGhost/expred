@@ -6,7 +6,7 @@ batch_size=16
 num_epochs=10
 dataset='fever'
 exp_structure='gru'
-benchmark_split='test'
+benchmark_split='val'
 train_on_portion='0.1'
 
 for par_lambda in ${lambdas[@]}; do

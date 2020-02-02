@@ -448,7 +448,7 @@ with graph.as_default():
                 epochs=NUM_EPOCHS,
                 batch_size=BATCH_SIZE,
                 callbacks=[cp_callback, es_callback], 
-                initial_epochs=initial_epoch
+                initial_epoch=initial_epoch
             )
             with open(cls_output_file, 'a+') as fw:
                 fw.write("{}:\n".format(datetime.now()))
@@ -466,8 +466,7 @@ with graph.as_default():
                 validation_data=(val_inputs, val_outputs_phase2),
                 epochs=NUM_EPOCHS,
                 batch_size=BATCH_SIZE,
-                callbacks=[cp_callback, es_callback], 
-                initial_epochs=initial_epoch
+                callbacks=[cp_callback, es_callback],
             )
             with open(cls_output_file, 'a+') as fw:
                 fw.write("{}:\n".format(datetime.now()))
@@ -514,7 +513,7 @@ with graph.as_default():
 
                 validation_data=(val_inputs,
                                  val_outputs),
-                epochs=NUM_EPOCHS + NUM_EPOCHS,
+                epochs=NUM_EPOCHS,
                 batch_size=BATCH_SIZE,
                 callbacks=[cp_callback, es_callback],
             )

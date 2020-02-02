@@ -1,11 +1,11 @@
 #!/bin/bash
 
-lambdas=( 0.1 0.2 0.5 1 2 5 10 20 50 100 200 500 )
+lambdas=( 0.001 0.002 0.005 0.01 0.02 0.05 0.1 0.2 0.5 1. 2. 5. )
 gpu_id=0
 batch_size=16
 num_epochs=10
 dataset='multirc'
-exp_structure='gru'
+exp_structure='rnr'
 benchmark_split='val'
 train_on_portion='0.4'
 
