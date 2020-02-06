@@ -1,8 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-# In[ ]:
-
-
 # imports
 from utils import *
 from display_rational import convert_res_to_htmls
@@ -67,20 +62,20 @@ parser.add_argument('--delete_checkpoints', action='store_true')
 parser.add_argument('--merge_evidences', action='store_true')
 parser.add_argument('--benchmark_split', type=str, default='test', choices='test train val'.split()) # gru, rnr
 parser.add_argument('--train_on_portion', type=float, default=0)
+parser.add_argument('--start_from_phase1', action='store_true')
+parser.add_argument('--load_phase1', action='store_true')
 
-args = ['--par_lambda', '0.01', 
+
+args = ['--par_lambda', '5.0',
         '--gpu_id', '0', 
         '--batch_size', '2', 
         '--num_epochs', '10',
-        '--dataset', 'movies',
-        '--do_train',
-        '--evaluate',
-        '--exp_benchmark',
-        '--exp_structure', 'rnr',
-        '--delete_checkpoints',
+        '--dataset', 'fever',
+        '--exp_visualize',
+        '--exp_structure', 'gru',
         '--merge_evidences']
 
-args = parser.parse_args(args)
+#args = parser.parse_args(args)
 args = parser.parse_args()
 
 BATCH_SIZE = args.batch_size
@@ -103,15 +98,14 @@ freeze_exp = args.freeze_exp
 train_cls_first = args.train_cls_first
 train_exp_first = args.train_exp_first
 
+start_from_phase1 = args.start_from_phase1
+load_phase1 = args.load_phase1
+
 assert (not (freeze_cls and freeze_exp))
 assert (not (train_exp_first and train_cls_first))
 assert not ((freeze_cls or freeze_exp) and (train_exp_first or train_cls_first))# can't freeze both in the same time
 
 LEARNING_RATE = 1e-5
-
-
-# In[ ]:
-
 
 # static hyper-parameters
 MAX_SEQ_LENGTH = 512
@@ -191,10 +185,14 @@ if DO_DELETE:
     except:
         # Doesn't matter if the directory didn't exist
         pass
-if tensorflow.__version__.startswith('2'):
-    tf.io.gfile.makedirs(OUTPUT_DIR)
-else:
-    tf.gfile.MakeDirs(OUTPUT_DIR)
+    
+def mkdirs(path):
+    if tensorflow.__version__.startswith('2'):
+        tf.io.gfile.makedirs(path)
+    else:
+        tf.gfile.MakeDirs(path)
+        
+mkdirs(OUTPUT_DIR)
 print('***** Model output directory: {} *****'.format(OUTPUT_DIR))
 
 # initializing graph and session
@@ -278,6 +276,19 @@ DIM_DENSE_CLS = 256
 NUM_GRU_UNITS_BERT_SEQ = 128
 NUM_INTERVAL_LSTM_WIDTH = 100
 
+if par_lambda is None:
+    loss_weights = None
+else:
+    loss_weights = {'cls_output': 1,
+                    'exp_output': par_lambda}
+metrics = {'cls_output': 'accuracy',
+           'exp_output': [f1_wrapper(EXP_OUTPUT),
+                          sp_precision_wrapper(EXP_OUTPUT),
+                          sp_recall_wrapper(EXP_OUTPUT),
+                          precision_wrapper(EXP_OUTPUT),
+                          recall_wrapper(EXP_OUTPUT)]}
+loss = {'cls_output': 'binary_crossentropy',
+        'exp_output': loss_function()}
 
 def build_model(par_lambda=None):
     in_id = Input(shape=(MAX_SEQ_LENGTH,), name="input_ids")
@@ -375,6 +386,10 @@ cls_output_file = os.path.join(OUTPUT_DIR, 'output.txt')
 
 RES_FOR_BENCHMARK_FNAME = MODEL_NAME + '_' + BENCHMARK_SPLIT_NAME
 
+
+# In[9]:
+
+
 with graph.as_default():
     set_session(sess)
     model, model_cls, model_exp = build_model(par_lambda)
@@ -404,13 +419,10 @@ with graph.as_default():
 
     initial_epoch = 0
     if load_best:
-        if dataset == 'fever':
-            best_epoch = 3
-        else:
-            with open(cls_output_file, 'r') as fin:
-                log = fin.readlines()
-            history = eval(log[2])
-            best_epoch = np.argmin(history['loss'])+1
+        with open(cls_output_file, 'r') as fin:
+            log = fin.readlines()
+        history = eval(log[2])
+        best_epoch = np.argmin(history['loss'])+1
         model.load_weights(checkpoint_path.format(epoch=best_epoch))
     else:
         for ckpt_i in range(NUM_EPOCHS, 0, -1):
@@ -425,59 +437,107 @@ with graph.as_default():
                                                          save_weights_only=False,
                                                          verbose=1,
                                                          period=1)
-        es_callback = tf.keras.callbacks.EarlyStopping(
-            monitor='val_loss', patience=3, restore_best_weights=True)
+        es_callback = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=3, restore_best_weights=True)
 
         with open(cls_output_file, 'a+') as fw:
             fw.write("=============== {} ===============\n".format(datetime.now()))
         if train_cls_first or train_exp_first:
             if train_cls_first:
-                model_phase1 = model_cls
-                model_phase2 = model_exp
-                training_outputs_phase1, val_outputs_phase1 = training_outputs['cls_output'], val_outputs['cls_output']
-                training_outputs_phase2, val_outputs_phase2 = training_outputs['exp_output'], val_outputs['exp_output']
-            elif train_exp_first:
+                phases = ['cls', 'exp']
+                model_phase0 = model_cls
                 model_phase1 = model_exp
-                model_phase2 = model_cls
+                training_outputs_phase0, val_outputs_phase0 = training_outputs['cls_output'], val_outputs['cls_output']
                 training_outputs_phase1, val_outputs_phase1 = training_outputs['exp_output'], val_outputs['exp_output']
-                training_outputs_phase2, val_outputs_phase2 = training_outputs['cls_output'], val_outputs['cls_output']
-            history = model_phase1.fit(
-                training_inputs,
-                training_outputs_phase1,
-                validation_data=(val_inputs, val_outputs_phase1),
-                epochs=NUM_EPOCHS,
-                batch_size=BATCH_SIZE,
-                callbacks=[cp_callback, es_callback], 
-                initial_epoch=initial_epoch
-            )
-            with open(cls_output_file, 'a+') as fw:
-                fw.write("{}:\n".format(datetime.now()))
-                fw.write(str(history.history) + '\n')
+            elif train_exp_first:
+                phases = ['exp', 'cls']
+                model_phase0 = model_exp
+                model_phase1 = model_cls
+                training_outputs_phase0, val_outputs_phase0 = training_outputs['exp_output'], val_outputs['exp_output']
+                training_outputs_phase1, val_outputs_phase1 = training_outputs['cls_output'], val_outputs['cls_output']
+            for layer in model.layers:
+                if layer.name.startswith(phases[1]):
+                    layer.trainable = False
+            checkpoint_path_phase0 = os.path.join(OUTPUT_DIR, 'phase0', 'cp-{epoch:04d}.ckpt')
+            mkdirs(os.path.join(OUTPUT_DIR, 'phase0'))
+            cp_callback_phase0 = tf.keras.callbacks.ModelCheckpoint(checkpoint_path_phase0,
+                                                                     save_weights_only=False,
+                                                                     verbose=1,
+                                                                     period=1)
+            if start_from_phase1:
+                with open(cls_output_file, 'r') as fin:
+                    log = fin.readlines()
+                history = eval(log[2])
+                best_epoch = np.argmin(history['loss'])+1
+                model_phase0.load_weights(checkpoint_path_phase0.format(epoch=best_epoch))
+            else:
+                history = model_phase0.fit(
+                    training_inputs,
+                    training_outputs_phase0,
+                    validation_data=(val_inputs, val_outputs_phase0),
+                    epochs=NUM_EPOCHS,
+                    batch_size=BATCH_SIZE,
+                    callbacks=[cp_callback_phase0, es_callback], 
+                    initial_epoch=initial_epoch
+                )
+                with open(cls_output_file, 'a+') as fw:
+                    fw.write("phase 0 training history {}:\n".format(datetime.now()))
+                    fw.write(str(history.history) + '\n')
+                evaluation_res = model.evaluate(x=test_inputs,
+                                                y=test_outputs,
+                                                batch_size=BATCH_SIZE,
+                                                verbose=1)
+                with open(cls_output_file, 'a+') as fw:
+                    fw.write("phase 0 evaluation {}:\n".format(datetime.now()))
+                    fw.write(str(evaluation_res) + '\n')
+            for layer in model.layers:
+                if layer.name == 'bert' or layer.name.startswith(phases[0]):
+                    layer.trainable = False
+                elif layer.name.startswith(phases[1]):
+                    layer.trainable = True
+            for layer in model_phase1.layers:
+                if layer.name == 'bert' or layer.name.startswith(phases[0]):
+                    layer.trainable = False
+                elif layer.name.startswith(phases[1]):
+                    layer.trainable = True
+            optimizer = Adam(LEARNING_RATE)
+            model_phase1.compile(loss=loss[phases[1]+'_output'], optimizer=optimizer, metrics=[metrics[phases[1]+'_output']])
+            print(f'trainable variables: {[v.name for v in model_phase1.trainable_variables]}')
+            checkpoint_path_phase1 = os.path.join(OUTPUT_DIR, 'phase1', 'cp-{epoch:04d}.ckpt')
+            mkdirs(os.path.join(OUTPUT_DIR, 'phase1'))
+            cp_callback_phase1 = tf.keras.callbacks.ModelCheckpoint(checkpoint_path_phase1,
+                                                                     save_weights_only=False,
+                                                                     verbose=1,
+                                                                     period=1)
+            if load_phase1:
+                for ckpt_i in range(NUM_EPOCHS, 0, -1):
+                    if os.path.isfile(checkpoint_path_phase1.format(epoch=ckpt_i)):
+                        initial_epoch = ckpt_i
+                        model_phase1.load_weights(checkpoint_path_phase1.format(epoch=ckpt_i))
+                        # assert False  # dumm proof, most of the case the training is end-to-end, without disturbance and reloading
+                        break
+                with open(cls_output_file, 'a+') as fw:
+                    fw.write("phase 1 loaded, no training history {}:\n".format(datetime.now()))
+            else:
+                history = model_phase1.fit(
+                    training_inputs,
+                    training_outputs_phase1,
+                    validation_data=(val_inputs, val_outputs_phase1),
+                    epochs=NUM_EPOCHS,
+                    initial_epoch=initial_epoch,
+                    batch_size=BATCH_SIZE,
+                    callbacks=[cp_callback_phase1, es_callback],
+                )
+                with open(cls_output_file, 'a+') as fw:
+                    fw.write("phase 1 training history {}:\n".format(datetime.now()))
+                    fw.write(str(history.history) + '\n')
             evaluation_res = model.evaluate(x=test_inputs,
                                             y=test_outputs,
                                             batch_size=BATCH_SIZE,
                                             verbose=1)
             with open(cls_output_file, 'a+') as fw:
-                fw.write("{}:\n".format(datetime.now()))
+                fw.write("phase 1 evaluation {}:\n".format(datetime.now()))
                 fw.write(str(evaluation_res) + '\n')
-            history = model_phase2.fit(
-                training_inputs,
-                training_outputs_phase2,
-                validation_data=(val_inputs, val_outputs_phase2),
-                epochs=NUM_EPOCHS,
-                batch_size=BATCH_SIZE,
-                callbacks=[cp_callback, es_callback],
-            )
-            with open(cls_output_file, 'a+') as fw:
-                fw.write("{}:\n".format(datetime.now()))
-                fw.write(str(history.history) + '\n')
-            evaluation_res = model.evaluate(x=test_inputs,
-                                            y=test_outputs,
-                                            batch_size=BATCH_SIZE,
-                                            verbose=1)
-            with open(cls_output_file, 'a+') as fw:
-                fw.write("{}:\n".format(datetime.now()))
-                fw.write(str(evaluation_res) + '\n')
+                
         elif freeze_cls or freeze_exp:
             if freeze_cls:
                 phases = ['cls', 'exp']
@@ -534,8 +594,7 @@ with graph.as_default():
             )
             with open(cls_output_file, 'a+') as fw:
                 fw.write("{}:\n".format(datetime.now()))
-                fw.write(str(history.history) + '\n')
-        
+                fw.write(str(history.history) + '\n')     
 
     if evaluate:
         evaluation_res = model.evaluate(x=test_inputs,
@@ -552,10 +611,9 @@ with graph.as_default():
         pred = model_exp.predict(test_inputs_head)
         pred = np.round(np.array(pred)).astype(np.int32)
         exp_output_folder = os.path.join(OUTPUT_DIR, 'exp_outputs/')
-        tf.gfile.MakeDirs(exp_output_folder)
+        mkdirs(exp_output_folder)
         print('marked rationals are saved under {}'.format(exp_output_folder))
-        vocab = get_vocab(BERT_MODEL_HUB)
-        for i, l in enumerate(tqdm_notebook(test.iterrows())):
+        for i, l in enumerate(tqdm_notebook(test)):
             if i == len_head:
                 break
             input_ids = test_input_ids[i]
@@ -563,9 +621,8 @@ with graph.as_default():
             label = test_labels[i]
             gt = test_rations[i].reshape([-1])
             html = convert_res_to_htmls(input_ids, pred_intp, gt, vocab)
-            with open(exp_output_folder + str(l[0]) + '.html', "w+") as f:
-                f.write(
-                    '<h1>label: {}</h1>\n'.format('pos' if label == 1 else 'neg'))
+            with open(exp_output_folder + l.annotation_id+'-'+l.docids[0] + '.html', "w+") as f:
+                f.write('<h1>label: {}</h1>\n'.format('pos' if label == 1 else 'neg'))
                 f.write(html[1] + '<br/><br/>\n' + html[0])
 
     if exp_benchmark:
