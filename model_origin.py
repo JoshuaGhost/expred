@@ -1,14 +1,15 @@
 import tensorflow as tf
-from tensorflow.keras import backend as K
 import tensorflow_hub as hub
+from tensorflow.keras import backend as K
+
 
 class BertLayer(tf.keras.layers.Layer):
     def __init__(
-        self,
-        n_fine_tune_layers=10,
-        pooling="first",
-        bert_path="https://tfhub.dev/google/bert_uncased_L-12_H-768_A-12/1",
-        **kwargs,
+            self,
+            n_fine_tune_layers=10,
+            pooling="first",
+            bert_path="https://tfhub.dev/google/bert_uncased_L-12_H-768_A-12/1",
+            **kwargs,
     ):
         self.n_fine_tune_layers = n_fine_tune_layers
         self.trainable = True

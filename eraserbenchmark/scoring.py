@@ -1,22 +1,19 @@
+from collections import defaultdict
+from itertools import chain
 from typing import Any, Callable, Dict, List, Tuple
 
+import numpy as np
 from scipy.stats import entropy
 from sklearn.metrics import accuracy_score, auc, average_precision_score, \
-                            classification_report, precision_recall_curve, \
-                            roc_auc_score
+    classification_report, precision_recall_curve, \
+    roc_auc_score
 
-from eraserbenchmark.rationale import Rationale
 from eraserbenchmark.position_scored_document import PositionScoredDocument
+from eraserbenchmark.rationale import Rationale
 from eraserbenchmark.rationale_benchmark.utils import (
-    Annotation,
-    Evidence,
-    annotations_from_jsonl,
-    load_jsonl,
-    load_documents,
-    load_flattened_documents
- )
-from collections import defaultdict
-import numpy as np
+    Annotation
+)
+
 
 def _f1(_p, _r):
     if _p == 0 or _r == 0:
@@ -44,12 +41,12 @@ def partial_match_score(truth: List[Rationale], pred: List[Rationale], threshold
     instance (annotation + document) precisions and recalls, averaging those,
     and finally computing an F1 of the resulting average.
     """
-    
+
     ann_to_rat = _keyed_rationale_from_list(truth)
     pred_to_rat = _keyed_rationale_from_list(pred)
-    num_classifications = {k:len(v) for k,v in pred_to_rat.items()}
-    #print(num_classifications)
-    num_truth = {k:len(v) for k,v in ann_to_rat.items()}
+    num_classifications = {k: len(v) for k, v in pred_to_rat.items()}
+    # print(num_classifications)
+    num_truth = {k: len(v) for k, v in ann_to_rat.items()}
     ious = defaultdict(dict)
     for k in set(ann_to_rat.keys()) | set(pred_to_rat.keys()):
         for p in pred_to_rat.get(k, []):
@@ -76,14 +73,14 @@ def partial_match_score(truth: List[Rationale], pred: List[Rationale], threshold
         macro_f1 = _f1(macro_r, macro_p)
         scores.append({'threshold': threshold,
                        'micro': {
-                            'p': micro_p,
-                            'r': micro_r,
-                            'f1': micro_f1
+                           'p': micro_p,
+                           'r': micro_r,
+                           'f1': micro_f1
                        },
                        'macro': {
-                            'p': macro_p,
-                            'r': macro_r,
-                            'f1': macro_f1
+                           'p': macro_p,
+                           'r': macro_r,
+                           'f1': macro_f1
                        },
                        })
     return scores
@@ -99,10 +96,10 @@ def score_hard_rationale_predictions(truth: List[Rationale], pred: List[Rational
     micro_f1 = _f1(micro_prec, micro_rec)
 
     scores['instance_micro'] = {
-                                'p': micro_prec,
-                                'r': micro_rec,
-                                'f1': micro_f1,
-                               }
+        'p': micro_prec,
+        'r': micro_rec,
+        'f1': micro_f1,
+    }
 
     ann_to_rat = _keyed_rationale_from_list(truth)
     pred_to_rat = _keyed_rationale_from_list(pred)
@@ -118,19 +115,19 @@ def score_hard_rationale_predictions(truth: List[Rationale], pred: List[Rational
             instance_rec = 0
         instance_f1 = _f1(instance_prec, instance_rec)
         instances_to_scores[k] = {
-                                    'p': instance_prec,
-                                    'r': instance_rec,
-                                    'f1': instance_f1,
-                                 }
+            'p': instance_prec,
+            'r': instance_rec,
+            'f1': instance_f1,
+        }
     # these are calculated as sklearn would
     macro_prec = sum(instance['p'] for instance in instances_to_scores.values()) / len(instances_to_scores)
     macro_rec = sum(instance['r'] for instance in instances_to_scores.values()) / len(instances_to_scores)
     macro_f1 = sum(instance['f1'] for instance in instances_to_scores.values()) / len(instances_to_scores)
     scores['instance_macro'] = {
-                                'p': macro_prec,
-                                'r': macro_rec,
-                                'f1': macro_f1,
-                               }
+        'p': macro_prec,
+        'r': macro_rec,
+        'f1': macro_f1,
+    }
     return scores
 
 
@@ -147,7 +144,9 @@ def _auprc(truth: Dict[Any, List[bool]], preds: Dict[Any, List[float]]) -> float
     return np.average(aucs)
 
 
-def _score_aggregator(truth: Dict[Any, List[bool]], preds: Dict[Any, List[float]], score_function: Callable[[List[float], List[float]], float ], discard_single_class_answers: bool) -> float:
+def _score_aggregator(truth: Dict[Any, List[bool]], preds: Dict[Any, List[float]],
+                      score_function: Callable[[List[float], List[float]], float],
+                      discard_single_class_answers: bool) -> float:
     if len(preds) == 0:
         return 0.0
     assert len(truth.keys() and preds.keys()) == len(truth.keys())
@@ -169,21 +168,23 @@ def score_soft_tokens(paired_scores: List[PositionScoredDocument]) -> Dict[str, 
     roc_auc = _score_aggregator(truth, pred, roc_auc_score, True)
 
     return {
-             'auprc': auprc_score,
-             'average_precision': ap,
-             'roc_auc_score': roc_auc,
-           }
+        'auprc': auprc_score,
+        'average_precision': ap,
+        'roc_auc_score': roc_auc,
+    }
 
 
-def score_classifications(instances: List[dict], annotations: List[Annotation], docs: Dict[str, List[str]]) -> Dict[str, float]:
+def score_classifications(instances: List[dict], annotations: List[Annotation], docs: Dict[str, List[str]]) -> Dict[
+    str, float]:
     def compute_kl(cls_scores_, faith_scores_):
         keys = list(cls_scores_.keys())
         cls_scores_ = [cls_scores_[k] for k in keys]
         faith_scores_ = [faith_scores_[k] for k in keys]
         return entropy(faith_scores_, cls_scores_)
+
     labels = list(set(x.classification for x in annotations))
-    label_to_int = {l:i for i,l in enumerate(labels)}
-    key_to_instances = {inst['annotation_id']:inst for inst in instances}
+    label_to_int = {l: i for i, l in enumerate(labels)}
+    key_to_instances = {inst['annotation_id']: inst for inst in instances}
     truth = []
     predicted = []
     for ann in annotations:
@@ -193,32 +194,39 @@ def score_classifications(instances: List[dict], annotations: List[Annotation], 
     classification_scores = classification_report(truth, predicted, output_dict=True, target_names=labels, digits=3)
     accuracy = accuracy_score(truth, predicted)
     if 'comprehensiveness_classification_scores' in instances[0]:
-        comprehensiveness_scores = [x['classification_scores'][x['classification']] - x['comprehensiveness_classification_scores'][x['classification']] for x in instances]
+        comprehensiveness_scores = [
+            x['classification_scores'][x['classification']] - x['comprehensiveness_classification_scores'][
+                x['classification']] for x in instances]
         comprehensiveness_score = np.average(comprehensiveness_scores)
-    else :
+    else:
         comprehensiveness_score = None
         comprehensiveness_scores = None
 
     if 'sufficiency_classification_scores' in instances[0]:
-        sufficiency_scores = [x['classification_scores'][x['classification']] - x['sufficiency_classification_scores'][x['classification']] for x in instances]
+        sufficiency_scores = [x['classification_scores'][x['classification']] - x['sufficiency_classification_scores'][
+            x['classification']] for x in instances]
         sufficiency_score = np.average(sufficiency_scores)
-    else :
+    else:
         sufficiency_score = None
         sufficiency_scores = None
-    
+
     if 'comprehensiveness_classification_scores' in instances[0]:
-        comprehensiveness_entropies = [entropy(list(x['classification_scores'].values())) - entropy(list(x['comprehensiveness_classification_scores'].values())) for x in instances]
+        comprehensiveness_entropies = [entropy(list(x['classification_scores'].values())) - entropy(
+            list(x['comprehensiveness_classification_scores'].values())) for x in instances]
         comprehensiveness_entropy = np.average(comprehensiveness_entropies)
-        comprehensiveness_kl = np.average(list(compute_kl(x['classification_scores'], x['comprehensiveness_classification_scores']) for x in instances))
+        comprehensiveness_kl = np.average(list(
+            compute_kl(x['classification_scores'], x['comprehensiveness_classification_scores']) for x in instances))
     else:
         comprehensiveness_entropies = None
         comprehensiveness_kl = None
         comprehensiveness_entropy = None
 
     if 'sufficiency_classification_scores' in instances[0]:
-        sufficiency_entropies = [entropy(list(x['classification_scores'].values())) - entropy(list(x['sufficiency_classification_scores'].values())) for x in instances]
+        sufficiency_entropies = [entropy(list(x['classification_scores'].values())) - entropy(
+            list(x['sufficiency_classification_scores'].values())) for x in instances]
         sufficiency_entropy = np.average(sufficiency_entropies)
-        sufficiency_kl = np.average(list(compute_kl(x['classification_scores'], x['sufficiency_classification_scores']) for x in instances))
+        sufficiency_kl = np.average(
+            list(compute_kl(x['classification_scores'], x['sufficiency_classification_scores']) for x in instances))
     else:
         sufficiency_entropies = None
         sufficiency_kl = None
@@ -238,12 +246,12 @@ def score_classifications(instances: List[dict], annotations: List[Annotation], 
         token_percentages = None
 
     return {
-              'accuracy': accuracy,
-              'prf': classification_scores,
-              'comprehensiveness': comprehensiveness_score,
-              'sufficiency': sufficiency_score,
-              'comprehensiveness_entropy': comprehensiveness_entropy,
-              'comprehensiveness_kl': comprehensiveness_kl,
-              'sufficiency_entropy': sufficiency_entropy,
-              'sufficiency_kl': sufficiency_kl,
-           }
+        'accuracy': accuracy,
+        'prf': classification_scores,
+        'comprehensiveness': comprehensiveness_score,
+        'sufficiency': sufficiency_score,
+        'comprehensiveness_entropy': comprehensiveness_entropy,
+        'comprehensiveness_kl': comprehensiveness_kl,
+        'sufficiency_entropy': sufficiency_entropy,
+        'sufficiency_kl': sufficiency_kl,
+    }

@@ -1,16 +1,11 @@
-from typing import List
 from dataclasses import dataclass
-from typing import Any, Callable, Dict, List, Tuple
+from dataclasses import dataclass
 from itertools import chain
+from typing import Any, Dict, List, Tuple
 
 from eraserbenchmark.rationale_benchmark.utils import (
-    Annotation,
-    Evidence,
-    annotations_from_jsonl,
-    load_jsonl,
-    load_documents,
-    load_flattened_documents
- )
+    Annotation
+)
 
 
 @dataclass(eq=True, frozen=True)
@@ -21,7 +16,8 @@ class PositionScoredDocument:
     truths: Tuple[bool]
 
     @classmethod
-    def from_results(cls, instances: List[dict], annotations: List[Annotation], docs: Dict[str, List[Any]], use_tokens: bool=True) -> List['PositionScoredDocument']:
+    def from_results(cls, instances: List[dict], annotations: List[Annotation], docs: Dict[str, List[Any]],
+                     use_tokens: bool = True) -> List['PositionScoredDocument']:
         """Creates a paired list of annotation ids/docids/predictions/truth values"""
         key_to_annotation = dict()
         for ann in annotations:
@@ -46,10 +42,11 @@ class PositionScoredDocument:
                 scores = rat[field]
                 key = (inst['annotation_id'], docid)
                 assert len(scores) == len(docs[docid])
-                if key in key_to_annotation :
+                if key in key_to_annotation:
                     assert len(scores) == len(key_to_annotation[key])
-                else :
-                    #In case model makes a prediction on docuemnt(s) for which ground truth evidence is not present
+                else:
+                    # In case model makes a prediction on docuemnt(s) for which ground truth evidence is not present
                     key_to_annotation[key] = [False for _ in docs[docid]]
-                ret.append(PositionScoredDocument(inst['annotation_id'], docid, tuple(scores), tuple(key_to_annotation[key])))
+                ret.append(
+                    PositionScoredDocument(inst['annotation_id'], docid, tuple(scores), tuple(key_to_annotation[key])))
         return ret

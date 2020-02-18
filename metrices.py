@@ -1,14 +1,17 @@
 import tensorflow.compat.v1 as tf
+
 tf.disable_v2_behavior()
 from tensorflow.keras import backend as K
 from config import *
+
 
 def precision_wrapper(exp_output):
     def precision(y_true, y_pred):
         def convert_intervals_to_ration_mask(interval):
             p = K.cumsum(interval, axis=1)
-            rations = K.clip(p[:, :, 0] - p[:, :, 1] + interval[:,:,1], 0, 1)
-            return rations 
+            rations = K.clip(p[:, :, 0] - p[:, :, 1] + interval[:, :, 1], 0, 1)
+            return rations
+
         def convert_rnr_matrix_to_ration_mask(y):
             starts = y[:, :, :1]
             ends_given_starts = y[:, :, 1:]
@@ -25,21 +28,24 @@ def precision_wrapper(exp_output):
             rations = tf.clip_by_value(rations, 0., 1.)
             rations = tf.transpose(rations, perm=[0, 2, 1])
             return rations
+
         if exp_output == 'rnr':
             y_pred = convert_rnr_matrix_to_ration_mask(y_pred)
         true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
         predicted_positives = K.sum(K.round(K.clip(y_pred, 0, 1)))
         precision = true_positives / (predicted_positives + K.epsilon())
         return precision
+
     return precision
- 
+
 
 def recall_wrapper(exp_output):
     def recall(y_true, y_pred):
         def convert_intervals_to_ration_mask(interval):
             p = K.cumsum(interval, axis=1)
-            rations = K.clip(p[:, :, 0] - p[:, :, 1] + interval[:,:,1], 0, 1)
-            return rations 
+            rations = K.clip(p[:, :, 0] - p[:, :, 1] + interval[:, :, 1], 0, 1)
+            return rations
+
         def convert_rnr_matrix_to_ration_mask(y):
             starts = y[:, :, :1]
             ends_given_starts = y[:, :, 1:]
@@ -56,12 +62,14 @@ def recall_wrapper(exp_output):
             rations = tf.clip_by_value(rations, 0., 1.)
             rations = tf.transpose(rations, perm=[0, 2, 1])
             return rations
+
         if exp_output == 'rnr':
             y_pred = convert_rnr_matrix_to_ration_mask(y_pred)
         true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
         possible_positives = K.sum(K.round(K.clip(y_true, 0, 1)))
         recall = true_positives / (possible_positives + K.epsilon())
         return recall
+
     return recall
 
 
@@ -72,11 +80,13 @@ def f1_wrapper(exp_output):
             predicted_positives = K.sum(K.round(K.clip(y_pred, 0, 1)))
             precision = true_positives / (predicted_positives + K.epsilon())
             return precision
+
         def recall(y_true, y_pred):
             true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
             possible_positives = K.sum(K.round(K.clip(y_true, 0, 1)))
             recall = true_positives / (possible_positives + K.epsilon())
             return recall
+
         def convert_rnr_matrix_to_ration_mask(y):
             starts = y[:, :, :1]
             ends_given_starts = y[:, :, 1:]
@@ -93,11 +103,13 @@ def f1_wrapper(exp_output):
             rations = tf.clip_by_value(rations, 0., 1.)
             rations = tf.transpose(rations, perm=[0, 2, 1])
             return rations
+
         if exp_output == 'rnr':
             y_pred = convert_rnr_matrix_to_ration_mask(y_pred)
         precision = precision(y_true, y_pred)
         recall = recall(y_true, y_pred)
-        return 2*((precision*recall)/(precision+recall+K.epsilon()))
+        return 2 * ((precision * recall) / (precision + recall + K.epsilon()))
+
     return f1
 
 
@@ -108,11 +120,13 @@ def sp_precision_wrapper(exp_output):
             predicted_positives = K.sum(K.round(K.clip(y_pred, 0, 1)))
             precision = true_positives / (predicted_positives + K.epsilon())
             return precision
+
         def recall(y_true, y_pred):
             true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
             possible_positives = K.sum(K.round(K.clip(y_true, 0, 1)))
             recall = true_positives / (possible_positives + K.epsilon())
             return recall
+
         if exp_output != 'rnr':
             return 0
         starts_pred = y_pred[:, :, :1]
@@ -120,6 +134,7 @@ def sp_precision_wrapper(exp_output):
         starts_true = tf.clip_by_value(starts_true, 0., 1.)
         precision = precision(y_true, y_pred)
         return precision
+
     return sp_precision
 
 
@@ -130,6 +145,7 @@ def sp_recall_wrapper(exp_output):
             possible_positives = K.sum(K.round(K.clip(y_true, 0, 1)))
             recall = true_positives / (possible_positives + K.epsilon())
             return recall
+
         if exp_output != 'rnr':
             return 0
         starts_pred = y_pred[:, :, :1]
@@ -137,6 +153,7 @@ def sp_recall_wrapper(exp_output):
         starts_true = tf.clip_by_value(starts_true, 0., 1.)
         recall = recall(y_true, y_pred)
         return recall
+
     return sp_recall
 
 

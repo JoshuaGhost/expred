@@ -1,23 +1,26 @@
-import numpy as np
 from itertools import chain
-from copy import deepcopy
-from bert_data_preprocessing_rational_eraser import preprocess, convert_bert_features, create_tokenizer_from_hub_module
-from bert_with_ration_eraser import InputRationalExample, convert_examples_to_features
+
+import numpy as np
 import re
-from utils import convert_subtoken_ids_to_tokens
+from copy import deepcopy
+
+from bert_data_preprocessing_rational_eraser import convert_bert_features, create_tokenizer_from_hub_module
+from bert_with_ration_eraser import InputRationalExample, convert_examples_to_features
 from eraserbenchmark.eraser_utils import extract_doc_ids_from_annotations
+from utils import convert_subtoken_ids_to_tokens
+
 
 def remove_rations(sentence, annotation):
     sentence = sentence.lower().split()
     rationales = annotation['rationales'][0]['hard_rationale_predictions']
     rationales = [{'end_token': 0, 'start_token': 0}] \
-        + sorted(rationales, key=lambda x: x['start_token']) \
-        + [{'start_token': len(sentence), 'end_token': len(sentence)}]
+                 + sorted(rationales, key=lambda x: x['start_token']) \
+                 + [{'start_token': len(sentence), 'end_token': len(sentence)}]
     ret = []
     for rat_id, rat in enumerate(rationales[:-1]):
         ret += ['.'] * (rat['end_token'] - rat['start_token']) \
-            + sentence[rat['end_token']
-                : rationales[rat_id + 1]['start_token']]
+               + sentence[rat['end_token']
+                          : rationales[rat_id + 1]['start_token']]
     return ' '.join(ret)
 
 
@@ -25,13 +28,13 @@ def extract_rations(sentence, rationale):
     sentence = sentence.lower().split()
     rationales = rationale['rationales'][0]['hard_rationale_predictions']
     rationales = [{'end_token': 0, 'start_token': 0}] \
-        + sorted(rationales, key=lambda x: x['start_token']) \
-        + [{'start_token': len(sentence), 'end_token': len(sentence)}]
+                 + sorted(rationales, key=lambda x: x['start_token']) \
+                 + [{'start_token': len(sentence), 'end_token': len(sentence)}]
     ret = []
     for rat_id, rat in enumerate(rationales[:-1]):
         ret += sentence[rat['start_token']: rat['end_token']] \
-            + ['.'] * (rationales[rat_id + 1]
-                       ['start_token'] - rat['end_token'])
+               + ['.'] * (rationales[rat_id + 1]
+                          ['start_token'] - rat['end_token'])
     return ' '.join(ret)
 
 
@@ -71,7 +74,7 @@ def get_cls_score(model, rationales, docs, label_list, dataset, decorate, max_se
 
     _inputs = [_input_ids, _input_masks, _segment_ids]
     _pred = model.predict(_inputs)
-    return(np.hstack([1-_pred[0], _pred[0]]))
+    return (np.hstack([1 - _pred[0], _pred[0]]))
 
 
 def add_cls_scores(res, cls, c, s, label_list):
@@ -113,7 +116,7 @@ def rational_bits_to_ev_generator(token_list, raw_input, exp_pred, hard_selectio
         ev['end_token'] = len(exp_pred)
         ev['text'] = ' '.join(token_list[ev['start_token']: ev['end_token']])
         yield deepcopy(ev)
-        
+
 
 # [SEP] == 102
 # [CLS] == 101
@@ -123,12 +126,12 @@ def extract_texts(tokens, exps=None, text_a=True, text_b=False):
         endp_text_a = tokens.index(102)
         if text_b:
             endp_text_b = endp_text_a + 1 + \
-                tokens[endp_text_a + 1:].index(102)
+                          tokens[endp_text_a + 1:].index(102)
     else:
         endp_text_a = tokens.index('[SEP]')
         if text_b:
             endp_text_b = endp_text_a + 1 + \
-                tokens[endp_text_a + 1:].index('[SEP]')
+                          tokens[endp_text_a + 1:].index('[SEP]')
     ret_token = []
     if text_a:
         ret_token += tokens[1: endp_text_a]
@@ -158,8 +161,10 @@ def rnr_matrix_to_rational_mask(rnr_matrix):
     ends = np.sum(ends, axis=0, keepdims=True)
     rational_mask = np.cumsum(starts.reshape((1, -1)), axis=1) - np.cumsum(ends, axis=1) + ends
     return rational_mask
-    
-def pred_to_results(raw_input, input_ids, pred, hard_selection_count, hard_selection_threshold, vocab, docs, label_list, exp_output):
+
+
+def pred_to_results(raw_input, input_ids, pred, hard_selection_count, hard_selection_threshold, vocab, docs, label_list,
+                    exp_output):
     cls_pred, exp_pred = pred
     if exp_output == 'rnr':
         exp_pred = rnr_matrix_to_rational_mask(exp_pred)
@@ -174,60 +179,11 @@ def pred_to_results(raw_input, input_ids, pred, hard_selection_count, hard_selec
     ev_groups = []
     result['docids'] = [docid]
     result['rationales'] = [{'docid': docid}]
-    for ev in rational_bits_to_ev_generator(token_list, raw_input, exp_pred, hard_selection_count, hard_selection_threshold):
+    for ev in rational_bits_to_ev_generator(token_list, raw_input, exp_pred, hard_selection_count,
+                                            hard_selection_threshold):
         ev_groups.append(ev)
     result['rationales'][-1]['hard_rationale_predictions'] = ev_groups
     if exp_output != 'rnr':
         result['rationales'][-1]['soft_rationale_predictions'] = exp_pred + [0] * (len(raw_sentence) - len(token_list))
     result['classification'] = label_list[int(round(cls_pred[0]))]
     return result
-
-
-
-
-
-
-           
-
-'''
-def pred_to_results(raw_input, input_ids, pred, hard_selection_count, hard_selection_threshold):
-    cls_pred, exp_pred = pred
-    exp_pred = exp_pred.reshape((-1,)).tolist()
-    if 'sentence' in raw_input:
-        raw_sentence = raw_input['sentence']
-    else:
-        raw_sentence = raw_input['passage']
-    raw_sentence = re.sub(pattern, '', raw_sentence)
-    raw_sentence = re.sub('\x12', '', raw_sentence)
-    raw_sentence = raw_sentence.lower().split()
-    if dataset == 'eraser_movie_mtl':
-        token_ids, exp_pred = extract_texts(input_ids, exp_pred, text_a=True, text_b=False)
-    else:
-        token_ids, exp_pred = extract_texts(input_ids, exp_pred, text_a=False, text_b=True)
-    token_list, exp_pred = convert_subtoken_ids_to_tokens(token_ids, exp_pred, raw_sentence)
-    result = {'annotation_id': raw_input['annotation_id']}
-    ev_groups = []
-    if dataset == 'eraser_movie_mtl':
-        docids = None
-    elif dataset == 'eraser_fever' or dataset == 'eraser_multirc':
-        docids = raw_input['docids']
-    result['docids'] = docids
-    result['rationales'] = [{'docid': docids[0]}]
-    for ev in rational_bits_to_ev_generator(token_list, raw_input, exp_pred, hard_selection_count, hard_selection_threshold):
-        ev_groups.append(ev)
-    result['rationales'][-1]['hard_rationale_predictions'] = ev_groups
-    result['rationales'][-1]['soft_rationale_predictions'] = exp_pred + \
-        [0] * (len(raw_sentence) - len(token_list))
-    if dataset == 'eraser_movie_mtl': 
-        POS_LABEL = 'POS'
-        NEG_LABEL = 'NEG'
-    elif dataset == 'eraser_fever':
-        POS_LABEL = 'SUPPORTS'
-        NEG_LABEL = 'REFUTES'
-    elif dataset == 'eraser_multirc':
-        POS_LABEL = 'True'
-        NEG_LABEL = 'False'
-    result['classification'] = NEG_LABEL if round(
-            cls_pred[0]) < (NEG+POS)/2 else POS_LABEL
-    return result
-'''

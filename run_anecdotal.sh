@@ -10,5 +10,5 @@ benchmark_split='test'
 train_on_portion='0'
 
 for dataset in ${datasets[@]}; do
-	python bert_as_tfkeras_layer.py --par_lambda ${par_lambda} --gpu_id ${gpu_id} --batch_size ${batch_size} --num_epochs ${num_epochs} --dataset ${dataset} --exp_structure ${exp_structure} --merge_evidences --exp_visualize;
+	python bert_cls_exp_gen.py --par_lambda ${par_lambda} --gpu_id ${gpu_id} --batch_size ${batch_size} --num_epochs ${num_epochs} --dataset ${dataset} --exp_structure ${exp_structure} --merge_evidences --exp_visualize;
 done

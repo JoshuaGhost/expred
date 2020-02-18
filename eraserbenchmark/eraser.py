@@ -1,76 +1,48 @@
 #
-import argparse
 import json
 import logging
-import os
+import pickle
 import pprint
 
-from collections import Counter, defaultdict, namedtuple
-from dataclasses import dataclass
-from itertools import chain
-from typing import Any, Callable, Dict, List, Tuple
-from copy import deepcopy
-
-import numpy as np
-
 from eraserbenchmark.rationale_benchmark.utils import (
-    Annotation,
-    Evidence,
     annotations_from_jsonl,
-    load_jsonl,
     load_documents,
     load_flattened_documents
 )
-
-from eraserbenchmark.eraser_utils import extract_doc_ids_from_annotations
 from eraserbenchmark.scoring import *
-from eraserbenchmark.position_scored_document import PositionScoredDocument
 from eraserbenchmark.verify_instances import _has_classifications, \
     _has_hard_predictions, \
     _has_soft_predictions, \
     _has_soft_sentence_predictions, \
     verify_instances
-import pickle
 
 logging.basicConfig(level=logging.DEBUG,
                     format='%(relativeCreated)6d %(threadName)s %(message)s')
 
 dataset_name = 'movies'
 
-#split_name = 'test'
-#split_name = 'val'
+# split_name = 'test'
+# split_name = 'val'
 
 strict = True
 strict = False
 
 iou_thresholds = [0.5]
 
-        
-def evaluate(model_name, dataset=dataset_name, split_name='test', train_on_portion=0):
-    data_dir = '/home/zzhang/.keras/datasets/{}/'.format(dataset)
+
+def evaluate(model_name, dataset=dataset_name, split_name='test', train_on_portion=0, data_dir='.'):
     annotation_fname = data_dir + split_name + '.jsonl'
-    results_fname = 'eraserbenchmark/annotated_by_exp/{}.jsonl'.format(model_name+'_'+split_name)
-    score_file = 'eraserbenchmark/outputs/{}.txt'.format(model_name+'_'+split_name)
-    results = None
-    with open(results_fname+'pkl3', 'rb') as fin:
+    results_fname = 'eraserbenchmark/annotated_by_exp/{}.jsonl'.format(model_name + '_' + split_name)
+    score_file = 'eraserbenchmark/outputs/{}.txt'.format(model_name + '_' + split_name)
+    with open(results_fname + 'pkl3', 'rb') as fin:
         results = pickle.load(fin)
-    '''
-    for i in range(len(results)):
-        for j in range(len(results[i]['rationales'])):
-            results[i]['rationales'][j]['docid'] = results[i]['rationales'][j]['docids'][0]
-            results[i]['rationales'][j].pop('docids', None)
-        for s in ['classification_scores', 'comprehensiveness_classification_scores', 'sufficiency_classification_scores']:
-            results[i][s]['True'] = results[i][s]['POS']
-            results[i][s]['False'] = results[i][s]['NEG']
-    #print(results[0])
-    '''
     docids = set(chain.from_iterable([rat['docid'] for rat in res['rationales']] for res in results))
     docs = load_flattened_documents(data_dir, docids)
     verify_instances(results, docs)
     # load truth
     annotations = annotations_from_jsonl(annotation_fname)
     if train_on_portion != 0 and split_name == 'train':
-        annotations = annotations[:int(len(annotations)*train_on_portion)]
+        annotations = annotations[:int(len(annotations) * train_on_portion)]
     docids |= set(
         chain.from_iterable(
             (ev.docid for ev in chain.from_iterable(ann.evidences))
@@ -92,7 +64,7 @@ def evaluate(model_name, dataset=dataset_name, split_name='test', train_on_porti
                                          for ann in annotations))
         pred = list(chain.from_iterable(Rationale.from_instance(inst)
                                         for inst in results))
-        #print(truth, pred)
+        # print(truth, pred)
         if iou_thresholds is not None:
             iou_scores = partial_match_score(truth, pred, iou_thresholds)
             scores['iou_scores'] = iou_scores
@@ -138,15 +110,15 @@ def evaluate(model_name, dataset=dataset_name, split_name='test', train_on_porti
     else:
         print(
             "No classification scores detected, skipping classification")
-    
+
     if 'classification_scores' in scores:
         if 'comprehensiveness' in scores['classification_scores'] and 'sufficiency' in scores['classification_scores']:
-            scores['classification_scores']['cs_f1'] = 2/(1/(scores['classification_scores']['comprehensiveness'] + 0.000000001)+ 1/(scores['classification_scores']['sufficiency'] + 0.000000001))
-            
+            scores['classification_scores']['cs_f1'] = 2 / (
+                        1 / (scores['classification_scores']['comprehensiveness'] + 0.000000001) + 1 / (
+                            scores['classification_scores']['sufficiency'] + 0.000000001))
+
     pprint.pprint(scores)
 
     if score_file:
         with open(score_file, 'w') as of:
             json.dump(str(scores), of, indent=4, sort_keys=True)
-
- 

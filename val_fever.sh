@@ -10,5 +10,5 @@ benchmark_split='train'
 train_on_portion='0.1'
 
 for par_lambda in ${lambdas[@]}; do
-	python bert_as_tfkeras_layer.py --par_lambda ${par_lambda} --gpu_id ${gpu_id} --batch_size ${batch_size} --num_epochs ${num_epochs} --dataset ${dataset} --exp_benchmark --exp_structure ${exp_structure} --merge_evidences --benchmark_split ${benchmark_split} --train_on_portion ${train_on_portion};
+	python bert_cls_exp_gen.py --par_lambda ${par_lambda} --gpu_id ${gpu_id} --batch_size ${batch_size} --num_epochs ${num_epochs} --dataset ${dataset} --exp_benchmark --exp_structure ${exp_structure} --merge_evidences --benchmark_split ${benchmark_split} --train_on_portion ${train_on_portion};
 done

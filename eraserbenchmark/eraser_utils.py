@@ -1,8 +1,3 @@
-import re
-from utils import *
-import numpy as np
-
-
 def extract_doc_ids_from_annotations(anns):
     ret = set()
     for ann in anns:

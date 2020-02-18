@@ -1,9 +1,10 @@
 import json
-import os
-
 from dataclasses import dataclass, asdict, is_dataclass
 from itertools import chain
 from typing import Dict, List, Set, Tuple, Union
+
+import os
+
 
 @dataclass(eq=True, frozen=True)
 class Evidence:
@@ -19,10 +20,11 @@ class Evidence:
     """
     text: Union[str, List[int]]
     docid: str
-    start_token: int=-1
-    end_token: int=-1
-    start_sentence: int=-1
-    end_sentence: int=-1
+    start_token: int = -1
+    end_token: int = -1
+    start_sentence: int = -1
+    end_sentence: int = -1
+
 
 @dataclass(eq=True, frozen=True)
 class Annotation:
@@ -51,6 +53,7 @@ class Annotation:
     def all_evidences(self) -> Tuple[Evidence]:
         return tuple(list(chain.from_iterable(self.evidences)))
 
+
 def annotations_to_jsonl(annotations, output_file):
     with open(output_file, 'w') as of:
         for ann in sorted(annotations, key=lambda x: x.annotation_id):
@@ -58,6 +61,7 @@ def annotations_to_jsonl(annotations, output_file):
             as_str = json.dumps(as_json, sort_keys=True)
             of.write(as_str)
             of.write('\n')
+
 
 def _annotation_to_dict(dc):
     # convenience method
@@ -84,6 +88,7 @@ def _annotation_to_dict(dc):
     else:
         return dc
 
+
 def load_jsonl(fp: str) -> List[dict]:
     ret = []
     with open(fp, 'r') as inf:
@@ -92,6 +97,7 @@ def load_jsonl(fp: str) -> List[dict]:
             ret.append(content)
     return ret
 
+
 def write_jsonl(jsonl, output_file):
     with open(output_file, 'w') as of:
         for js in jsonl:
@@ -99,7 +105,8 @@ def write_jsonl(jsonl, output_file):
             of.write(as_str)
             of.write('\n')
 
-#def annotations_from_jsonl(fp: str) -> List[Annotation]:
+
+# def annotations_from_jsonl(fp: str) -> List[Annotation]:
 def annotations_from_jsonl(fp: str):
     ret = []
     with open(fp, 'r') as inf:
@@ -113,6 +120,7 @@ def annotations_from_jsonl(fp: str):
             ret.append(Annotation(**content))
     return ret
 
+
 def load_datasets(data_dir: str) -> Tuple[List[Annotation], List[Annotation], List[Annotation]]:
     """Loads a training, validation, and test dataset
 
@@ -124,16 +132,17 @@ def load_datasets(data_dir: str) -> Tuple[List[Annotation], List[Annotation], Li
     test_data = annotations_from_jsonl(os.path.join(data_dir, 'test.jsonl'))
     return train_data, val_data, test_data
 
-def load_documents(data_dir: str, docids: Set[str]=None) -> Dict[str, List[List[str]]]:
+
+def load_documents(data_dir: str, docids: Set[str] = None) -> Dict[str, List[List[str]]]:
     """Loads a subset of available documents from disk.
 
     Each document is assumed to be serialized as newline ('\n') separated sentences.
     Each sentence is assumed to be space (' ') joined tokens.
     """
-    if os.path.exists(os.path.join(data_dir, 'docs.jsonl')) :
+    if os.path.exists(os.path.join(data_dir, 'docs.jsonl')):
         assert not os.path.exists(os.path.join(data_dir, 'docs'))
         return load_documents_from_file(data_dir, docids)
-        
+
     docs_dir = os.path.join(data_dir, 'docs')
     res = dict()
     if docids is None:
@@ -148,6 +157,7 @@ def load_documents(data_dir: str, docids: Set[str]=None) -> Dict[str, List[List[
             res[d] = tokenized
     return res
 
+
 def load_flattened_documents(data_dir: str, docids: Set[str]) -> Dict[str, List[str]]:
     """Loads a subset of available documents from disk.
 
@@ -158,6 +168,7 @@ def load_flattened_documents(data_dir: str, docids: Set[str]) -> Dict[str, List[
     for doc, unflattened in unflattened_docs.items():
         flattened_docs[doc] = list(chain.from_iterable(unflattened))
     return flattened_docs
+
 
 def intern_documents(documents: Dict[str, List[List[str]]], word_interner: Dict[str, int], unk_token: str):
     """
@@ -170,6 +181,7 @@ def intern_documents(documents: Dict[str, List[List[str]]], word_interner: Dict[
     for docid, sentences in documents.items():
         ret[docid] = [[word_interner.get(w, unk) for w in s] for s in sentences]
     return ret
+
 
 def intern_annotations(annotations: List[Annotation], word_interner: Dict[str, int], unk_token: str):
     ret = []
@@ -193,7 +205,8 @@ def intern_annotations(annotations: List[Annotation], word_interner: Dict[str, i
                               query_type=ann.query_type))
     return ret
 
-def load_documents_from_file(data_dir: str, docids: Set[str]=None) -> Dict[str, List[List[str]]]:
+
+def load_documents_from_file(data_dir: str, docids: Set[str] = None) -> Dict[str, List[List[str]]]:
     """Loads a subset of available documents from 'docs.jsonl' file on disk.
 
     Each document is assumed to be serialized as newline ('\n') separated sentences.

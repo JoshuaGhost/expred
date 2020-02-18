@@ -2,14 +2,8 @@ from dataclasses import dataclass
 from typing import List
 
 from eraserbenchmark.rationale_benchmark.utils import (
-    Annotation,
-    Evidence,
-    annotations_from_jsonl,
-    load_jsonl,
-    load_documents,
-    load_flattened_documents
- )
-
+    Annotation
+)
 
 # start_token is inclusive, end_token is exclusive
 @dataclass(eq=True, frozen=True)
@@ -22,7 +16,7 @@ class Rationale:
     def to_token_level(self) -> List['Rationale']:
         ret = []
         for t in range(self.start_token, self.end_token):
-            ret.append(Rationale(self.ann_id, self.docid, t, t+1))
+            ret.append(Rationale(self.ann_id, self.docid, t, t + 1))
         return ret
 
     @classmethod

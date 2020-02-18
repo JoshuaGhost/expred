@@ -1,4 +1,5 @@
 import tensorflow.compat.v1 as tf
+
 tf.disable_v2_behavior()
 from tensorflow.keras import backend as K
 import tensorflow_hub as hub
@@ -6,11 +7,11 @@ import tensorflow_hub as hub
 
 class BertLayer(tf.keras.layers.Layer):
     def __init__(
-        self,
-        n_fine_tune_layers=10,
-        bert_path="https://tfhub.dev/google/bert_uncased_L-12_H-768_A-12/1",
-        pooling='first',  # or 'mean'
-        **kwargs
+            self,
+            n_fine_tune_layers=10,
+            bert_path="https://tfhub.dev/google/bert_uncased_L-12_H-768_A-12/1",
+            pooling='first',  # or 'mean'
+            **kwargs
     ):
         self.n_fine_tune_layers = n_fine_tune_layers
         self.trainable = True
@@ -67,12 +68,14 @@ class BertLayer(tf.keras.layers.Layer):
                         as_dict=True)["sequence_output"]
 
         def mul_mask(x, m): return x * tf.expand_dims(m, axis=-1)
+
         input_mask = tf.cast(input_mask, tf.float32)
         exp = mul_mask(exp, input_mask)
 
         if self.pooling == 'mean':
             def masked_reduce_mean(x, m): return tf.reduce_sum(mul_mask(x, m), axis=1) / (
-                tf.reduce_sum(m, axis=1, keepdims=True) + 1e-10)
+                    tf.reduce_sum(m, axis=1, keepdims=True) + 1e-10)
+
             cls = masked_reduce_mean(exp, input_mask)
         return [cls, exp]
 

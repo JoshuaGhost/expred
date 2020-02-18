@@ -1,23 +1,22 @@
 import pickle
+
 import os
 import re
-
 import tensorflow
+
 if tensorflow.__version__.startswith('2'):
     import tensorflow.compat.v1 as tf
+
     tf.disable_v2_behavior()
 else:
     import tensorflow as tf
-import tensorflow_hub as hub
-import bert
-from bert.tokenization import FullTokenizer, BasicTokenizer, WordpieceTokenizer,\
-    convert_to_unicode, whitespace_tokenize, convert_ids_to_tokens
-from config import *
+from bert.tokenization import convert_ids_to_tokens
 
 NEG = 0
 POS = 1
 
 pattern = re.compile('</?(POS)?(NEG)?>')
+
 
 def cache_decorator(*dump_fnames):
     def excution_decorator(func):
@@ -29,11 +28,11 @@ def cache_decorator(*dump_fnames):
                     with open(dump_fname, 'wb') as fdump:
                         pickle.dump(ret, fdump)
                     return ret
-                
+
                 with open(dump_fname, 'rb') as fdump:
                     ret = pickle.load(fdump)
                 return ret
-            
+
             rets = None
             for fname in dump_fnames:
                 if not os.path.isfile(fname):
@@ -44,13 +43,15 @@ def cache_decorator(*dump_fnames):
                     with open(fname, 'wb') as fdump:
                         pickle.dump(r, fdump)
                 return rets
-            
+
             rets = []
             for fname in dump_fnames:
                 with open(fname, 'rb') as fdump:
                     rets.append(pickle.load(fdump))
             return tuple(rets)
+
         return wrapper
+
     return excution_decorator
 
 
@@ -84,3 +85,9 @@ def convert_subtoken_ids_to_tokens(ids, vocab, exps=None, raw_sentence=None):
         return tokens
     return tokens, exps_output
 
+
+def mkdirs(path):
+    if tensorflow.__version__.startswith('2'):
+        tf.io.gfile.makedirs(path)
+    else:
+        tf.gfile.MakeDirs(path)

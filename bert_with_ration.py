@@ -1,26 +1,25 @@
 IRRATIONAL = 0
-RATIONAL   = 1
+RATIONAL = 1
 
 import tensorflow
+
 if tensorflow.__version__.startswith('2'):
     import tensorflow.compat.v1 as tf
+
     tf.disable_v2_behavior()
 else:
     import tensorflow as tf
 
-from bert.tokenization import FullTokenizer, BasicTokenizer, WordpieceTokenizer,\
-                              convert_to_unicode, whitespace_tokenize, convert_ids_to_tokens
+from bert.tokenization import FullTokenizer, BasicTokenizer, \
+    convert_to_unicode, whitespace_tokenize, convert_ids_to_tokens
 from bert.run_classifier import InputFeatures, PaddingInputExample, _truncate_seq_pair
-from bert import tokenization
 from tqdm import tqdm_notebook
-import tensorflow_hub as hub
-from config import *
 
 
 class BasicTokenizerWithRation(BasicTokenizer):  # usability test passed :)
     def __init__(self, do_lower_case=True):
         super(BasicTokenizerWithRation, self).__init__(do_lower_case)
-    
+
     def _parse_rations(self, s):
         tokens = s
         rationality = IRRATIONAL
@@ -35,14 +34,14 @@ class BasicTokenizerWithRation(BasicTokenizer):  # usability test passed :)
                 ret_tokens.append(t)
                 ret_rations.append(rationality)
         return ret_tokens, ret_rations
-    
+
     def tokenize(self, text):
         text = convert_to_unicode(text)
         text = self._clean_text(text)
         orig_tokens = whitespace_tokenize(text)
         orig_tokens, orig_rations = self._parse_rations(orig_tokens)
         split_tokens = []
-        split_rations= []
+        split_rations = []
         for token, ration in zip(orig_tokens, orig_rations):
             if self.do_lower_case:
                 token = token.lower()
@@ -52,26 +51,28 @@ class BasicTokenizerWithRation(BasicTokenizer):  # usability test passed :)
             if len(sub_tokens) > 0:
                 split_tokens.extend(sub_tokens)
                 split_rations.extend([ration] * len(sub_tokens))
-        return zip(split_tokens,  split_rations)
+        return zip(split_tokens, split_rations)
 
-#--------------------------------------------------------------------------------------
+
+# --------------------------------------------------------------------------------------
 
 class FullTokenizerWithRations(FullTokenizer):  # Test passed :)
-    
+
     def __init__(self, vocab_file, do_lower_case=True):
         self.basic_rational_tokenizer = BasicTokenizerWithRation(do_lower_case=do_lower_case)
         super(FullTokenizerWithRations, self).__init__(vocab_file, do_lower_case)
-        
+
     def tokenize(self, text):
         split_tokens = []
-        split_rations= []
+        split_rations = []
         for token, ration in self.basic_rational_tokenizer.tokenize(text):
             for sub_token in self.wordpiece_tokenizer.tokenize(token):
                 split_tokens.append(sub_token)
                 split_rations.append(ration)
         return list(zip(split_tokens, split_rations))
-    
-#--------------------------------------------------------------------------------------
+
+
+# --------------------------------------------------------------------------------------
 
 class InputRationalFeatures(InputFeatures):
     def __init__(self,
@@ -83,7 +84,7 @@ class InputRationalFeatures(InputFeatures):
                  is_real_example=True):
         self.rations = rations
         super(InputRationalFeatures, self).__init__(input_ids, input_mask, segment_ids, label_id, is_real_example)
-        
+
 
 def convert_single_rational_example(ex_index, example, label_list, max_seq_length, tokenizer):
     if isinstance(example, PaddingInputExample):
@@ -103,7 +104,7 @@ def convert_single_rational_example(ex_index, example, label_list, max_seq_lengt
     tokens_b = None  # no tokens_b in our tasks
     if example.text_b:
         tokens_b = tokenizer.tokenize(example.text_b)
-        
+
     if tokens_b:
         _truncate_seq_pair(tokens_a, tokens_b, max_seq_length - 3)
     if len(tokens_a) > max_seq_length - 2:
@@ -122,7 +123,7 @@ def convert_single_rational_example(ex_index, example, label_list, max_seq_lengt
     tokens.append("[SEP]")
     segment_ids.append(0)
     rations.append(IRRATIONAL)
-    
+
     if tokens_b:
         for token, ration in tokens_b:
             tokens.append(token)
@@ -162,12 +163,12 @@ def convert_single_rational_example(ex_index, example, label_list, max_seq_lengt
         tf.logging.info("label: %s (id = %d)" % (example.label, label_id))
     '''
     feature = InputRationalFeatures(
-                input_ids=input_ids,
-                input_mask=input_mask,
-                segment_ids=segment_ids,
-                label_id=label_id,
-                rations=rations,
-                is_real_example=True)
+        input_ids=input_ids,
+        input_mask=input_mask,
+        segment_ids=segment_ids,
+        label_id=label_id,
+        rations=rations,
+        is_real_example=True)
     return feature
 
 
@@ -184,6 +185,6 @@ def convert_examples_to_features(examples, label_list, max_seq_length, tokenizer
 
 def convert_ids_to_token_list(input_ids, vocab):
     iv_vocab = {input_id: wordpiece for wordpiece, input_id in vocab.items()}
-    
+
     token_list = convert_ids_to_tokens(iv_vocab, input_ids)
     return token_list
