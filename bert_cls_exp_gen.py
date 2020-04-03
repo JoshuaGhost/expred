@@ -3,7 +3,9 @@ import argparse
 from datetime import datetime
 
 import numpy as np
-from tensorflow.python.keras.backend import set_session
+import shutil
+import torch
+from transformers import BertModel, BertTokenizer
 from tqdm import tqdm_notebook
 
 from display_rational import convert_res_to_htmls
@@ -13,19 +15,13 @@ from losses import rnr_matrix_loss
 from metrices import *
 from utils import *
 
-if tensorflow.__version__.startswith('2'):
-    import tensorflow.compat.v1 as tf
-
-    tf.disable_v2_behavior()
-else:
-    import tensorflow as tf
-
 LEARNING_RATE = 1e-5
 MAX_SEQ_LENGTH = 512
 HARD_SELECTION_COUNT = None
 HARD_SELECTION_THRESHOLD = 0.5
 
-if __name__ == '__main__':
+
+def setup_parser():
     parser = argparse.ArgumentParser()
     parser.add_argument('--par_lambda', type=float)
     parser.add_argument('--gpu_id', type=str)
@@ -54,154 +50,136 @@ if __name__ == '__main__':
     parser.add_argument('--rebalance_approach', type=str, default='resampling', choices=['resampling', 'bayesian'])
     parser.add_argument('--data_dir', type=str)
 
-    args = ['--par_lambda', '5.0',
-            '--gpu_id', '0',
-            '--batch_size', '2',
-            '--num_epochs', '10',
-            '--dataset', 'fever',
-            '--exp_visualize',
-            '--exp_structure', 'gru',
-            '--merge_evidences']
+    return parser
 
-    # args = parser.parse_args(args)
-    args = parser.parse_args()
 
-    BATCH_SIZE = args.batch_size
-    par_lambda = args.par_lambda
-    NUM_EPOCHS = args.num_epochs
-    gpu_id = args.gpu_id
-    exp_structure = args.exp_structure
-    dataset = args.dataset
-    DO_DELETE = args.delete_checkpoints
-    do_train = args.do_train
-    load_best = not do_train
-    evaluate = args.evaluate
-    exp_visualize = args.exp_visualize
-    exp_benchmark = args.exp_benchmark
-    merge_evidences = args.merge_evidences
-    BENCHMARK_SPLIT_NAME = args.benchmark_split
-    train_on_portion = args.train_on_portion
-    freeze_cls = args.freeze_cls
-    freeze_exp = args.freeze_exp
-    train_cls_first = args.train_cls_first
-    train_exp_first = args.train_exp_first
-    start_from_phase1 = args.start_from_phase1
-    load_phase1 = args.load_phase1
-    pooling = args.pooling
-    EXP_OUTPUT = exp_structure
-    bert_size = args.bert_size
-    rebalance_approach = args.rebalance_approach
-    USE_BUCKET = args.use_bucket
-    data_dir = args.data_dir
-    len_head = args.len_viz_head
+class Config():
+    def __init__(self, args):
+        self.BATCH_SIZE = args.batch_size
+        self.par_lambda = args.par_lambda
+        self.NUM_EPOCHS = args.num_epochs
+        self.gpu_id = args.gpu_id
+        self.exp_structure = args.exp_structure
+        self.dataset_name = args.dataset
+        self.DO_DELETE = args.delete_checkpoints
+        self.do_train = args.do_train
+        self.load_best = not self.do_train
+        self.evaluate = args.evaluate
+        self.exp_visualize = args.exp_visualize
+        self.exp_benchmark = args.exp_benchmark
+        self.merge_evidences = args.merge_evidences
+        self.BENCHMARK_SPLIT_NAME = args.benchmark_split
+        self.train_on_portion = args.train_on_portion
+        self.freeze_cls = args.freeze_cls
+        self.freeze_exp = args.freeze_exp
+        self.train_cls_first = args.train_cls_first
+        self.train_exp_first = args.train_exp_first
+        self.start_from_phase1 = args.start_from_phase1
+        self.load_phase1 = args.load_phase1
+        self.pooling = args.pooling
+        self.EXP_OUTPUT = self.exp_structure
+        self.bert_size = args.bert_size
+        self.rebalance_approach = args.rebalance_approach
+        self.USE_BUCKET = args.use_bucket
+        self.data_dir = args.data_dir
+        self.len_head = args.len_viz_head
 
-    assert (not (freeze_cls and freeze_exp))
-    assert (not (train_exp_first and train_cls_first))
-    assert not ((freeze_cls or freeze_exp) and (
-            train_exp_first or train_cls_first))  # can't freeze both in the same time
+        self.loss_function = self.decide_loss_function()
+        self.suffix = self.decide_suffix()
+        self.montage_output_dir()
 
-    if bert_size == 'base':
-        BERT_MODEL_HUB = "https://tfhub.dev/google/bert_uncased_L-12_H-768_A-12/1"
-    elif bert_size == 'large':
-        BERT_MODELL_HUB = 'https://tfhub.dev/tensorflow/bert_en_uncased_L-24_H-1024_A-16/1'
-
-    if EXP_OUTPUT == 'gru':
-        if rebalance_approach == 'resampling':
-            loss_function = imbalanced_bce_resampling
+        if config.par_lambda is None:
+            self.loss_weights = None
         else:
-            loss_function = imbalanced_bce_bayesian
-    elif EXP_OUTPUT == 'rnr':
-        loss_function = rnr_matrix_loss
+            self.loss_weights = {'cls_output': 1,
+                            'exp_output': self.par_lambda}
+        self.metrics = {'cls_output': 'accuracy',
+                   'exp_output': [f1_wrapper(self.EXP_OUTPUT),
+                                  sp_precision_wrapper(self.EXP_OUTPUT),
+                                  sp_recall_wrapper(self.EXP_OUTPUT),
+                                  precision_wrapper(self.EXP_OUTPUT),
+                                  recall_wrapper(self.EXP_OUTPUT)]}
+        self.loss = {'cls_output': 'binary_crossentropy',
+                     'exp_output': self.loss_function()}
 
-    if freeze_cls:
-        suffix = 'freeze_cls'
-    elif freeze_exp:
-        suffix = 'freeze_exp'
-    elif train_cls_first:
-        suffix = 'train_cls_first'
-    elif train_exp_first:
-        suffix = 'train_exp_first'
-    else:
-        suffix = ''
+    def decide_loss_function(self):
+        if self.EXP_OUTPUT == 'gru':
+            if self.rebalance_approach == 'resampling':
+                return imbalanced_bce_resampling
+            else:
+                return imbalanced_bce_bayesian
+        elif self.EXP_OUTPUT == 'rnr':
+            return rnr_matrix_loss
 
-    OUTPUT_DIR = ['bert_{}_seqlen_{}_{}_exp_output_{}'.format(bert_size, MAX_SEQ_LENGTH, dataset, EXP_OUTPUT)]
-    OUTPUT_DIR.append('merged_evidences' if merge_evidences else 'separated_evidences')
-    if train_on_portion != 0:
-        OUTPUT_DIR += ['train_on_portion', str(train_on_portion)]
-    DATASET_CACHE_NAME = '_'.join(OUTPUT_DIR) + '_inputdata_cache'
-    if par_lambda is None:
-        OUTPUT_DIR.append('no_weight')
-    else:
-        OUTPUT_DIR.append('par_lambda_{}'.format(par_lambda))
-    OUTPUT_DIR.append(
-        'no_padding_imbalanced_bce_{}_pooling_{}_learning_rate_{}'.format(rebalance_approach, pooling, LEARNING_RATE))
-    OUTPUT_DIR.append(suffix)
-    OUTPUT_DIR = '_'.join(OUTPUT_DIR)
-    MODEL_NAME = OUTPUT_DIR
-    OUTPUT_DIR = os.path.join('model_checkpoints', MODEL_NAME)
+    def decide_suffix(self):
+        if self.freeze_cls:
+            return 'freeze_cls'
+        elif self.freeze_exp:
+            return 'freeze_exp'
+        elif self.train_cls_first:
+            return 'train_cls_first'
+        elif self.train_exp_first:
+            return 'train_exp_first'
+        else:
+            return ''
 
-    if USE_BUCKET:
-        BUCKET = 'bert-base-uncased-test0'  # @param {type:"string"}
-        OUTPUT_DIR = 'gs://{}/{}'.format(BUCKET, OUTPUT_DIR)
-        from google.colab import auth
-
-        auth.authenticate_user()
-    if DO_DELETE:
-        try:
-            tf.gfile.DeleteRecursively(OUTPUT_DIR)
-        except:
-            pass
-
-    mkdirs(OUTPUT_DIR)
-    print('***** Model output directory: {} *****'.format(OUTPUT_DIR))
-
-    # initializing graph and session
-    graph = tf.get_default_graph()
-    config = tf.ConfigProto()
-    config.gpu_options.allow_growth = True
-    config.gpu_options.visible_device_list = gpu_id
-    config.graph_options.optimizer_options.global_jit_level = tf.OptimizerOptions.ON_1
-    sess = tf.Session(config=config)
-    set_session(sess)
-
-    # data loading and preprocessing from eraser
-    from eraserbenchmark.rationale_benchmark.utils import load_datasets, load_documents
-    from eraserbenchmark.eraser_utils import extract_doc_ids_from_annotations
-    from itertools import chain
-
-    if dataset == 'movies':
-        label_list = ['POS', 'NEG']
-    elif dataset == 'multirc':
-        label_list = ['True', 'False']
-    elif dataset == 'fever':
-        label_list = ['SUPPORTS', 'REFUTES']
-
-    train, val, test = load_datasets(data_dir)
-    if train_on_portion != 0:
-        train = train[:int(len(train) * train_on_portion)]
-    docids = set(chain.from_iterable(extract_doc_ids_from_annotations(d) for d in [train, val, test]))
-    docs = load_documents(data_dir, docids)
-
-    from bert_data_preprocessing_rational_eraser import preprocess
+    def montage_output_dir(self):
+        OUTPUT_DIR = ['bert_{}_seqlen_{}_{}_exp_output_{}'.format(self.bert_size, MAX_SEQ_LENGTH, dataset, self.EXP_OUTPUT)]
+        OUTPUT_DIR.append('merged_evidences' if self.merge_evidences else 'separated_evidences')
+        if self.train_on_portion != 0:
+            OUTPUT_DIR += ['train_on_portion', str(self.train_on_portion)]
+        self.DATASET_CACHE_NAME = '_'.join(OUTPUT_DIR) + '_inputdata_cache'
+        if self.par_lambda is None:
+            OUTPUT_DIR.append('no_weight')
+        else:
+            OUTPUT_DIR.append('par_lambda_{}'.format(self.par_lambda))
+        OUTPUT_DIR.append(
+            'no_padding_imbalanced_bce_{}_pooling_{}_learning_rate_{}'.format(self.rebalance_approach, self.pooling, LEARNING_RATE))
+        OUTPUT_DIR.append(self.suffix)
+        OUTPUT_DIR = '_'.join(OUTPUT_DIR)
+        self.MODEL_NAME = OUTPUT_DIR
+        self.OUTPUT_DIR = os.path.join('model_checkpoints', self.MODEL_NAME)
 
 
-    @cache_decorator(os.path.join('cache', DATASET_CACHE_NAME + '_eraser_format'))
-    def preprocess_wrapper(*data_inputs, docs=docs):
-        ret = []
-        for data in data_inputs:
-            ret.append(
-                preprocess(data, docs, label_list, dataset, MAX_SEQ_LENGTH, EXP_OUTPUT, merge_evidences, gpu_id=gpu_id))
-        return ret
+class Dataset():
+    def __init__(self, config):
+        from eraserbenchmark.rationale_benchmark.utils import load_datasets, load_documents
+        from eraserbenchmark.eraser_utils import extract_doc_ids_from_annotations
+        from itertools import chain
+        from bert_data_preprocessing_rational_eraser import preprocess
 
+        if config.dataset_name == 'movies':
+            self.label_list = ['POS', 'NEG']
+        elif config.dataset == 'multirc':
+            self.label_list = ['True', 'False']
+        elif config.dataset == 'fever':
+            self.label_list = ['SUPPORTS', 'REFUTES']
 
-    rets_train, rets_val, rets_test = preprocess_wrapper(train, val, test, docs=docs)
+        self.train, self.val, self.test = load_datasets(config.data_dir)
+        if config.train_on_portion != 0:
+            self.train = self.train[:int(len(self.train) * config.train_on_portion)]
+        self.docids = set(chain.from_iterable(extract_doc_ids_from_annotations(d) for d in [self.train, self.val, self.test]))
+        self.docs = load_documents(config.data_dir, self.docids)
 
-    train_input_ids, train_input_masks, train_segment_ids, train_rations, train_labels = rets_train
-    val_input_ids, val_input_masks, val_segment_ids, val_rations, val_labels = rets_val
-    test_input_ids, test_input_masks, test_segment_ids, test_rations, test_labels = rets_test
+        @cache_decorator(os.path.join('cache', config.DATASET_CACHE_NAME + '_eraser_format'))
+        def preprocess_wrapper(*data_inputs):#, docs=self.docs):
+            ret = []
+            for data in data_inputs:
+                ret.append(
+                    preprocess(data, self.docs, self.label_list,
+                               config.dataset_name, config.MAX_SEQ_LENGTH,
+                               config.EXP_OUTPUT, config.merge_evidences,
+                               gpu_id=config.gpu_id))
+            return ret
 
+        self.rets_train, self.rets_val, self.rets_test = preprocess_wrapper(self.train, self.val, self.test, docs=self.docs)
 
-    def expand_on_evidences(data):
+        self.train_input_ids, self.train_input_masks, self.train_segment_ids, self.train_rations, self.train_labels = self.rets_train
+        self.val_input_ids, self.val_input_masks, self.val_segment_ids, self.val_rations, self.val_labels = self.rets_val
+        self.test_input_ids, self.test_input_masks, self.test_segment_ids, self.test_rations, self.test_labels = self.rets_test
+
+    @classmethod
+    def expand_on_evidences(self, data):
         from eraserbenchmark.rationale_benchmark.utils import Annotation
         expanded_data = []
         for ann in tqdm_notebook(data):
@@ -214,15 +192,46 @@ if __name__ == '__main__':
         return expanded_data
 
 
+if __name__ == '__main__':
+    parser = setup_parser()
+
+    args = ['--par_lambda', '5.0',
+            '--gpu_id', '0',
+            '--batch_size', '2',
+            '--num_epochs', '10',
+            '--dataset', 'fever',
+            '--exp_visualize',
+            '--exp_structure', 'gru',
+            '--merge_evidences']
+
+    # args = parser.parse_args(args)
+    args = parser.parse_args()
+    config = Config(args)
+
+    assert (not (config.freeze_cls and config.freeze_exp))
+    assert (not (config.train_exp_first and config.train_cls_first))
+    assert not ((config.freeze_cls or config.freeze_exp) and (
+            config.train_exp_first or config.train_cls_first))  # can't freeze both in the same time
+
+    if config.DO_DELETE:
+        try:
+            shutil.rmtree(config.OUTPUT_DIR)
+        except:
+            pass
+
+    mkdirs(config.OUTPUT_DIR)
+    print('***** Model output directory: {} *****'.format(config.OUTPUT_DIR))
+
+    dataset = Dataset(config)
+
     # hyper-parameters of BERT's
     WARMUP_PROPORTION = 0.1
-
-    num_train_steps = int(len(train_input_ids) / BATCH_SIZE * float(NUM_EPOCHS))
+    num_train_steps = int(len(config.train_input_ids) / config.BATCH_SIZE * float(config.NUM_EPOCHS))
     num_warmup_steps = int(num_train_steps * WARMUP_PROPORTION)
 
     from bert_utils import get_vocab
 
-    vocab = get_vocab(config)
+    vocab = get_vocab()
 
     # building models
     from model import BertLayer
@@ -233,25 +242,11 @@ if __name__ == '__main__':
     from tensorflow.keras.layers import Input, Dense, Reshape, Multiply, Concatenate, Dot, Lambda, Softmax
 
     from metrices import sp_precision_wrapper, sp_recall_wrapper
+    from metrices_pytorch import sp_precision_wrapper, sp_recall_wrapper
 
     DIM_DENSE_CLS = 256
     NUM_GRU_UNITS_BERT_SEQ = 128
     NUM_INTERVAL_LSTM_WIDTH = 100
-
-    if par_lambda is None:
-        loss_weights = None
-    else:
-        loss_weights = {'cls_output': 1,
-                        'exp_output': par_lambda}
-    metrics = {'cls_output': 'accuracy',
-               'exp_output': [f1_wrapper(EXP_OUTPUT),
-                              sp_precision_wrapper(EXP_OUTPUT),
-                              sp_recall_wrapper(EXP_OUTPUT),
-                              precision_wrapper(EXP_OUTPUT),
-                              recall_wrapper(EXP_OUTPUT)]}
-    loss = {'cls_output': 'binary_crossentropy',
-            'exp_output': loss_function()}
-
 
     def build_model():
         in_id = Input(shape=(MAX_SEQ_LENGTH,), name="input_ids")

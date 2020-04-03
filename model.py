@@ -1,3 +1,73 @@
+from pytorch_transformers import BertModel, BertForMaskedLM, BertTokenizer, BertConfig
+import logging
+logging.basicConfig(level=logging.INFO)
+tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+
+import torch
+import torch.nn as nn
+from torch import optim
+from torch.optim import lr_scheduler
+import numpy as np
+import torchvision
+from torchvision import datasets, models, transforms
+import matplotlib.pyplot as plt
+import time
+import os
+import copy
+from torch.utils.data import Dataset, DataLoader
+from PIL import Image
+from random import randrange
+import torch.nn.functional as F
+
+
+text = 'what is a pug'
+zz = tokenizer.tokenize(text)
+
+class BertLayerNorm(nn.Module):
+    def __init__(self, hidden_size, eps=1e-12):
+        super(BertLayerNorm, self).__init__()
+        self.weight = nn.Parameter(torch.ones(hidden_size))
+        self.bias = nn.Parameter(torch.zeros(hidden_size))
+        self.variance_epsilon = eps
+
+    def forward(self, x):
+        u = x.mean(-1, keepdim=True)
+        s = (x - u).power(2).mean(-1, keepdim=True)
+        x = (x - u)/torch.sqrt(s + self.variance_epsilon)
+        return self.weight * x + self.bias
+
+
+class BertLayer(nn.Module):
+
+    def __init__(self, config, num_labels=2):
+        super(BertLayer, self).__init__()
+        self.num_labels = num_labels
+        self.bert = BertModel.from_pretrained('bert-base-uncased')
+        self.dropout = nn.Dropout(config.hidden_dropout_prob)
+        self.classifier = nn.Linear(config.hidden_size, num_labels)
+        nn.init.xavier_normal_(self.classifier.weight)
+
+    def forward(self, input_ids, token_type_ids=None, attention_mask=None, labels=None):
+        sequence_output, pooled_output = self.bert(input_ids=input_ids,
+                                                   token_type_ids=token_type_ids,
+                                                   attention_mask=attention_mask)
+        pooled_output = self.dropout(pooled_output)
+        logits = self.classifier(pooled_output)
+        return logits
+
+    def freeze_bert_encoder(self):
+        for param in self.bert.parameters():
+            param.requires_grad = False
+
+    def unfreeze_bert_encoder(self):
+        for param in self.bert.parameters():
+            param.requires_grad = True
+
+
+config = BertConfig.from_pretrained('bert-base-uncased')
+
+
+'''
 import tensorflow.compat.v1 as tf
 
 tf.disable_v2_behavior()
@@ -81,3 +151,4 @@ class BertLayer(tf.keras.layers.Layer):
 
     def compute_output_shape(self, input_shape):
         return (input_shape[0], self.output_size)
+'''
