@@ -41,8 +41,15 @@ if __name__ == '__main__':
     parser.add_argument('--freeze_exp', action='store_true')
     parser.add_argument('--train_cls_first', action='store_true')
     parser.add_argument('--train_exp_first', action='store_true')
+    parser.add_argument('--cls_only', action='store_true')
+    parser.add_argument('--exp_only', action='store_true')
+
+    parser.add_argument('--train_on_human_annotation_only', action='store_true')
+    parser.add_argument('--train_without_human_annotation', action='store_true')
+    parser.add_argument('--eval_human_annotation', action='store_true')
+
     parser.add_argument('--use_bucket', action='store_true')
-    parser.add_argument('--exp_structure', type=str, default='gru', choices='gru rnr'.split())  # gru, rnr
+    parser.add_argument('--exp_structure', type=str, default='none', choices='gru rnr none'.split())  # gru, rnr
     parser.add_argument('--delete_checkpoints', action='store_true')
     parser.add_argument('--merge_evidences', action='store_true')
     parser.add_argument('--benchmark_split', type=str, default='test', choices='test train val'.split())  # gru, rnr
@@ -50,6 +57,7 @@ if __name__ == '__main__':
     parser.add_argument('--start_from_phase1', action='store_true')
     parser.add_argument('--load_phase1', action='store_true')
     parser.add_argument('--pooling', type=str, default='first', choices=['first', 'mean'])
+    parser.add_argument('--cache_dir', type=str, default='/tmp')
     parser.add_argument('--bert_size', type=str, default='base', choices=['base', 'large'])
     parser.add_argument('--rebalance_approach', type=str, default='resampling', choices=['resampling', 'bayesian'])
     parser.add_argument('--data_dir', type=str)
@@ -66,6 +74,7 @@ if __name__ == '__main__':
     # args = parser.parse_args(args)
     args = parser.parse_args()
 
+    cache_dir = args.cache_dir
     BATCH_SIZE = args.batch_size
     par_lambda = args.par_lambda
     NUM_EPOCHS = args.num_epochs
@@ -92,28 +101,33 @@ if __name__ == '__main__':
     bert_size = args.bert_size
     rebalance_approach = args.rebalance_approach
     USE_BUCKET = args.use_bucket
-    data_dir = args.data_dir
+    data_dir = os.path.join(args.data_dir, dataset)
     len_head = args.len_viz_head
+    train_on_human_annotation_only = args.train_on_human_annotation_only
+    train_without_human_annotation = args.train_without_human_annotation
+    cls_only = args.cls_only or (train_on_human_annotation_only or train_without_human_annotation)
+    exp_only = args.exp_only
+    eval_human_annotation = args.eval_human_annotation
 
     assert (not (freeze_cls and freeze_exp))
     assert (not (train_exp_first and train_cls_first))
     assert not ((freeze_cls or freeze_exp) and (
             train_exp_first or train_cls_first))  # can't freeze both in the same time
+    #assert (not (human_annotation and do_train))
 
     if bert_size == 'base':
         BERT_MODEL_HUB = "https://tfhub.dev/google/bert_uncased_L-12_H-768_A-12/1"
     elif bert_size == 'large':
         BERT_MODELL_HUB = 'https://tfhub.dev/tensorflow/bert_en_uncased_L-24_H-1024_A-16/1'
 
-    if EXP_OUTPUT == 'gru':
-        if rebalance_approach == 'resampling':
-            loss_function = imbalanced_bce_resampling
-        else:
-            loss_function = imbalanced_bce_bayesian
-    elif EXP_OUTPUT == 'rnr':
-        loss_function = rnr_matrix_loss
+    from eraser_benchmark import remove_rations, extract_rations
+    training_data_decorator = None
 
-    if freeze_cls:
+    if cls_only:
+        suffix = 'cls_only'
+    elif exp_only:
+        suffix = 'exp_only'
+    elif freeze_cls:
         suffix = 'freeze_cls'
     elif freeze_exp:
         suffix = 'freeze_exp'
@@ -124,11 +138,39 @@ if __name__ == '__main__':
     else:
         suffix = ''
 
-    OUTPUT_DIR = ['bert_{}_seqlen_{}_{}_exp_output_{}'.format(bert_size, MAX_SEQ_LENGTH, dataset, EXP_OUTPUT)]
-    OUTPUT_DIR.append('merged_evidences' if merge_evidences else 'separated_evidences')
+    if train_on_human_annotation_only:
+        suffix += '_train_on_human_annotation_only'
+        training_data_decorator = extract_rations
+    elif train_without_human_annotation:
+        suffix += '_train_without_human_annotation'
+        training_data_decorator = remove_rations
+
+    if eval_human_annotation:
+        suffix += '_eval_human_annotation'
+
+    if EXP_OUTPUT == 'gru':
+        if rebalance_approach == 'resampling':
+            loss_function = imbalanced_bce_resampling
+        else:
+            loss_function = imbalanced_bce_bayesian
+    elif EXP_OUTPUT == 'rnr':
+        loss_function = rnr_matrix_loss
+
+    OUTPUT_DIR = ['bert_{}_seqlen_{}_{}_exp_output_{}'.format(bert_size, MAX_SEQ_LENGTH, dataset, EXP_OUTPUT),
+                  'merged_evidences' if merge_evidences else 'separated_evidences']
+
     if train_on_portion != 0:
         OUTPUT_DIR += ['train_on_portion', str(train_on_portion)]
+
+    if train_on_human_annotation_only:
+        OUTPUT_DIR.append('train_on_human_annotation_only')
+        training_data_decorator = extract_rations
+    elif train_without_human_annotation:
+        OUTPUT_DIR.append('train_without_human_annotation')
+        training_data_decorator = remove_rations
+
     DATASET_CACHE_NAME = '_'.join(OUTPUT_DIR) + '_inputdata_cache'
+
     if par_lambda is None:
         OUTPUT_DIR.append('no_weight')
     else:
@@ -185,12 +227,13 @@ if __name__ == '__main__':
     from bert_data_preprocessing_rational_eraser import preprocess
 
 
-    @cache_decorator(os.path.join('cache', DATASET_CACHE_NAME + '_eraser_format'))
+    @cache_decorator(os.path.join(cache_dir, 'cache', DATASET_CACHE_NAME + '_eraser_format'))
     def preprocess_wrapper(*data_inputs, docs=docs):
         ret = []
         for data in data_inputs:
             ret.append(
-                preprocess(data, docs, label_list, dataset, MAX_SEQ_LENGTH, EXP_OUTPUT, merge_evidences, gpu_id=gpu_id))
+                preprocess(data, docs, label_list, dataset, MAX_SEQ_LENGTH, EXP_OUTPUT, merge_evidences,
+                           data_decorator=training_data_decorator, gpu_id=gpu_id))
         return ret
 
 
@@ -243,14 +286,15 @@ if __name__ == '__main__':
     else:
         loss_weights = {'cls_output': 1,
                         'exp_output': par_lambda}
-    metrics = {'cls_output': 'accuracy',
-               'exp_output': [f1_wrapper(EXP_OUTPUT),
-                              sp_precision_wrapper(EXP_OUTPUT),
-                              sp_recall_wrapper(EXP_OUTPUT),
-                              precision_wrapper(EXP_OUTPUT),
-                              recall_wrapper(EXP_OUTPUT)]}
-    loss = {'cls_output': 'binary_crossentropy',
-            'exp_output': loss_function()}
+    metrics = {'cls_output': 'accuracy'}
+    loss = {'cls_output': 'binary_crossentropy'}
+    if EXP_OUTPUT != 'none':
+        metrics['exp_output'] = [f1_wrapper(EXP_OUTPUT),
+                                 sp_precision_wrapper(EXP_OUTPUT),
+                                 sp_recall_wrapper(EXP_OUTPUT),
+                                 precision_wrapper(EXP_OUTPUT),
+                                 recall_wrapper(EXP_OUTPUT)]
+        loss['exp_output'] = loss_function()
 
 
     def build_model():
@@ -263,12 +307,20 @@ if __name__ == '__main__':
             n_fine_tune_layers=10, name='bert')(bert_inputs)
 
         outputs = []
-        if 'seq' not in dataset:
+        model_cls, model_exp = None, None
+
+        if 'seq' not in dataset and not exp_only:
             # Classifier output
             dense = Dense(DIM_DENSE_CLS, activation='tanh', name='cls_dense')(bert_cls_output)
             cls_output = Dense(1, activation='sigmoid', name='cls_output')(dense)
             outputs.append(cls_output)
-        if 'cls' not in dataset:
+            model_cls = Model(inputs=bert_inputs, outputs=cls_output)
+            optimizer = Adam(LEARNING_RATE)
+            model_cls.compile(loss=loss['cls_output'], optimizer=optimizer, metrics=[metrics['cls_output']])
+        else:
+            model_cls = None
+
+        if 'cls' not in dataset and EXP_OUTPUT != 'none' and not cls_only:
             # Explainer output
             if EXP_OUTPUT == 'gru':
                 gru = CuDNNGRU(
@@ -303,19 +355,15 @@ if __name__ == '__main__':
 
                 exp_outputs = Concatenate(axis=-1, name='exp_output')([p_starts, p_end_given_start])
             outputs.append(exp_outputs)
+            model_exp = Model(inputs=bert_inputs, outputs=exp_outputs)
+            optimizer = Adam(LEARNING_RATE)
+            model_exp.compile(loss=loss['exp_output'], optimizer=optimizer, metrics=[metrics['exp_output']])
+        else:
+            model_exp = None
 
         model = Model(inputs=bert_inputs, outputs=outputs)
         optimizer = Adam(LEARNING_RATE)
-
         model.compile(loss=loss, loss_weights=loss_weights, optimizer=optimizer, metrics=metrics)
-
-        model_exp = Model(inputs=bert_inputs, outputs=exp_outputs)
-        optimizer = Adam(LEARNING_RATE)
-        model_exp.compile(loss=loss['exp_output'], optimizer=optimizer, metrics=[metrics['exp_output']])
-
-        model_cls = Model(inputs=bert_inputs, outputs=cls_output)
-        optimizer = Adam(LEARNING_RATE)
-        model_cls.compile(loss=loss['cls_output'], optimizer=optimizer, metrics=[metrics['cls_output']])
 
         return model, model_cls, model_exp
 
@@ -334,7 +382,9 @@ if __name__ == '__main__':
 
     with graph.as_default():
         set_session(sess)
-        model, model_cls, model_exp = build_model(par_lambda)
+        model, model_cls, model_exp = build_model()
+        if EXP_OUTPUT == 'none':
+            model = model_cls
         model.summary()
         sess.run(tf.local_variables_initializer())
         sess.run(tf.global_variables_initializer())
@@ -534,32 +584,45 @@ if __name__ == '__main__':
             from eraserbenchmark.eraser import evaluate
 
             result_fname = RES_FOR_BENCHMARK_FNAME + '.jsonl'
-            result_fname = os.path.join(
-                'eraserbenchmark', 'annotated_by_exp', result_fname)
+            result_fname = os.path.join('eraserbenchmark', 'annotated_by_exp', result_fname)
             if BENCHMARK_SPLIT_NAME == 'test':
-                benchmark_inputs, raw_input, benchmark_input_ids = test_inputs, test, test_input_ids
+                benchmark_inputs, raw_input, benchmark_input_ids, benchmark_outputs = test_inputs, test, test_input_ids, test_outputs
             elif BENCHMARK_SPLIT_NAME == 'val':
-                benchmark_inputs, raw_input, benchmark_input_ids = val_inputs, val, val_input_ids
+                benchmark_inputs, raw_input, benchmark_input_ids, benchmark_outputs = val_inputs, val, val_input_ids, val_outputs
             elif BENCHMARK_SPLIT_NAME == 'train':
-                benchmark_inputs, raw_input, benchmark_input_ids = training_inputs, train, train_input_ids
+                benchmark_inputs, raw_input, benchmark_input_ids, benchmark_outputs = training_inputs, train, train_input_ids, training_outputs
 
             pred = model.predict(x=benchmark_inputs)
+            if eval_human_annotation:
+                cls_pred = pred if EXP_OUTPUT == 'none' else pred[0]
+                exp_pred = benchmark_outputs['exp_output']
+            else:
+                cls_pred = pred[0]
+                exp_pred = pred[1]
+
             results = [pred_to_results(raw_input[i], benchmark_input_ids[i],
-                                       (pred[0][i], pred[1][i]),
+                                       (cls_pred[i], exp_pred[i]),
                                        HARD_SELECTION_COUNT,
                                        HARD_SELECTION_THRESHOLD,
                                        vocab, docs, label_list, EXP_OUTPUT)
-                       for i in range(len(pred[0]))]
-            pred_softmax = np.hstack([1 - pred[0], pred[0]])
+                       for i in range(len(cls_pred))]
+            pred_softmax = np.hstack([1 - cls_pred, cls_pred])
             c_pred_softmax = get_cls_score(
                 model, results, docs, label_list, dataset, remove_rations, MAX_SEQ_LENGTH, EXP_OUTPUT, gpu_id=gpu_id)
             s_pred_softmax = get_cls_score(
                 model, results, docs, label_list, dataset, extract_rations, MAX_SEQ_LENGTH, EXP_OUTPUT, gpu_id=gpu_id)
 
-            results = [add_cls_scores(res, cls_score, c_cls_score, s_cls_score, label_list) for res, cls_score,
-                                                                                                c_cls_score, s_cls_score
-                       in
-                       zip(results, pred_softmax, c_pred_softmax, s_pred_softmax)]
+            print(len(c_pred_softmax))
+            print((c_pred_softmax[0]))
+
+            results = [add_cls_scores(res,
+                                      cls_score,
+                                      c_cls_score,
+                                      s_cls_score,
+                                      label_list) for res, cls_score, c_cls_score, s_cls_score in zip(results,
+                                                                                                      pred_softmax,
+                                                                                                      c_pred_softmax,
+                                                                                                      s_pred_softmax)]
             anns_saved = set()
             real_results = []
             for ann in results:

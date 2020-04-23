@@ -1,5 +1,6 @@
 #
 import json
+import os
 import logging
 import pickle
 import pprint
@@ -31,7 +32,7 @@ iou_thresholds = [0.5]
 
 
 def evaluate(model_name, dataset=dataset_name, split_name='test', train_on_portion=0, data_dir='.'):
-    annotation_fname = data_dir + split_name + '.jsonl'
+    annotation_fname = os.path.join(data_dir, split_name + '.jsonl')
     results_fname = 'eraserbenchmark/annotated_by_exp/{}.jsonl'.format(model_name + '_' + split_name)
     score_file = 'eraserbenchmark/outputs/{}.txt'.format(model_name + '_' + split_name)
     with open(results_fname + 'pkl3', 'rb') as fin:

@@ -8,32 +8,43 @@ from bert_data_preprocessing_rational_eraser import convert_bert_features, creat
 from bert_with_ration_eraser import InputRationalExample, convert_examples_to_features
 from eraserbenchmark.eraser_utils import extract_doc_ids_from_annotations
 from utils import convert_subtoken_ids_to_tokens
+from eraserbenchmark.rationale import Annotation
+from eraserbenchmark.rationale_benchmark.utils import Evidence
 
 
-def remove_rations(sentence, annotation):
+def flatten_rations(rations, len_sentence):
+    rations = [{'end_token': 0, 'start_token': 0}] \
+              + sorted(rations, key=lambda x: x['start_token']) \
+              + [{'start_token': len_sentence, 'end_token': len_sentence}]
+    return rations
+
+
+def remove_rations(sentence, rations, sub='.'):
     sentence = sentence.lower().split()
-    rationales = annotation['rationales'][0]['hard_rationale_predictions']
-    rationales = [{'end_token': 0, 'start_token': 0}] \
-                 + sorted(rationales, key=lambda x: x['start_token']) \
-                 + [{'start_token': len(sentence), 'end_token': len(sentence)}]
+    if isinstance(rations, list): # a list of Evidence-s
+        rations = [e.__dict__ for e in rations]
+    else: # an Annotation
+        rations = rations['rationales'][0]['hard_rationale_predictions']
+    rations = flatten_rations(rations, len(sentence))
     ret = []
-    for rat_id, rat in enumerate(rationales[:-1]):
-        ret += ['.'] * (rat['end_token'] - rat['start_token']) \
+    for rat_id, rat in enumerate(rations[:-1]):
+        ret += [sub] * (rat['end_token'] - rat['start_token']) \
                + sentence[rat['end_token']
-                          : rationales[rat_id + 1]['start_token']]
+                          : rations[rat_id + 1]['start_token']]
     return ' '.join(ret)
 
 
-def extract_rations(sentence, rationale):
+def extract_rations(sentence, rations, sub='.'):
     sentence = sentence.lower().split()
-    rationales = rationale['rationales'][0]['hard_rationale_predictions']
-    rationales = [{'end_token': 0, 'start_token': 0}] \
-                 + sorted(rationales, key=lambda x: x['start_token']) \
-                 + [{'start_token': len(sentence), 'end_token': len(sentence)}]
+    if isinstance(rations, list): # a list of Evidence-s
+        rations = [e.__dict__ for e in rations]
+    else: # an Annotation
+        rations = rations['rationales'][0]['hard_rationale_predictions']
+    rations = flatten_rations(rations, len(sentence))
     ret = []
-    for rat_id, rat in enumerate(rationales[:-1]):
+    for rat_id, rat in enumerate(rations[:-1]):
         ret += sentence[rat['start_token']: rat['end_token']] \
-               + ['.'] * (rationales[rat_id + 1]
+               + [sub] * (rations[rat_id + 1]
                           ['start_token'] - rat['end_token'])
     return ' '.join(ret)
 
@@ -47,6 +58,7 @@ def ce_load_bert_features(rationales, docs, label_list, decorate, max_seq_length
         sentences = chain.from_iterable(docs[docid] for docid in docids)
         flattened_tokens = chain(*sentences)
         text_b = ' '.join(flattened_tokens)
+        #print(rational)
         text_b = decorate(text_b, rational)
         label = rational['classification']
         evidences = None
@@ -74,6 +86,8 @@ def get_cls_score(model, rationales, docs, label_list, dataset, decorate, max_se
 
     _inputs = [_input_ids, _input_masks, _segment_ids]
     _pred = model.predict(_inputs)
+    if exp_output == 'none':
+        _pred = [_pred,]
     return (np.hstack([1 - _pred[0], _pred[0]]))
 
 
