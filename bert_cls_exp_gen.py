@@ -57,7 +57,7 @@ if __name__ == '__main__':
     parser.add_argument('--start_from_phase1', action='store_true')
     parser.add_argument('--load_phase1', action='store_true')
     parser.add_argument('--pooling', type=str, default='first', choices=['first', 'mean'])
-    parser.add_argument('--cache_dir', type=str, default='/tmp')
+    parser.add_argument('--cache_dir', type=str, default='/tmp/interpretation_by_design')
     parser.add_argument('--bert_size', type=str, default='base', choices=['base', 'large'])
     parser.add_argument('--rebalance_approach', type=str, default='resampling', choices=['resampling', 'bayesian'])
     parser.add_argument('--data_dir', type=str)
