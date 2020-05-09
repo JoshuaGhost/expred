@@ -1,7 +1,6 @@
 from pytorch_transformers import BertModel, BertForMaskedLM, BertTokenizer, BertConfig
 import logging
-logging.basicConfig(level=logging.INFO)
-tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+
 
 import torch
 import torch.nn as nn
@@ -20,9 +19,6 @@ from random import randrange
 import torch.nn.functional as F
 
 
-text = 'what is a pug'
-zz = tokenizer.tokenize(text)
-
 class BertLayerNorm(nn.Module):
     def __init__(self, hidden_size, eps=1e-12):
         super(BertLayerNorm, self).__init__()
@@ -38,23 +34,17 @@ class BertLayerNorm(nn.Module):
 
 
 class BertLayer(nn.Module):
-
-    def __init__(self, config, num_labels=2):
+    def __init__(self):
         super(BertLayer, self).__init__()
-        self.num_labels = num_labels
         self.bert = BertModel.from_pretrained('bert-base-uncased')
-        self.dropout = nn.Dropout(config.hidden_dropout_prob)
-        self.classifier = nn.Linear(config.hidden_size, num_labels)
         nn.init.xavier_normal_(self.classifier.weight)
 
     def forward(self, input_ids, token_type_ids=None, attention_mask=None, labels=None):
         sequence_output, pooled_output = self.bert(input_ids=input_ids,
                                                    token_type_ids=token_type_ids,
                                                    attention_mask=attention_mask)
-        pooled_output = self.dropout(pooled_output)
-        logits = self.classifier(pooled_output)
-        return logits
-
+        return sequence_output, pooled_output
+    '''
     def freeze_bert_encoder(self):
         for param in self.bert.parameters():
             param.requires_grad = False
@@ -62,93 +52,147 @@ class BertLayer(nn.Module):
     def unfreeze_bert_encoder(self):
         for param in self.bert.parameters():
             param.requires_grad = True
+    '''
+
+    # building models
+    from model import BertLayer
+    from pytorch_transformers import BertConfig
+
+    from tensorflow.keras.layers import CuDNNGRU, CuDNNLSTM
+    from tensorflow.keras.layers import Bidirectional
+    from tensorflow.keras.optimizers import Adam
+    from tensorflow.keras.models import Model
+    from tensorflow.keras.layers import Input, Dense, Reshape, Multiply, Concatenate, Dot, Lambda, Softmax
+
+    from metrices import sp_precision_wrapper, sp_recall_wrapper
+    from metrices_pytorch import sp_precision_wrapper, sp_recall_wrapper
+
+    from
+
+    DIM_DENSE_CLS = 256
+    NUM_GRU_UNITS_BERT_SEQ = 128
+    NUM_INTERVAL_LSTM_WIDTH = 100
+
+    class BERT_cls(nn.Module):
+        def __init__(self, dim_input, dim_cls_dense=256, num_cls=2, eps=1e-12):
+            super(BERT_cls, self).__init__()
+            self.dim_input = dim_input
+            self.dim_cls_dense = dim_cls_dense
+            self.num_cls = num_cls
+            nn.lin1 = nn.Linear(self.dim_input, self.dim_cls_dense, bias=True)
+            nn.act1 = nn.Tanh()
+            nn.lin2 = nn.Linear(self.dim_cls_dense, self.dim_input, bias=True)
+            nn.act2 = nn.Sigmoid()
+            self.variance_epsilon = eps
+            nn.init.uniform_(self.classifier.weight)
+
+        def forward(self, x):
+            x = self.act1(self.lin1(x))
+            x = self.act2(self.lin2(x))
 
 
-config = BertConfig.from_pretrained('bert-base-uncased')
+    class GRU_exp(nn.Module):
+        def __init__(self, dim_input, dim_exp_gru=100):
+            super(GRU_exp, self).__init__()
+            self.dim_exp_gru = dim_exp_gru
+            self.gru = nn.GRU(dim_input, hidden_size=self.dim_exp_gru)
+            self.exp_lin = nn.Linear(self.dim_exp_gru, 1)
+                       gru = CuDNNGRU(
+                    NUM_GRU_UNITS_BERT_SEQ, kernel_initializer='random_uniform', return_sequences=True,
+                    name='exp_gru_gru')(
+                    bert_exp_output)
+                exp = Dense(1, activation='sigmoid', name='exp_gru_dense')(gru)
+                output_mask = Reshape((MAX_SEQ_LENGTH, 1), name='exp_gru_reshape')(in_mask)
+                exp_outputs = Multiply(name='exp_output')([output_mask, exp])
+
+    class L2I_model(nn.Module):
+        def __init__(self, dim_cls_dense=256, dim_bilstm=128, dim_exp_gru=100):
+            super(L2I_model, self).__init__()
+            self.dim_cls_dense = dim_cls_dense
+            self.dim_bilstm = dim_bilstm
+            self.dim_exp_gru=
 
 
-'''
-import tensorflow.compat.v1 as tf
+    def build_model():
+        in_id = Input(shape=(MAX_SEQ_LENGTH,), name="input_ids")
+        in_mask = Input(shape=(MAX_SEQ_LENGTH,), name="input_masks")
+        in_segment = Input(shape=(MAX_SEQ_LENGTH,), name="segment_ids")
+        bert_inputs = [in_id, in_mask, in_segment]
+        bert_config = BertConfig.from_pretrained('bert-base-uncased')
+        bert_cls_output, bert_exp_output = BertLayer(
+            n_fine_tune_layers=10, name='bert')(bert_inputs)
 
-tf.disable_v2_behavior()
-from tensorflow.keras import backend as K
-import tensorflow_hub as hub
+        outputs = []
+        if 'seq' not in dataset:
+            # Classifier output
+            dense = Dense(DIM_DENSE_CLS, activation='tanh', name='cls_dense')(bert_cls_output)
+            cls_output = Dense(1, activation='sigmoid', name='cls_output')(dense)
+            outputs.append(cls_output)
+        if 'cls' not in dataset:
+            # Explainer output
+            if EXP_OUTPUT == 'gru':
+                gru = CuDNNGRU(
+                    NUM_GRU_UNITS_BERT_SEQ, kernel_initializer='random_uniform', return_sequences=True,
+                    name='exp_gru_gru')(
+                    bert_exp_output)
+                exp = Dense(1, activation='sigmoid', name='exp_gru_dense')(gru)
+                output_mask = Reshape((MAX_SEQ_LENGTH, 1), name='exp_gru_reshape')(in_mask)
+                exp_outputs = Multiply(name='exp_output')([output_mask, exp])
+            elif EXP_OUTPUT == 'rnr':
+                M1 = Bidirectional(
+                    layer=CuDNNLSTM(NUM_INTERVAL_LSTM_WIDTH, return_sequences=True, name='exp_rnr_lstm1'),
+                    merge_mode='concat', name='exp_rnr_bidirectional1')(bert_exp_output)
+                p_starts = Dense(1, activation='sigmoid', name='exp_rnr_starts')(
+                    Concatenate(axis=-1)([bert_exp_output, M1]))
+                start_mask = Reshape((MAX_SEQ_LENGTH, 1))(in_mask)
+                p_starts = Multiply()([p_starts, start_mask])
 
+                m1_tilde = Dot(axes=-2)([p_starts, M1])
+                M1_tilde = Lambda(lambda x: tf.tile(x, (1, MAX_SEQ_LENGTH, 1)))(m1_tilde)
+                x = Multiply()([M1, M1_tilde])
+                M2 = Bidirectional(
+                    layer=CuDNNLSTM(NUM_INTERVAL_LSTM_WIDTH, return_sequences=True, name='exp_rnr_lstm2'),
+                    merge_mode='concat', name='exp_rnr_bidirecitonal2')(
+                    Concatenate(axis=-1)([bert_exp_output, M1, M1_tilde, x]))
+                p_end_given_start = Dense(MAX_SEQ_LENGTH, activation='linear', name='exp_rnr_end')(
+                    Concatenate(axis=-1)([bert_exp_output, M2]))
+                end_mask = Lambda(lambda x: tf.tile(x, (1, MAX_SEQ_LENGTH, 1)))(Reshape((1, MAX_SEQ_LENGTH))(in_mask))
+                p_end_given_start = Multiply()([p_end_given_start, end_mask])
+                p_end_given_start = Lambda(lambda x: tf.linalg.band_part(x, 0, -1))(p_end_given_start)
+                p_end_given_start = Softmax(axis=-1)(p_end_given_start)
 
-class BertLayer(tf.keras.layers.Layer):
-    def __init__(
-            self,
-            n_fine_tune_layers=10,
-            bert_path="https://tfhub.dev/google/bert_uncased_L-12_H-768_A-12/1",
-            pooling='first',  # or 'mean'
-            **kwargs
-    ):
-        self.n_fine_tune_layers = n_fine_tune_layers
-        self.trainable = True
-        self.output_size = 768
-        self.bert_path = bert_path
-        self.pooling = pooling
+                exp_outputs = Concatenate(axis=-1, name='exp_output')([p_starts, p_end_given_start])
+            outputs.append(exp_outputs)
 
-        super(BertLayer, self).__init__(**kwargs)
+        model = Model(inputs=bert_inputs, outputs=outputs)
+        optimizer = Adam(LEARNING_RATE)
 
-    def build(self, input_shape):
-        self.bert = hub.Module(
-            self.bert_path, trainable=self.trainable, name="{}_module".format(self.name)
-        )
+        model.compile(loss=loss, loss_weights=loss_weights, optimizer=optimizer, metrics=metrics)
 
-        # Remove unused layers
-        trainable_vars = self.bert.variables
-        trainable_vars = [
-            var
-            for var in trainable_vars
-            if not "/cls/" in var.name and not "/pooler/" in var.name
-        ]
-        trainable_layers = []
+        model_exp = Model(inputs=bert_inputs, outputs=exp_outputs)
+        optimizer = Adam(LEARNING_RATE)
+        model_exp.compile(loss=loss['exp_output'], optimizer=optimizer, metrics=[metrics['exp_output']])
 
-        # Select how many layers to fine tune
-        for i in range(self.n_fine_tune_layers):
-            trainable_layers.append("encoder/layer_{}".format(str(11 - i)))
+        model_cls = Model(inputs=bert_inputs, outputs=cls_output)
+        optimizer = Adam(LEARNING_RATE)
+        model_cls.compile(loss=loss['cls_output'], optimizer=optimizer, metrics=[metrics['cls_output']])
 
-        # Update trainable vars to contain only the specified layers
-        trainable_vars = [
-            var
-            for var in trainable_vars
-            if any([l in var.name for l in trainable_layers])
-        ]
+        return model, model_cls, model_exp
 
-        # Add to trainable weights
-        for var in trainable_vars:
-            self._trainable_weights.append(var)
+if __name__ == '__main__':
+    logging.basicConfig(level=logging.WARNING)
+    tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+    text = 'what is a pug'# + ' pug'*1024 # induces error due to the overwhelming length
+    zz = tokenizer.tokenize(text)
+    print(len(zz))
+    print(zz)
+    device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+    bert_config = BertConfig.from_pretrained('bert-base-uncased')
+    bertlayer = BertLayer(bert_config).to(device)
 
-        for var in self.bert.variables:
-            if var not in self._trainable_weights:
-                self._non_trainable_weights.append(var)
+    zz = torch.tensor([tokenizer.convert_tokens_to_ids(zz)]).to(device)
 
-        super(BertLayer, self).build(input_shape)
+    print(zz)
 
-    def call(self, inputs):
-        inputs = [K.cast(x, dtype="int32") for x in inputs]
-        input_ids, input_mask, segment_ids = inputs
-        bert_inputs = dict(
-            input_ids=input_ids, input_mask=input_mask, segment_ids=segment_ids
-        )
-        cls = self.bert(inputs=bert_inputs, signature="tokens",
-                        as_dict=True)["pooled_output"]
-        exp = self.bert(inputs=bert_inputs, signature="tokens",
-                        as_dict=True)["sequence_output"]
+    print(bertlayer(zz))
 
-        def mul_mask(x, m): return x * tf.expand_dims(m, axis=-1)
-
-        input_mask = tf.cast(input_mask, tf.float32)
-        exp = mul_mask(exp, input_mask)
-
-        if self.pooling == 'mean':
-            def masked_reduce_mean(x, m): return tf.reduce_sum(mul_mask(x, m), axis=1) / (
-                    tf.reduce_sum(m, axis=1, keepdims=True) + 1e-10)
-
-            cls = masked_reduce_mean(exp, input_mask)
-        return [cls, exp]
-
-    def compute_output_shape(self, input_shape):
-        return (input_shape[0], self.output_size)
-'''

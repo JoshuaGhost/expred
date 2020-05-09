@@ -1,9 +1,3 @@
-import tensorflow.compat.v1 as tf
-
-tf.disable_v2_behavior()
-from bert_with_ration import convert_ids_to_token_list
-
-
 def convert_single_intp_to_html(string, intp, intp_ref=None):
     assert (len(string) == len(intp))
     raw_html = ''
@@ -23,8 +17,8 @@ def convert_single_intp_to_html(string, intp, intp_ref=None):
     return raw_html
 
 
-def convert_res_to_htmls(input_ids, pred_intp, gt_intp=None, vocab=None):
-    token_list = convert_ids_to_token_list(input_ids, vocab)
+def convert_res_to_htmls(input_ids, pred_intp, gt_intp=None, tokenizer=None):
+    token_list = tokenizer._convert_id_to_token(input_ids)
     pred_html = convert_single_intp_to_html(token_list, pred_intp, gt_intp)
 
     if gt_intp is not None:

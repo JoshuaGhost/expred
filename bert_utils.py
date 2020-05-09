@@ -1,3 +1,4 @@
+from transformers.tokenization_bert import get_vocab
 import tensorflow
 
 if tensorflow.__version__.startswith('2'):
