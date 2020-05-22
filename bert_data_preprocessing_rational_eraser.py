@@ -32,7 +32,7 @@ def create_tokenizer_from_hub_module(gpu_id):
 def load_bert_features(data, docs, label_list, max_seq_length, merge_evidences, decorator, gpu_id):
     tokenizer = create_tokenizer_from_hub_module(gpu_id)
     input_examples = []
-    for ann in data:
+    for ann_id, ann in enumerate(data):
         text_a = ann.query
         label = ann.classification
         if not merge_evidences:
@@ -49,7 +49,7 @@ def load_bert_features(data, docs, label_list, max_seq_length, merge_evidences, 
                                                            text_b=text_b,
                                                            label=label,
                                                            evidences=evidences))
-        if merge_evidences:
+        else:
             docids_to_offsets = dict()
             latest_offset = 0
             example_evidences = []
@@ -71,10 +71,12 @@ def load_bert_features(data, docs, label_list, max_seq_length, merge_evidences, 
                                           start_sentence=ev.start_sentence,
                                           end_sentence=ev.end_sentence)
                     example_evidences.append(deepcopy(example_ev))
+            if len(ann.evidences) == 0: # posR_161.txt has no evidence
+                text_b_tokens = list(chain.from_iterable(docs[ann.annotation_id]))
             text_b = ' '.join(text_b_tokens)
             evidences = example_evidences
             if decorator is not None:
-                text_b = decorator(text_b, evidences)
+                text_b = decorator(text_b, evidences, tokenizer)
             input_examples.append(InputRationalExample(guid=None,
                                                        text_a=text_a,
                                                        text_b=text_b,

@@ -110,12 +110,20 @@ def write_jsonl(jsonl, output_file):
 def annotations_from_jsonl(fp: str):
     ret = []
     with open(fp, 'r') as inf:
-        for line in inf:
-            content = json.loads(line)
+        for line_id, line in enumerate(inf):
+            try:
+                content = json.loads(line)
+            except json.decoder.JSONDecodeError:
+                #print(line_id, line)
+                raise json.decoder.JSONDecodeError
             ev_groups = []
-            for ev_group in content['evidences']:
-                ev_group = tuple([Evidence(**ev) for ev in ev_group])
-                ev_groups.append(ev_group)
+            try:
+                for ev_group in content['evidences']:
+                    ev_group = tuple([Evidence(**ev) for ev in ev_group])
+                    ev_groups.append(ev_group)
+            except TypeError:
+                #print(line_id, line)
+                raise TypeError
             content['evidences'] = frozenset(ev_groups)
             ret.append(Annotation(**content))
     return ret

@@ -6,7 +6,8 @@ import tensorflow as tf
 from bert.run_classifier import InputFeatures, PaddingInputExample, _truncate_seq_pair
 from bert.tokenization import FullTokenizer, BasicTokenizer, \
     convert_to_unicode, whitespace_tokenize, convert_ids_to_tokens
-from tqdm import tqdm_notebook
+#from tqdm import tqdm_notebook as tqdm
+from tqdm import tqdm
 
 
 class InputRationalExample(object):
@@ -169,7 +170,7 @@ def convert_single_rational_example(ex_index, example, label_list, max_seq_lengt
 
 def convert_examples_to_features(examples, label_list, max_seq_length, tokenizer):
     features = []
-    for (ex_index, example) in enumerate(tqdm_notebook(examples, desc="Converting examples to features")):
+    for (ex_index, example) in enumerate(tqdm(examples, desc="Converting examples to features")):
         if ex_index % 10000 == 0:
             tf.logging.info("Writing example %d of %d" % (ex_index, len(examples)))
         feature = convert_single_rational_example(ex_index, example, label_list,

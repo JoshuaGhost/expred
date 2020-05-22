@@ -4,7 +4,8 @@ from datetime import datetime
 
 import numpy as np
 from tensorflow.python.keras.backend import set_session
-from tqdm import tqdm_notebook
+# from tqdm import tqdm_notebook as tqdm
+from tqdm import tqdm
 
 from display_rational import convert_res_to_htmls
 from eraser_benchmark import rnr_matrix_to_rational_mask
@@ -37,6 +38,7 @@ if __name__ == '__main__':
     parser.add_argument('--exp_visualize', action='store_true')
     parser.add_argument('--evaluate', action='store_true')
     parser.add_argument('--exp_benchmark', action='store_true')
+    parser.add_argument('--benchmark_split', type=str, default='test', choices='test train val'.split())  # gru, rnr
     parser.add_argument('--freeze_cls', action='store_true')
     parser.add_argument('--freeze_exp', action='store_true')
     parser.add_argument('--train_cls_first', action='store_true')
@@ -44,24 +46,26 @@ if __name__ == '__main__':
     parser.add_argument('--cls_only', action='store_true')
     parser.add_argument('--exp_only', action='store_true')
 
-    parser.add_argument('--train_on_human_annotation_only', action='store_true')
-    parser.add_argument('--train_without_human_annotation', action='store_true')
-    parser.add_argument('--eval_human_annotation', action='store_true')
+    parser.add_argument('--train_on_annotations_only', action='store_true')
+    parser.add_argument('--train_without_annotations', action='store_true')
+    parser.add_argument('--eval_annotations', action='store_true')
+    parser.add_argument('--annotation_source', type=str)
 
     parser.add_argument('--use_bucket', action='store_true')
     parser.add_argument('--exp_structure', type=str, default='none', choices='gru rnr none'.split())  # gru, rnr
     parser.add_argument('--delete_checkpoints', action='store_true')
     parser.add_argument('--merge_evidences', action='store_true')
-    parser.add_argument('--benchmark_split', type=str, default='test', choices='test train val'.split())  # gru, rnr
     parser.add_argument('--train_on_portion', type=float, default=0)
     parser.add_argument('--start_from_phase1', action='store_true')
+    parser.add_argument('--save_machine_rationale', action='store_true')
+    parser.add_argument('--machine_rationale_folder', type=str, default='eraserbenchmark/machine_rationale')
     parser.add_argument('--load_phase1', action='store_true')
+    parser.add_argument('--force_recache', action='store_true')
     parser.add_argument('--pooling', type=str, default='first', choices=['first', 'mean'])
     parser.add_argument('--cache_dir', type=str, default='/tmp/interpretation_by_design')
     parser.add_argument('--bert_size', type=str, default='base', choices=['base', 'large'])
     parser.add_argument('--rebalance_approach', type=str, default='resampling', choices=['resampling', 'bayesian'])
     parser.add_argument('--data_dir', type=str)
-
     args = ['--par_lambda', '5.0',
             '--gpu_id', '0',
             '--batch_size', '2',
@@ -73,6 +77,8 @@ if __name__ == '__main__':
 
     # args = parser.parse_args(args)
     args = parser.parse_args()
+
+    save_machine_rationale = args.save_machine_rationale
 
     cache_dir = args.cache_dir
     BATCH_SIZE = args.batch_size
@@ -97,23 +103,25 @@ if __name__ == '__main__':
     start_from_phase1 = args.start_from_phase1
     load_phase1 = args.load_phase1
     pooling = args.pooling
-    EXP_OUTPUT = exp_structure
+    exp_structure = exp_structure
     bert_size = args.bert_size
     rebalance_approach = args.rebalance_approach
     USE_BUCKET = args.use_bucket
     data_dir = os.path.join(args.data_dir, dataset)
     len_head = args.len_viz_head
-    train_on_human_annotation_only = args.train_on_human_annotation_only
-    train_without_human_annotation = args.train_without_human_annotation
-    cls_only = args.cls_only or (train_on_human_annotation_only or train_without_human_annotation)
+    train_on_annotations_only = args.train_on_annotations_only
+    train_without_annotations = args.train_without_annotations
+    cls_only = args.cls_only or (train_on_annotations_only or train_without_annotations)
     exp_only = args.exp_only
-    eval_human_annotation = args.eval_human_annotation
-
+    eval_annotations = args.eval_annotations
+    force_recache = args.force_recache
+    annotation_source = args.annotation_source
+    machine_rationale_folder = args.machine_rationale_folder
     assert (not (freeze_cls and freeze_exp))
     assert (not (train_exp_first and train_cls_first))
     assert not ((freeze_cls or freeze_exp) and (
             train_exp_first or train_cls_first))  # can't freeze both in the same time
-    #assert (not (human_annotation and do_train))
+    # assert (not (human_annotation and do_train))
 
     if bert_size == 'base':
         BERT_MODEL_HUB = "https://tfhub.dev/google/bert_uncased_L-12_H-768_A-12/1"
@@ -121,81 +129,89 @@ if __name__ == '__main__':
         BERT_MODELL_HUB = 'https://tfhub.dev/tensorflow/bert_en_uncased_L-24_H-1024_A-16/1'
 
     from eraser_benchmark import remove_rations, extract_rations
+
     training_data_decorator = None
 
-    if cls_only:
-        suffix = 'cls_only'
-    elif exp_only:
-        suffix = 'exp_only'
-    elif freeze_cls:
-        suffix = 'freeze_cls'
-    elif freeze_exp:
-        suffix = 'freeze_exp'
-    elif train_cls_first:
-        suffix = 'train_cls_first'
-    elif train_exp_first:
-        suffix = 'train_exp_first'
-    else:
-        suffix = ''
+    # input data relevant settings
 
-    if train_on_human_annotation_only:
-        suffix += '_train_on_human_annotation_only'
+    data_cache_name = [f'seqlen_{MAX_SEQ_LENGTH}',
+                       f'dataset_{dataset}',
+                       f'exp_structure_{exp_structure}']
+    if train_on_annotations_only:
+        data_cache_name.append('train_on_annotations_only')
         training_data_decorator = extract_rations
-    elif train_without_human_annotation:
-        suffix += '_train_without_human_annotation'
+    elif train_without_annotations:
+        data_cache_name.append('train_without_annotations')
         training_data_decorator = remove_rations
+    else:
+        data_cache_name.append('complete_sentences')
+        training_data_decorator = None
+    if annotation_source is not None:
+        data_cache_name.append(annotation_source)
+    if train_on_portion != 0:
+        data_cache_name.append(f'train_on_portion_{train_on_portion}')
+    if merge_evidences:
+        data_cache_name.append('merged_evidences')
+    else:
+        data_cache_name.append('separated_evidences')
 
-    if eval_human_annotation:
-        suffix += '_eval_human_annotation'
+    # input data irrelevant (model) settings
 
-    if EXP_OUTPUT == 'gru':
+    import copy
+
+    model_name = copy.deepcopy(data_cache_name)
+    model_name += [f'bert_{bert_size}',
+                   f'bce_rebalance_approach_{rebalance_approach}',
+                   f'pooling_{pooling}',
+                   f'learning_rate_{LEARNING_RATE}']
+    if par_lambda is None:
+        model_name.append('no_weight')
+    else:
+        model_name.append('par_lambda_{}'.format(par_lambda))
+    if cls_only:
+        model_suffix = 'cls_only'
+    elif exp_only:
+        model_suffix = 'exp_only'
+    elif freeze_cls:
+        model_suffix = 'freeze_cls'
+    elif freeze_exp:
+        model_suffix = 'freeze_exp'
+    elif train_cls_first:
+        model_suffix = 'train_cls_first'
+    elif train_exp_first:
+        model_suffix = 'train_exp_first'
+    else:
+        model_suffix = ''
+    if eval_annotations:
+        model_suffix += '_eval_annotations'
+    model_name.append(model_suffix)
+
+    data_cache_name = '_'.join(data_cache_name) + '_inputdata_cache'
+    model_name = '_'.join(model_name)
+    output_dir = os.path.join('model_checkpoints', model_name)
+
+    if exp_structure == 'gru':
         if rebalance_approach == 'resampling':
             loss_function = imbalanced_bce_resampling
         else:
             loss_function = imbalanced_bce_bayesian
-    elif EXP_OUTPUT == 'rnr':
+    elif exp_structure == 'rnr':
         loss_function = rnr_matrix_loss
-
-    OUTPUT_DIR = ['bert_{}_seqlen_{}_{}_exp_output_{}'.format(bert_size, MAX_SEQ_LENGTH, dataset, EXP_OUTPUT),
-                  'merged_evidences' if merge_evidences else 'separated_evidences']
-
-    if train_on_portion != 0:
-        OUTPUT_DIR += ['train_on_portion', str(train_on_portion)]
-
-    if train_on_human_annotation_only:
-        OUTPUT_DIR.append('train_on_human_annotation_only')
-        training_data_decorator = extract_rations
-    elif train_without_human_annotation:
-        OUTPUT_DIR.append('train_without_human_annotation')
-        training_data_decorator = remove_rations
-
-    DATASET_CACHE_NAME = '_'.join(OUTPUT_DIR) + '_inputdata_cache'
-
-    if par_lambda is None:
-        OUTPUT_DIR.append('no_weight')
-    else:
-        OUTPUT_DIR.append('par_lambda_{}'.format(par_lambda))
-    OUTPUT_DIR.append(
-        'no_padding_imbalanced_bce_{}_pooling_{}_learning_rate_{}'.format(rebalance_approach, pooling, LEARNING_RATE))
-    OUTPUT_DIR.append(suffix)
-    OUTPUT_DIR = '_'.join(OUTPUT_DIR)
-    MODEL_NAME = OUTPUT_DIR
-    OUTPUT_DIR = os.path.join('model_checkpoints', MODEL_NAME)
 
     if USE_BUCKET:
         BUCKET = 'bert-base-uncased-test0'  # @param {type:"string"}
-        OUTPUT_DIR = 'gs://{}/{}'.format(BUCKET, OUTPUT_DIR)
+        output_dir = 'gs://{}/{}'.format(BUCKET, output_dir)
         from google.colab import auth
 
         auth.authenticate_user()
     if DO_DELETE:
         try:
-            tf.gfile.DeleteRecursively(OUTPUT_DIR)
+            tf.gfile.DeleteRecursively(output_dir)
         except:
             pass
 
-    mkdirs(OUTPUT_DIR)
-    print('***** Model output directory: {} *****'.format(OUTPUT_DIR))
+    mkdirs(output_dir)
+    print('***** Model output directory: {} *****'.format(output_dir))
 
     # initializing graph and session
     graph = tf.get_default_graph()
@@ -227,12 +243,12 @@ if __name__ == '__main__':
     from bert_data_preprocessing_rational_eraser import preprocess
 
 
-    @cache_decorator(os.path.join(cache_dir, 'cache', DATASET_CACHE_NAME + '_eraser_format'))
+    @cache_decorator(os.path.join(cache_dir, 'cache', data_cache_name + '_eraser_format'), force_recache=force_recache)
     def preprocess_wrapper(*data_inputs, docs=docs):
         ret = []
         for data in data_inputs:
             ret.append(
-                preprocess(data, docs, label_list, dataset, MAX_SEQ_LENGTH, EXP_OUTPUT, merge_evidences,
+                preprocess(data, docs, label_list, dataset, MAX_SEQ_LENGTH, exp_structure, merge_evidences,
                            data_decorator=training_data_decorator, gpu_id=gpu_id))
         return ret
 
@@ -243,11 +259,20 @@ if __name__ == '__main__':
     val_input_ids, val_input_masks, val_segment_ids, val_rations, val_labels = rets_val
     test_input_ids, test_input_masks, test_segment_ids, test_rations, test_labels = rets_test
 
+    for i, input_ids in enumerate([train_input_ids, val_input_ids, test_input_ids]):
+        for j, ids in enumerate(input_ids):
+            try:
+                a = ids[ids.index(102) + 1:].index(102)
+            except ValueError:
+                print(i, j)
+                print(ids)
+                raise ValueError
+
 
     def expand_on_evidences(data):
         from eraserbenchmark.rationale_benchmark.utils import Annotation
         expanded_data = []
-        for ann in tqdm_notebook(data):
+        for ann in tqdm(data):
             for ev_group in ann.evidences:
                 new_ann = Annotation(annotation_id=ann.annotation_id,
                                      query=ann.query,
@@ -286,14 +311,17 @@ if __name__ == '__main__':
     else:
         loss_weights = {'cls_output': 1,
                         'exp_output': par_lambda}
-    metrics = {'cls_output': 'accuracy'}
-    loss = {'cls_output': 'binary_crossentropy'}
-    if EXP_OUTPUT != 'none':
-        metrics['exp_output'] = [f1_wrapper(EXP_OUTPUT),
-                                 sp_precision_wrapper(EXP_OUTPUT),
-                                 sp_recall_wrapper(EXP_OUTPUT),
-                                 precision_wrapper(EXP_OUTPUT),
-                                 recall_wrapper(EXP_OUTPUT)]
+    metrics = {}
+    loss = {}
+    if not exp_only:
+        metrics['cls_output'] = 'accuracy'
+        loss['cls_output'] = 'binary_crossentropy'
+    if exp_structure != 'none':
+        metrics['exp_output'] = [f1_wrapper(exp_structure),
+                                 sp_precision_wrapper(exp_structure),
+                                 sp_recall_wrapper(exp_structure),
+                                 precision_wrapper(exp_structure),
+                                 recall_wrapper(exp_structure)]
         loss['exp_output'] = loss_function()
 
 
@@ -320,9 +348,9 @@ if __name__ == '__main__':
         else:
             model_cls = None
 
-        if 'cls' not in dataset and EXP_OUTPUT != 'none' and not cls_only:
+        if 'cls' not in dataset and exp_structure != 'none' and not cls_only:
             # Explainer output
-            if EXP_OUTPUT == 'gru':
+            if exp_structure == 'gru':
                 gru = CuDNNGRU(
                     NUM_GRU_UNITS_BERT_SEQ, kernel_initializer='random_uniform', return_sequences=True,
                     name='exp_gru_gru')(
@@ -330,7 +358,7 @@ if __name__ == '__main__':
                 exp = Dense(1, activation='sigmoid', name='exp_gru_dense')(gru)
                 output_mask = Reshape((MAX_SEQ_LENGTH, 1), name='exp_gru_reshape')(in_mask)
                 exp_outputs = Multiply(name='exp_output')([output_mask, exp])
-            elif EXP_OUTPUT == 'rnr':
+            elif exp_structure == 'rnr':
                 M1 = Bidirectional(
                     layer=CuDNNLSTM(NUM_INTERVAL_LSTM_WIDTH, return_sequences=True, name='exp_rnr_lstm1'),
                     merge_mode='concat', name='exp_rnr_bidirectional1')(bert_exp_output)
@@ -374,16 +402,16 @@ if __name__ == '__main__':
     SAVE_CHECKPOINTS_STEPS = 500
     SAVE_SUMMARY_STEPS = 100
 
-    checkpoint_path = os.path.join(OUTPUT_DIR, 'cp-{epoch:04d}.ckpt')
+    checkpoint_path = os.path.join(output_dir, 'cp-{epoch:04d}.ckpt')
     checkpoint_dir = os.path.dirname(checkpoint_path)
-    cls_output_file = os.path.join(OUTPUT_DIR, 'output.txt')
+    cls_output_file = os.path.join(output_dir, 'output.txt')
 
-    RES_FOR_BENCHMARK_FNAME = MODEL_NAME + '_' + BENCHMARK_SPLIT_NAME
+    RES_FOR_BENCHMARK_FNAME = model_name + '_' + BENCHMARK_SPLIT_NAME
 
     with graph.as_default():
         set_session(sess)
         model, model_cls, model_exp = build_model()
-        if EXP_OUTPUT == 'none':
+        if exp_structure == 'none':
             model = model_cls
         model.summary()
         sess.run(tf.local_variables_initializer())
@@ -449,8 +477,8 @@ if __name__ == '__main__':
                 for layer in model.layers:
                     if layer.name.startswith(phases[1]):
                         layer.trainable = False
-                checkpoint_path_phase0 = os.path.join(OUTPUT_DIR, 'phase0', 'cp-{epoch:04d}.ckpt')
-                mkdirs(os.path.join(OUTPUT_DIR, 'phase0'))
+                checkpoint_path_phase0 = os.path.join(output_dir, 'phase0', 'cp-{epoch:04d}.ckpt')
+                mkdirs(os.path.join(output_dir, 'phase0'))
                 cp_callback_phase0 = tf.keras.callbacks.ModelCheckpoint(checkpoint_path_phase0,
                                                                         save_weights_only=False,
                                                                         verbose=1,
@@ -494,8 +522,8 @@ if __name__ == '__main__':
                 optimizer = Adam(LEARNING_RATE)
                 model_phase1.compile(loss=loss[phases[1] + '_output'], optimizer=optimizer,
                                      metrics=[metrics[phases[1] + '_output']])
-                checkpoint_path_phase1 = os.path.join(OUTPUT_DIR, 'phase1', 'cp-{epoch:04d}.ckpt')
-                mkdirs(os.path.join(OUTPUT_DIR, 'phase1'))
+                checkpoint_path_phase1 = os.path.join(output_dir, 'phase1', 'cp-{epoch:04d}.ckpt')
+                mkdirs(os.path.join(output_dir, 'phase1'))
                 cp_callback_phase1 = tf.keras.callbacks.ModelCheckpoint(checkpoint_path_phase1,
                                                                         save_weights_only=False,
                                                                         verbose=1,
@@ -549,24 +577,36 @@ if __name__ == '__main__':
                                             y=test_outputs,
                                             batch_size=BATCH_SIZE,
                                             verbose=1)
+            pred = model.predict(x=test_inputs)
+            evaluation_output_name = ['test_loss', 'test_accuracy']
+            if not exp_only:
+                from sklearn.metrics import f1_score
+
+                macro_f1 = f1_score(np.squeeze(test_outputs['cls_output']),
+                                    np.round(np.squeeze(pred)),
+                                    average='macro')
+                evaluation_res.append(macro_f1)
+                evaluation_output_name.append('macro_f1')
             with open(cls_output_file, 'a+') as fw:
                 fw.write("{}:\n".format(datetime.now()))
-                fw.write(str(evaluation_res) + '\n')
+                for name, value in zip(evaluation_output_name, evaluation_res):
+                    fw.write(f"{name}: {value} ")
+                fw.write('\n')
 
         if exp_visualize:
             test_inputs_head = [x[:len_head] for x in test_inputs]
             pred = model_exp.predict(test_inputs_head)
             pred = np.round(np.array(pred)).astype(np.int32)
-            exp_output_folder = os.path.join(OUTPUT_DIR, 'exp_outputs/')
-            mkdirs(exp_output_folder)
-            print('marked rationals are saved under {}'.format(exp_output_folder))
-            for i, l in enumerate(tqdm_notebook(test)):
+            exp_vis_folder = os.path.join(output_dir, 'exp_outputs/')
+            mkdirs(exp_vis_folder)
+            print('marked rationals are saved under {}'.format(exp_vis_folder))
+            for i, l in enumerate(tqdm(test)):
                 if i == len_head:
                     break
                 input_ids = test_input_ids[i]
-                if EXP_OUTPUT == 'rnr':
+                if exp_structure == 'rnr':
                     pred_intp = rnr_matrix_to_rational_mask(pred[i])[0]
-                elif EXP_OUTPUT == 'gru':
+                elif exp_structure == 'gru':
                     pred_intp = pred[i].reshape([-1])
                 label = test_labels[i]
                 gt = test_rations[i].reshape([-1])
@@ -574,15 +614,15 @@ if __name__ == '__main__':
                 fname = l.annotation_id
                 if l.docids is not None:
                     fname += '-' + l.docids[0]
-                with open(exp_output_folder + fname + '.html', "w+") as f:
+                with open(exp_vis_folder + fname + '.html', "w+") as f:
                     f.write('<h1>label: {}</h1>\n'.format('pos' if label == 1 else 'neg'))
                     f.write(html[1] + '<br/><br/>\n' + html[0])
 
-        if exp_benchmark:
+        if exp_benchmark or save_machine_rationale:
             from eraser_benchmark import pred_to_results, get_cls_score, add_cls_scores, remove_rations, \
-                extract_rations, rnr_matrix_to_rational_mask
-            from eraserbenchmark.eraser import evaluate
+                extract_rations, rnr_matrix_to_rational_mask, ann_to_exp_output, convert_res_to_csv
 
+            from eraserbenchmark.eraser import evaluate
             result_fname = RES_FOR_BENCHMARK_FNAME + '.jsonl'
             result_fname = os.path.join('eraserbenchmark', 'annotated_by_exp', result_fname)
             if BENCHMARK_SPLIT_NAME == 'test':
@@ -593,45 +633,78 @@ if __name__ == '__main__':
                 benchmark_inputs, raw_input, benchmark_input_ids, benchmark_outputs = training_inputs, train, train_input_ids, training_outputs
 
             pred = model.predict(x=benchmark_inputs)
-            if eval_human_annotation:
-                cls_pred = pred if EXP_OUTPUT == 'none' else pred[0]
+            if eval_annotations:
+                cls_pred = pred if exp_structure == 'none' else pred[0]
                 exp_pred = benchmark_outputs['exp_output']
+            elif exp_only:
+                cls_pred = [[0] for i in pred]
+                exp_pred = pred
+            elif cls_only:
+                cls_pred = pred
+                exp_pred = [[0 for j in range(MAX_SEQ_LENGTH)] for i in pred]
             else:
                 cls_pred = pred[0]
                 exp_pred = pred[1]
 
+            from bert_with_ration import FullTokenizerWithRations
+
+            full_tokenizer = FullTokenizerWithRations.create_tokenizer_from_hub_module(gpu_id)
             results = [pred_to_results(raw_input[i], benchmark_input_ids[i],
                                        (cls_pred[i], exp_pred[i]),
                                        HARD_SELECTION_COUNT,
                                        HARD_SELECTION_THRESHOLD,
-                                       vocab, docs, label_list, EXP_OUTPUT)
+                                       vocab, docs, label_list, exp_structure)
                        for i in range(len(cls_pred))]
-            pred_softmax = np.hstack([1 - cls_pred, cls_pred])
-            c_pred_softmax = get_cls_score(
-                model, results, docs, label_list, dataset, remove_rations, MAX_SEQ_LENGTH, EXP_OUTPUT, gpu_id=gpu_id)
-            s_pred_softmax = get_cls_score(
-                model, results, docs, label_list, dataset, extract_rations, MAX_SEQ_LENGTH, EXP_OUTPUT, gpu_id=gpu_id)
+            bert_tokens = [res[1] for res in results]
+            bert_tokens = {annotation_id: tokens for annotation_id, tokens in bert_tokens}
+            results = [res[0] for res in results]
 
-            print(len(c_pred_softmax))
-            print((c_pred_softmax[0]))
+            if save_machine_rationale:
+                ref = {ri.annotation_id: ri for ri in raw_input}
+                machine_rationale_folder = os.path.join(machine_rationale_folder, dataset)
+                if not os.path.isdir(machine_rationale_folder):
+                    os.mkdir(machine_rationale_folder)
+                exp_output_res = [ann_to_exp_output(ann, ref) for ann in results]
+                exp_output_res = list(filter(lambda x: len(x) > 0, exp_output_res))
+                exp_output_fname = RES_FOR_BENCHMARK_FNAME + '_' \
+                                   + BENCHMARK_SPLIT_NAME + '_exp_output.jsonl'
+                exp_output_fname = os.path.join(machine_rationale_folder, exp_output_fname)
+                with open(exp_output_fname, 'w+') as fout:
+                    for res in exp_output_res:
+                        fout.write(str(res) + '\n')
+                # exp_output_docs_dir = os.path.join(exp_output_folder, 'docs')
+                exp_csv_fname = exp_output_fname[:-5] + 'csv'
+                exp_csv = convert_res_to_csv(results, benchmark_input_ids, bert_tokens, ref)
+                exp_csv.to_csv(exp_csv_fname)
+            elif exp_benchmark:
+                pred_softmax = np.hstack([1 - cls_pred, cls_pred])
+                c_pred_softmax = get_cls_score(
+                    model, results, docs, label_list, dataset, remove_rations, MAX_SEQ_LENGTH, exp_structure,
+                    gpu_id=gpu_id, tokenizer=full_tokenizer)
+                s_pred_softmax = get_cls_score(
+                    model, results, docs, label_list, dataset, extract_rations, MAX_SEQ_LENGTH, exp_structure,
+                    gpu_id=gpu_id, tokenizer=full_tokenizer)
 
-            results = [add_cls_scores(res,
-                                      cls_score,
-                                      c_cls_score,
-                                      s_cls_score,
-                                      label_list) for res, cls_score, c_cls_score, s_cls_score in zip(results,
-                                                                                                      pred_softmax,
-                                                                                                      c_pred_softmax,
-                                                                                                      s_pred_softmax)]
-            anns_saved = set()
-            real_results = []
-            for ann in results:
-                if ann['annotation_id'] not in anns_saved:
-                    anns_saved.add(ann['annotation_id'])
-                    real_results.append(ann)
-            with open(result_fname + 'pkl3', "wb+") as pfout:
-                pickle.dump(real_results, pfout)
+                print(len(c_pred_softmax))
+                print((c_pred_softmax[0]))
 
-            evaluate(MODEL_NAME, dataset, BENCHMARK_SPLIT_NAME, train_on_portion, data_dir)
+                results = [add_cls_scores(res,
+                                          cls_score,
+                                          c_cls_score,
+                                          s_cls_score,
+                                          label_list) for res, cls_score, c_cls_score, s_cls_score in zip(results,
+                                                                                                          pred_softmax,
+                                                                                                          c_pred_softmax,
+                                                                                                          s_pred_softmax)]
+                anns_saved = set()
+                real_results = []
+                for ann in results:
+                    if ann['annotation_id'] not in anns_saved:
+                        anns_saved.add(ann['annotation_id'])
+                        real_results.append(ann)
+                with open(result_fname + 'pkl3', "wb+") as pfout:
+                    pickle.dump(real_results, pfout)
+
+                evaluate(model_name, dataset, BENCHMARK_SPLIT_NAME, train_on_portion, data_dir)
         with open(cls_output_file, 'a+') as fw:
             fw.write('/////////////////experiment ends//////////////////\n\n\n')

@@ -18,12 +18,12 @@ POS = 1
 pattern = re.compile('</?(POS)?(NEG)?>')
 
 
-def cache_decorator(*dump_fnames):
+def cache_decorator(*dump_fnames, force_recache=False):
     def excution_decorator(func):
         def wrapper(*args, **kwargs):
             if len(dump_fnames) == 1:
                 dump_fname = dump_fnames[0]
-                if not os.path.isfile(dump_fname):
+                if not os.path.isfile(dump_fname) or force_recache:
                     ret = func(*args, **kwargs)
                     with open(dump_fname, 'wb') as fdump:
                         pickle.dump(ret, fdump)
@@ -35,7 +35,7 @@ def cache_decorator(*dump_fnames):
 
             rets = None
             for fname in dump_fnames:
-                if not os.path.isfile(fname):
+                if not os.path.isfile(fname) or force_recache:
                     rets = func(*args, **kwargs)
                     break
             if rets is not None:

@@ -8,6 +8,7 @@ from bert_data_preprocessing_rational_eraser import convert_bert_features, creat
 from bert_with_ration_eraser import InputRationalExample, convert_examples_to_features
 from eraserbenchmark.eraser_utils import extract_doc_ids_from_annotations
 from utils import convert_subtoken_ids_to_tokens
+from bert_with_ration_eraser import convert_ids_to_token_list
 from eraserbenchmark.rationale import Annotation
 from eraserbenchmark.rationale_benchmark.utils import Evidence
 
@@ -19,7 +20,7 @@ def flatten_rations(rations, len_sentence):
     return rations
 
 
-def remove_rations(sentence, rations, sub='.'):
+def remove_rations(sentence, rations, tokenizer=None, sub='.', combine_subtokens=False):
     sentence = sentence.lower().split()
     if isinstance(rations, list): # a list of Evidence-s
         rations = [e.__dict__ for e in rations]
@@ -28,13 +29,16 @@ def remove_rations(sentence, rations, sub='.'):
     rations = flatten_rations(rations, len(sentence))
     ret = []
     for rat_id, rat in enumerate(rations[:-1]):
-        ret += [sub] * (rat['end_token'] - rat['start_token']) \
-               + sentence[rat['end_token']
-                          : rations[rat_id + 1]['start_token']]
+        if combine_subtokens or tokenizer is None:
+            rep_count = rat['end_token'] - rat['start_token']
+        else:
+            rep_str = ' '.join(sentence[rat['start_token']: rat['end_token']])
+            rep_count = len(tokenizer.tokenize(rep_str))
+        ret += [sub] * rep_count + sentence[rat['end_token']:rations[rat_id + 1]['start_token']]
     return ' '.join(ret)
 
 
-def extract_rations(sentence, rations, sub='.'):
+def extract_rations(sentence, rations, tokenizer=None, sub='.', combine_subtokens=False):
     sentence = sentence.lower().split()
     if isinstance(rations, list): # a list of Evidence-s
         rations = [e.__dict__ for e in rations]
@@ -43,14 +47,17 @@ def extract_rations(sentence, rations, sub='.'):
     rations = flatten_rations(rations, len(sentence))
     ret = []
     for rat_id, rat in enumerate(rations[:-1]):
-        ret += sentence[rat['start_token']: rat['end_token']] \
-               + [sub] * (rations[rat_id + 1]
-                          ['start_token'] - rat['end_token'])
+        if combine_subtokens or tokenizer is None:
+            rep_count = rations[rat_id + 1]['start_token'] - rations[rat_id]['end_token']
+        else:
+            rep_str = ' '.join(sentence[rations[rat_id]['end_token']: rations[rat_id + 1]['start_token']])
+            rep_count = len(tokenizer.tokenize(rep_str))
+        ret += sentence[rat['start_token']: rat['end_token']] + [sub] * (rep_count)
     return ' '.join(ret)
 
 
-def ce_load_bert_features(rationales, docs, label_list, decorate, max_seq_length, gpu_id):
-    tokenizer = create_tokenizer_from_hub_module(gpu_id)
+def ce_load_bert_features(rationales, docs, label_list, decorate, max_seq_length, gpu_id, tokenizer):
+    #tokenizer = create_tokenizer_from_hub_module(gpu_id)
     input_examples = []
     for r_idx, rational in enumerate(rationales):
         text_a = rational['query']
@@ -59,7 +66,7 @@ def ce_load_bert_features(rationales, docs, label_list, decorate, max_seq_length
         flattened_tokens = chain(*sentences)
         text_b = ' '.join(flattened_tokens)
         #print(rational)
-        text_b = decorate(text_b, rational)
+        text_b = decorate(text_b, rational, tokenizer=tokenizer)
         label = rational['classification']
         evidences = None
         input_examples.append(InputRationalExample(guid=None,
@@ -71,8 +78,8 @@ def ce_load_bert_features(rationales, docs, label_list, decorate, max_seq_length
     return features
 
 
-def ce_preprocess(rationales, docs, label_list, dataset_name, decorate, max_seq_length, exp_output, gpu_id):
-    features = ce_load_bert_features(rationales, docs, label_list, decorate, max_seq_length, gpu_id)
+def ce_preprocess(rationales, docs, label_list, dataset_name, decorate, max_seq_length, exp_output, gpu_id, tokenizer):
+    features = ce_load_bert_features(rationales, docs, label_list, decorate, max_seq_length, gpu_id, tokenizer)
 
     with_rations = ('cls' not in dataset_name)
     with_lable_id = ('seq' not in dataset_name)
@@ -80,8 +87,8 @@ def ce_preprocess(rationales, docs, label_list, dataset_name, decorate, max_seq_
     return convert_bert_features(features, with_lable_id, with_rations, exp_output)
 
 
-def get_cls_score(model, rationales, docs, label_list, dataset, decorate, max_seq_length, exp_output, gpu_id):
-    rets = ce_preprocess(rationales, docs, label_list, dataset, decorate, max_seq_length, exp_output, gpu_id)
+def get_cls_score(model, rationales, docs, label_list, dataset, decorate, max_seq_length, exp_output, gpu_id, tokenizer):
+    rets = ce_preprocess(rationales, docs, label_list, dataset, decorate, max_seq_length, exp_output, gpu_id, tokenizer)
     _input_ids, _input_masks, _segment_ids, _rations, _labels = rets
 
     _inputs = [_input_ids, _input_masks, _segment_ids]
@@ -183,11 +190,20 @@ def pred_to_results(raw_input, input_ids, pred, hard_selection_count, hard_selec
     if exp_output == 'rnr':
         exp_pred = rnr_matrix_to_rational_mask(exp_pred)
     exp_pred = exp_pred.reshape((-1,)).tolist()
-    docid = list(raw_input.evidences)[0][0].docid
+    try:
+        docid = list(raw_input.evidences)[0][0].docid
+    except IndexError:
+        docid = raw_input.annotation_id  # posR_161 of movies reviews has no evidence
     raw_sentence = ' '.join(list(chain.from_iterable(docs[docid])))
     raw_sentence = re.sub('\x12', '', raw_sentence)
     raw_sentence = raw_sentence.lower().split()
-    token_ids, exp_pred = extract_texts(input_ids, exp_pred, text_a=False, text_b=True)
+    try:
+        token_ids, exp_pred = extract_texts(input_ids, exp_pred, text_a=False, text_b=True)
+    except ValueError:
+        print(docid)
+        print(input_ids)
+        print(convert_subtoken_ids_to_tokens(input_ids, vocab))
+        raise ValueError
     token_list, exp_pred = convert_subtoken_ids_to_tokens(token_ids, vocab, exp_pred, raw_sentence)
     result = {'annotation_id': raw_input.annotation_id, 'query': raw_input.query}
     ev_groups = []
@@ -200,4 +216,42 @@ def pred_to_results(raw_input, input_ids, pred, hard_selection_count, hard_selec
     if exp_output != 'rnr':
         result['rationales'][-1]['soft_rationale_predictions'] = exp_pred + [0] * (len(raw_sentence) - len(token_list))
     result['classification'] = label_list[int(round(cls_pred[0]))]
-    return result
+    return result, (result['annotation_id'], token_list)
+
+
+def prediction_correct(ann, ref):
+    return ann['classification'] == ref[ann['annotation_id']].classification
+
+
+def ann_to_exp_output(ann, ref):
+    res = {}
+    if not prediction_correct(ann, ref):
+        return res
+    res['annotation_id'] = ann['annotation_id']
+    res['classification'] = ann['classification']
+    res['evidences'] = ann['rationales'][-1]['hard_rationale_predictions']
+    res['query'] = ref[ann['annotation_id']].query
+    return res
+
+
+def convert_res_to_csv(results, input_ids, bert_tokens, ref):
+    from pandas import DataFrame
+    res = {'annotation_id': [],
+           'type': [], 'text': [],
+           'query': [],
+           'classification': []}
+    for ids, ann in zip(input_ids, results):
+        if not prediction_correct(ann, ref):
+            continue
+        for i in range(3): # cs, ma, no_ma
+            res['annotation_id'].append(ann['annotation_id'])
+            res['query'].append(ann['query'])
+            res['classification'].append(ann['classification'])
+        res['type'].append('cs')
+        tokens = ' '.join(bert_tokens[ann['annotation_id']])
+        res['text'].append(tokens)
+        res['type'].append('ma')
+        res['text'].append(extract_rations(tokens, ann))
+        res['type'].append('no_ma')
+        res['text'].append(remove_rations(tokens, ann))
+    return DataFrame(res)
