@@ -665,7 +665,7 @@ if __name__ == '__main__':
                 if not os.path.isdir(machine_rationale_folder):
                     os.mkdir(machine_rationale_folder)
                 if exp_only:
-                    exp_output_res = [ann_to_exp_output(ann, ref, keep_correct_predictions_only=False) for ann in results] # for two-stage model where the first stage has exp only. We don't care about the correctness of the cls prediction in the first stage
+                    exp_output_res = [ann_to_exp_output(ann, ref, reset_cls_prediction=True) for ann in results] # for two-stage model where the first stage has exp only. We don't care about the correctness of the cls prediction in the first stage
                 else:
                     exp_output_res = [ann_to_exp_output(ann, ref) for ann in results]
                 exp_output_res = list(filter(lambda x: len(x) > 0, exp_output_res))
