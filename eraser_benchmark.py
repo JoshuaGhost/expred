@@ -223,9 +223,9 @@ def prediction_correct(ann, ref):
     return ann['classification'] == ref[ann['annotation_id']].classification
 
 
-def ann_to_exp_output(ann, ref):
+def ann_to_exp_output(ann, ref, keep_correct_predictions_only=True):
     res = {}
-    if not prediction_correct(ann, ref):
+    if not prediction_correct(ann, ref) and keep_correct_predictions_only:
         return res
     res['annotation_id'] = ann['annotation_id']
     res['classification'] = ann['classification']
