@@ -3,6 +3,8 @@ from itertools import chain
 
 import numpy as np
 import tensorflow as tf
+if tf.__version__.startswith('2'):
+    import tensorflow.compat.v1 as tf
 import tensorflow_hub as hub
 from copy import deepcopy
 
@@ -83,6 +85,9 @@ def load_bert_features(data, docs, label_list, max_seq_length, merge_evidences, 
                                                        label=label,
                                                        evidences=evidences))
             # print(input_examples[-1].text_b, input_examples[-1].text_a, input_examples[-1].evi)
+            if ann.annotation_id == 'posR_945.txt':
+                print(input_examples[-1])
+                print(text_b)
 
     features = convert_examples_to_features(input_examples, label_list, max_seq_length, tokenizer)
     return features

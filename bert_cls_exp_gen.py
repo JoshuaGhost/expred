@@ -16,7 +16,7 @@ from utils import *
 
 if tensorflow.__version__.startswith('2'):
     import tensorflow.compat.v1 as tf
-
+    tensorflow = tf
     tf.disable_v2_behavior()
 else:
     import tensorflow as tf
@@ -266,6 +266,7 @@ if __name__ == '__main__':
             except ValueError:
                 print(i, j)
                 print(ids)
+                print(train[j])
                 raise ValueError
 
 
@@ -294,11 +295,18 @@ if __name__ == '__main__':
 
     # building models
     from model import BertLayer
-    from tensorflow.keras.layers import CuDNNGRU, CuDNNLSTM
-    from tensorflow.keras.layers import Bidirectional
-    from tensorflow.keras.optimizers import Adam
-    from tensorflow.keras.models import Model
-    from tensorflow.keras.layers import Input, Dense, Reshape, Multiply, Concatenate, Dot, Lambda, Softmax
+    if not tensorflow.__version__.startswith('2'):
+        from tensorflow.keras.layers import CuDNNGRU, CuDNNLSTM
+        from tensorflow.keras.layers import Bidirectional
+        from tensorflow.keras.optimizers import Adam
+        from tensorflow.keras.models import Model
+        from tensorflow.keras.layers import Input, Dense, Reshape, Multiply, Concatenate, Dot, Lambda, Softmax
+    else:
+        from tensorflow.compat.v1.keras.layers import CuDNNGRU, CuDNNLSTM
+        from tensorflow.compat.v1.keras.layers import Bidirectional
+        from tensorflow.compat.v1.keras.optimizers import Adam
+        from tensorflow.compat.v1.keras.models import Model
+        from tensorflow.compat.v1.keras.layers import Input, Dense, Reshape, Multiply, Concatenate, Dot, Lambda, Softmax
 
     from metrices import sp_precision_wrapper, sp_recall_wrapper
 
