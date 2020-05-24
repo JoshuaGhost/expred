@@ -229,6 +229,8 @@ def ann_to_exp_output(ann, ref, reset_cls_prediction=False):
         ann['classification'] = ref[ann['annotation_id']].classification
     elif not prediction_correct(ann, ref):
         return res
+    if len(ann['rationales'][-1]['hard_rationale_predictions']) == 0:
+        return res
     res['annotation_id'] = ann['annotation_id']
     res['classification'] = ann['classification']
     res['evidences'] = ann['rationales'][-1]['hard_rationale_predictions']

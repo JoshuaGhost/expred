@@ -73,8 +73,16 @@ def load_bert_features(data, docs, label_list, max_seq_length, merge_evidences, 
                                           start_sentence=ev.start_sentence,
                                           end_sentence=ev.end_sentence)
                     example_evidences.append(deepcopy(example_ev))
-            if len(ann.evidences) == 0: # posR_161.txt has no evidence
+            #if len(ann.evidences) == 0 or \
+            #   (len(ann.evidences) == 1 and len(ann.evidences[0]) == 0): # posR_161.txt has no evidence
+            #    text_b_tokens = list(chain.from_iterable(docs[ann.annotation_id]))
+            if len(text_b_tokens) == 0:
                 text_b_tokens = list(chain.from_iterable(docs[ann.annotation_id]))
+            if ann.annotation_id == 'negR_010.txt':
+                print('#'*100)
+                print(len(ann.evidences))
+                #print(len(ann.evidences[0]))
+                print("#" * 100)
             text_b = ' '.join(text_b_tokens)
             evidences = example_evidences
             if decorator is not None:
@@ -85,11 +93,16 @@ def load_bert_features(data, docs, label_list, max_seq_length, merge_evidences, 
                                                        label=label,
                                                        evidences=evidences))
             # print(input_examples[-1].text_b, input_examples[-1].text_a, input_examples[-1].evi)
-            if ann.annotation_id == 'posR_945.txt':
-                print(input_examples[-1])
-                print(text_b)
+            #if ann.annotation_id == 'negR_010.txt':
+            #    print('#'*100)
+            #    print(input_examples[-1].text_b)
+            #    print(text_b)
+            #    print("#"*100)
 
     features = convert_examples_to_features(input_examples, label_list, max_seq_length, tokenizer)
+    print(data[10].annotation_id)
+    print(input_examples[10].text_b)
+    print(features[10].input_ids)
     return features
 
 

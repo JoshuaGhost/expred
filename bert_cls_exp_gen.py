@@ -264,9 +264,10 @@ if __name__ == '__main__':
             try:
                 a = ids[ids.index(102) + 1:].index(102)
             except ValueError:
-                print(i, j)
-                print(ids)
-                print(train[j])
+                #print("$"*100)
+                #print(i, j)
+                #print(ids)
+                #print(train[j])
                 raise ValueError
 
 
@@ -683,6 +684,8 @@ if __name__ == '__main__':
                 import json
                 with open(exp_output_fname, 'w+') as fout:
                     for res in exp_output_res:
+                        if len(res) == 0:
+                            continue
                         res['evidences'] = [res['evidences']]
                         json.dump(res, fout)
                         fout.write('\n')
