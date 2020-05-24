@@ -3,6 +3,8 @@ IRRATIONAL = 0
 RATIONAL = 1
 
 import tensorflow as tf
+if tf.__version__.startswith('2'):
+    import tensorflow.compat.v1 as tf
 from bert.run_classifier import InputFeatures, PaddingInputExample, _truncate_seq_pair
 from bert.tokenization import FullTokenizer, BasicTokenizer, \
     convert_to_unicode, whitespace_tokenize, convert_ids_to_tokens
