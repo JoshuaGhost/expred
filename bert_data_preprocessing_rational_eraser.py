@@ -85,6 +85,8 @@ def load_bert_features(data, docs, label_list, max_seq_length, merge_evidences, 
             # print(input_examples[-1].text_b, input_examples[-1].text_a, input_examples[-1].evi)
 
     features = convert_examples_to_features(input_examples, label_list, max_seq_length, tokenizer)
+    print(input_examples[10].text_b)
+    print(features[10].input_ids)
     return features
 
 
