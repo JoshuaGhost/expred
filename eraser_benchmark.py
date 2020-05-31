@@ -224,11 +224,17 @@ def prediction_correct(ann, ref):
 
 
 def ann_to_exp_output(ann, ref, reset_cls_prediction=False):
-    res = {}
     if reset_cls_prediction:
         ann['classification'] = ref[ann['annotation_id']].classification
     elif not prediction_correct(ann, ref):
-        return res
+        return {}
+    res = {'annotation_id': ann['annotation_id'],
+           'classification': ann['classification'],
+           'evidences': [{'start_token': -1, 'end_token': -1,
+                        'start_sentence': -1, 'end_sentence': -1,
+                        'docid':list(ref[ann['annotation_id']].evidences)[0][0].docid,
+                        'text': ''}],
+           'query': ref[ann['annotation_id']].query}
     if len(ann['rationales'][-1]['hard_rationale_predictions']) == 0:
         return res
     res['annotation_id'] = ann['annotation_id']

@@ -12,8 +12,7 @@ else:
     import tensorflow as tf
 from bert.tokenization import convert_ids_to_tokens
 
-NEG = 0
-POS = 1
+
 
 pattern = re.compile('</?(POS)?(NEG)?>')
 

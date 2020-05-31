@@ -66,6 +66,7 @@ if __name__ == '__main__':
     parser.add_argument('--bert_size', type=str, default='base', choices=['base', 'large'])
     parser.add_argument('--rebalance_approach', type=str, default='resampling', choices=['resampling', 'bayesian'])
     parser.add_argument('--data_dir', type=str)
+    parser.add_argument('--eval_on_explanation_only', action='store_true')
     args = ['--par_lambda', '5.0',
             '--gpu_id', '0',
             '--batch_size', '2',
@@ -117,6 +118,7 @@ if __name__ == '__main__':
     force_recache = args.force_recache
     annotation_source = args.annotation_source
     machine_rationale_folder = args.machine_rationale_folder
+    eval_on_explanation_only = args.eval_on_explanation_only
     assert (not (freeze_cls and freeze_exp))
     assert (not (train_exp_first and train_cls_first))
     assert not ((freeze_cls or freeze_exp) and (
@@ -154,6 +156,9 @@ if __name__ == '__main__':
         data_cache_name.append('merged_evidences')
     else:
         data_cache_name.append('separated_evidences')
+
+    #if eval_on_explanation_only:
+    #    data_cache_name.append('eval_on_explanation_only')
 
     # input data irrelevant (model) settings
 
@@ -245,11 +250,18 @@ if __name__ == '__main__':
 
     @cache_decorator(os.path.join(cache_dir, 'cache', data_cache_name + '_eraser_format'), force_recache=force_recache)
     def preprocess_wrapper(*data_inputs, docs=docs):
+        data_decorators = [training_data_decorator, None]
+        if eval_on_explanation_only:
+            data_decorators.append(training_data_decorator)
+        else:
+            data_decorators.append(None)
         ret = []
-        for data in data_inputs:
+        for data, decorator in zip(data_inputs, data_decorators):
             ret.append(
-                preprocess(data, docs, label_list, dataset, MAX_SEQ_LENGTH, exp_structure, merge_evidences,
-                           data_decorator=training_data_decorator, gpu_id=gpu_id))
+                preprocess(data, docs, label_list, dataset,
+                           MAX_SEQ_LENGTH, exp_structure, merge_evidences,
+                           data_decorator=decorator, gpu_id=gpu_id)
+            )
         return ret
 
 
@@ -258,6 +270,8 @@ if __name__ == '__main__':
     train_input_ids, train_input_masks, train_segment_ids, train_rations, train_labels = rets_train
     val_input_ids, val_input_masks, val_segment_ids, val_rations, val_labels = rets_val
     test_input_ids, test_input_masks, test_segment_ids, test_rations, test_labels = rets_test
+
+    print(test_input_ids[0])
 
     for i, input_ids in enumerate([train_input_ids, val_input_ids, test_input_ids]):
         for j, ids in enumerate(input_ids):
@@ -587,18 +601,31 @@ if __name__ == '__main__':
                                             batch_size=BATCH_SIZE,
                                             verbose=1)
             pred = model.predict(x=test_inputs)
-            evaluation_output_name = ['test_loss', 'test_accuracy']
+            if exp_only:
+                eval_output_names = ['exp_loss', 'exp_f1',
+                                     'exp_sp_precision', 'exp_sp_recall',
+                                     'exp_precision', 'exp_recall']
+            elif cls_only:
+                eval_output_names = ['cls_loss', 'test_acc', 'macro_f1']
+            else: # normal MTL
+                eval_output_names = ['loss', 'cls_loss', 'exp_loss', 'cls_acc',
+                                     'exp_f1',
+                                     'exp_sp_precision', 'exp_sp_recall',
+                                     'exp_precision', 'exp_recall']
             if not exp_only:
+                eval_output_names.append('cls_macro_f1')
+                if not cls_only:
+                    pred_cls = pred[0]
+                else:
+                    pred_cls = pred
                 from sklearn.metrics import f1_score
-
                 macro_f1 = f1_score(np.squeeze(test_outputs['cls_output']),
-                                    np.round(np.squeeze(pred)),
+                                    np.round(np.squeeze(pred_cls)),
                                     average='macro')
                 evaluation_res.append(macro_f1)
-                evaluation_output_name.append('macro_f1')
             with open(cls_output_file, 'a+') as fw:
                 fw.write("{}:\n".format(datetime.now()))
-                for name, value in zip(evaluation_output_name, evaluation_res):
+                for name, value in zip(eval_output_names, evaluation_res):
                     fw.write(f"{name}: {value} ")
                 fw.write('\n')
 
@@ -609,23 +636,40 @@ if __name__ == '__main__':
             exp_vis_folder = os.path.join(output_dir, 'exp_outputs/')
             mkdirs(exp_vis_folder)
             print('marked rationals are saved under {}'.format(exp_vis_folder))
+            if not exp_only:
+                pred_cls = model_cls.predict(test_inputs_head)
+                #print(pred_cls[:10])
+                pred_cls = [label_list[int(round(x[0]))] for x in pred_cls]
             for i, l in enumerate(tqdm(test)):
                 if i == len_head:
                     break
+                label = label_list[test_labels[i][0]]
+                if not exp_only:
+                    pred_label = pred_cls[i]
+                    if label != pred_label:
+                        continue
                 input_ids = test_input_ids[i]
                 if exp_structure == 'rnr':
                     pred_intp = rnr_matrix_to_rational_mask(pred[i])[0]
                 elif exp_structure == 'gru':
                     pred_intp = pred[i].reshape([-1])
-                label = test_labels[i]
+
+                #print(label)
                 gt = test_rations[i].reshape([-1])
                 html = convert_res_to_htmls(input_ids, pred_intp, gt, vocab)
+
                 fname = l.annotation_id
                 if l.docids is not None:
                     fname += '-' + l.docids[0]
                 with open(exp_vis_folder + fname + '.html', "w+") as f:
-                    f.write('<h1>label: {}</h1>\n'.format('pos' if label == 1 else 'neg'))
-                    f.write(html[1] + '<br/><br/>\n' + html[0])
+                    if not exp_only:
+                        f.write(f'<h1>predict: {pred_label}</h1\n>')
+                    f.write(html[1])
+                    f.write('<br/><br/>\n')
+                    #print(label)
+                    #print(label_list)
+                    f.write('<h1>label: {}</h1>\n'.format(label))
+                    f.write(html[0])
 
         if exp_benchmark or save_machine_rationale:
             from eraser_benchmark import pred_to_results, get_cls_score, add_cls_scores, remove_rations, \
@@ -646,16 +690,16 @@ if __name__ == '__main__':
                 cls_pred = pred if exp_structure == 'none' else pred[0]
                 exp_pred = benchmark_outputs['exp_output']
             elif exp_only:
-                cls_pred = [[0] for i in pred]
+                cls_pred = np.array([[0] for i in pred])
                 exp_pred = pred
             elif cls_only:
                 cls_pred = pred
-                exp_pred = [[0 for j in range(MAX_SEQ_LENGTH)] for i in pred]
+                exp_pred = np.array([[0 for j in range(MAX_SEQ_LENGTH)] for i in pred])
             else:
                 cls_pred = pred[0]
                 exp_pred = pred[1]
 
-            from bert_with_ration import FullTokenizerWithRations
+            from bert_with_ration_eraser import FullTokenizerWithRations
 
             full_tokenizer = FullTokenizerWithRations.create_tokenizer_from_hub_module(gpu_id)
             results = [pred_to_results(raw_input[i], benchmark_input_ids[i],
@@ -673,7 +717,7 @@ if __name__ == '__main__':
                 machine_rationale_folder = os.path.join(machine_rationale_folder, dataset)
                 if not os.path.isdir(machine_rationale_folder):
                     os.mkdir(machine_rationale_folder)
-                if exp_only:
+                if exp_only or BENCHMARK_SPLIT_NAME == 'test':
                     exp_output_res = [ann_to_exp_output(ann, ref, reset_cls_prediction=True) for ann in results] # for two-stage model where the first stage has exp only. We don't care about the correctness of the cls prediction in the first stage
                 else:
                     exp_output_res = [ann_to_exp_output(ann, ref) for ann in results]
@@ -694,16 +738,23 @@ if __name__ == '__main__':
                 exp_csv = convert_res_to_csv(results, benchmark_input_ids, bert_tokens, ref)
                 exp_csv.to_csv(exp_csv_fname)
             elif exp_benchmark:
-                pred_softmax = np.hstack([1 - cls_pred, cls_pred])
-                c_pred_softmax = get_cls_score(
-                    model, results, docs, label_list, dataset, remove_rations, MAX_SEQ_LENGTH, exp_structure,
-                    gpu_id=gpu_id, tokenizer=full_tokenizer)
-                s_pred_softmax = get_cls_score(
-                    model, results, docs, label_list, dataset, extract_rations, MAX_SEQ_LENGTH, exp_structure,
-                    gpu_id=gpu_id, tokenizer=full_tokenizer)
 
-                print(len(c_pred_softmax))
-                print((c_pred_softmax[0]))
+                pred_softmax = np.hstack([1 - cls_pred, cls_pred])
+                if exp_only:
+                    c_pred_softmax = np.array([[0.5, 0.5] for i in pred])
+                    s_pred_softmax = np.array([[0.5, 0.5] for i in pred])
+                else:
+                    c_pred_softmax = get_cls_score(
+                        model, results, docs, label_list, dataset, remove_rations, MAX_SEQ_LENGTH, exp_structure,
+                        gpu_id=gpu_id, tokenizer=full_tokenizer)
+                    s_pred_softmax = get_cls_score(
+                        model, results, docs, label_list, dataset, extract_rations, MAX_SEQ_LENGTH, exp_structure,
+                        gpu_id=gpu_id, tokenizer=full_tokenizer)
+
+                #print(len(results), len(exp_pred))
+                #print(len(pred_softmax))
+                #print(len(c_pred_softmax))
+                #print(len(s_pred_softmax))
 
                 results = [add_cls_scores(res,
                                           cls_score,
@@ -715,10 +766,13 @@ if __name__ == '__main__':
                                                                                                           s_pred_softmax)]
                 anns_saved = set()
                 real_results = []
+                #print(len(results))
+                #print(results[0]['annotation_id'])
                 for ann in results:
                     if ann['annotation_id'] not in anns_saved:
                         anns_saved.add(ann['annotation_id'])
                         real_results.append(ann)
+                print(len(real_results))
                 with open(result_fname + 'pkl3', "wb+") as pfout:
                     pickle.dump(real_results, pfout)
 

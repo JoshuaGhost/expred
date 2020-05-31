@@ -18,8 +18,18 @@ class BertLayer(tf.keras.layers.Layer):
         self.output_size = 768
         self.bert_path = bert_path
         self.pooling = pooling
-
         super(BertLayer, self).__init__(**kwargs)
+
+    def get_config(self):
+        config = super().get_config().copy()
+        config.update({
+            'n_fine_tune_layers': self.n_fine_tune_layers,
+            'trainable': self.trainable,
+            'output_size':self.output_size,
+            'bert_path':self.bert_path,
+            'pooling':self.pooling
+        })
+        return config
 
     def build(self, input_shape):
         self.bert = hub.Module(

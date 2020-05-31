@@ -10,6 +10,8 @@ from bert.tokenization import FullTokenizer, BasicTokenizer, \
     convert_to_unicode, whitespace_tokenize, convert_ids_to_tokens
 #from tqdm import tqdm_notebook as tqdm
 from tqdm import tqdm
+import tensorflow_hub as hub
+from config import *
 
 
 class InputRationalExample(object):
@@ -69,6 +71,22 @@ class FullTokenizerWithRations(FullTokenizer):  # Test passed :)
                 split_rations.append(ration)
         return list(zip(split_tokens, split_rations))
 
+    @classmethod
+    def create_tokenizer_from_hub_module(self, gpu_id):
+        """Get the vocab file and casing info from the Hub module."""
+        with tf.Graph().as_default():  # basically useless, but good practice to specify the graph using, even it sets the default graph as the default graph
+            bert_module = hub.Module(BERT_MODEL_HUB)
+            tokenization_info = bert_module(signature="tokenization_info", as_dict=True)
+            config = tf.ConfigProto()
+            config.gpu_options.allow_growth = True
+            config.gpu_options.visible_device_list = gpu_id
+            config.graph_options.optimizer_options.global_jit_level = tf.OptimizerOptions.ON_1
+            with tf.Session(
+                    config=config) as sess:  # create a new session, with session we can setup even remote computation
+                vocab_file, do_lower_case = sess.run([tokenization_info["vocab_file"],
+                                                      tokenization_info["do_lower_case"]])
+        return FullTokenizerWithRations(vocab_file=vocab_file, do_lower_case=do_lower_case)
+
 
 # --------------------------------------------------------------------------------------
 
@@ -99,7 +117,7 @@ def convert_single_rational_example(ex_index, example, label_list, max_seq_lengt
         label_map[label] = i
 
     tokens_a = tokenizer.tokenize(example.text_a)
-    tokens_b = None  # no tokens_b in our tasks
+    tokens_b = None
     if example.text_b:
         tokens_b = tokenizer.tokenize(example.text_b, example.evidences)
 

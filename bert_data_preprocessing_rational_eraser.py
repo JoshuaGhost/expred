@@ -3,6 +3,7 @@ from itertools import chain
 
 import numpy as np
 import tensorflow as tf
+
 if tf.__version__.startswith('2'):
     import tensorflow.compat.v1 as tf
 import tensorflow_hub as hub
@@ -73,16 +74,16 @@ def load_bert_features(data, docs, label_list, max_seq_length, merge_evidences, 
                                           start_sentence=ev.start_sentence,
                                           end_sentence=ev.end_sentence)
                     example_evidences.append(deepcopy(example_ev))
-            #if len(ann.evidences) == 0 or \
+            # if len(ann.evidences) == 0 or \
             #   (len(ann.evidences) == 1 and len(ann.evidences[0]) == 0): # posR_161.txt has no evidence
             #    text_b_tokens = list(chain.from_iterable(docs[ann.annotation_id]))
             if len(text_b_tokens) == 0:
                 text_b_tokens = list(chain.from_iterable(docs[ann.annotation_id]))
-            if ann.annotation_id == 'negR_010.txt':
-                print('#'*100)
-                print(len(ann.evidences))
-                #print(len(ann.evidences[0]))
-                print("#" * 100)
+            # if ann.annotation_id == 'negR_010.txt':
+            #    print('#'*100)
+            #    print(len(ann.evidences))
+            # print(len(ann.evidences[0]))
+            #    print("#" * 100)
             text_b = ' '.join(text_b_tokens)
             evidences = example_evidences
             if decorator is not None:
@@ -93,16 +94,16 @@ def load_bert_features(data, docs, label_list, max_seq_length, merge_evidences, 
                                                        label=label,
                                                        evidences=evidences))
             # print(input_examples[-1].text_b, input_examples[-1].text_a, input_examples[-1].evi)
-            #if ann.annotation_id == 'negR_010.txt':
+            # if ann.annotation_id == 'negR_010.txt':
             #    print('#'*100)
             #    print(input_examples[-1].text_b)
             #    print(text_b)
             #    print("#"*100)
 
     features = convert_examples_to_features(input_examples, label_list, max_seq_length, tokenizer)
-    print(data[10].annotation_id)
-    print(input_examples[10].text_b)
-    print(features[10].input_ids)
+    #print(data[10].annotation_id)
+    #print(input_examples[10].text_b)
+    #print(features[10].input_ids)
     return features
 
 
@@ -140,7 +141,8 @@ def convert_bert_features(features, with_label_id, with_rations, exp_output='gru
     return rets
 
 
-def preprocess(data, docs, label_list, dataset_name, max_seq_length, exp_output, merge_evidences, data_decorator=None, gpu_id='0'):
+def preprocess(data, docs, label_list, dataset_name, max_seq_length, exp_output, merge_evidences, data_decorator=None,
+               gpu_id='0'):
     features = load_bert_features(data, docs, label_list, max_seq_length, merge_evidences, data_decorator, gpu_id)
 
     with_rations = ('cls' not in dataset_name)
