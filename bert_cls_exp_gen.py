@@ -657,7 +657,8 @@ if __name__ == '__main__':
                 #print(label)
                 gt = test_rations[i].reshape([-1])
                 html = convert_res_to_htmls(input_ids, pred_intp, gt, vocab)
-
+                if "fada5e" not in html[1]:
+                    continue
                 fname = l.annotation_id
                 if l.docids is not None:
                     fname += '-' + l.docids[0]
