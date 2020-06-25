@@ -4,19 +4,19 @@ import logging
 
 import torch
 import torch.nn as nn
-from torch import optim
-from torch.optim import lr_scheduler
-import numpy as np
-import torchvision
-from torchvision import datasets, models, transforms
-import matplotlib.pyplot as plt
-import time
-import os
-import copy
-from torch.utils.data import Dataset, DataLoader
-from PIL import Image
-from random import randrange
-import torch.nn.functional as F
+#from torch import optim
+#from torch.optim import lr_scheduler
+#import numpy as np
+#import torchvision
+#from torchvision import datasets, models, transforms
+#import matplotlib.pyplot as plt
+#import time
+#import os
+#import copy
+#from torch.utils.data import Dataset, DataLoader
+#from PIL import Image
+#from random import randrange
+#import torch.nn.functional as F
 
 
 class BertLayerNorm(nn.Module):
@@ -53,7 +53,7 @@ class BertLayer(nn.Module):
         for param in self.bert.parameters():
             param.requires_grad = True
     '''
-
+    '''
     # building models
     from model import BertLayer
     from pytorch_transformers import BertConfig
@@ -68,27 +68,27 @@ class BertLayer(nn.Module):
     from metrices_pytorch import sp_precision_wrapper, sp_recall_wrapper
 
     from
-
+    '''
     DIM_DENSE_CLS = 256
     NUM_GRU_UNITS_BERT_SEQ = 128
     NUM_INTERVAL_LSTM_WIDTH = 100
 
-    class BERT_cls(nn.Module):
-        def __init__(self, dim_input, dim_cls_dense=256, num_cls=2, eps=1e-12):
-            super(BERT_cls, self).__init__()
-            self.dim_input = dim_input
-            self.dim_cls_dense = dim_cls_dense
-            self.num_cls = num_cls
-            nn.lin1 = nn.Linear(self.dim_input, self.dim_cls_dense, bias=True)
-            nn.act1 = nn.Tanh()
-            nn.lin2 = nn.Linear(self.dim_cls_dense, self.dim_input, bias=True)
-            nn.act2 = nn.Sigmoid()
-            self.variance_epsilon = eps
-            nn.init.uniform_(self.classifier.weight)
+class BERT_cls(nn.Module):
+    def __init__(self, dim_input, dim_cls_dense=256, num_cls=2, eps=1e-12):
+        super(BERT_cls, self).__init__()
+        self.dim_input = dim_input
+        self.dim_cls_dense = dim_cls_dense
+        self.num_cls = num_cls
+        nn.lin1 = nn.Linear(self.dim_input, self.dim_cls_dense, bias=True)
+        nn.act1 = nn.Tanh()
+        nn.lin2 = nn.Linear(self.dim_cls_dense, self.dim_input, bias=True)
+        nn.act2 = nn.Sigmoid()
+        self.variance_epsilon = eps
+        nn.init.uniform_(self.classifier.weight)
 
-        def forward(self, x):
-            x = self.act1(self.lin1(x))
-            x = self.act2(self.lin2(x))
+    def forward(self, x):
+        x = self.act1(self.lin1(x))
+        x = self.act2(self.lin2(x))
 
 
     class GRU_exp(nn.Module):
