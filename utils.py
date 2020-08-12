@@ -63,31 +63,27 @@ def convert_ids_to_token_list(input_ids, vocab=None):
 
 def convert_subtoken_ids_to_tokens(ids, vocab, exps=None, raw_sentence=None):
     subtokens = convert_ids_to_token_list(ids, vocab)
-    tokens, exps_output = [], []
-    exps_input = [0 for i in ids] if exps is None else exps
+    tokens, exps_outputs = [], []
+    if not isinstance(exps[0], list):
+        exps = [exps]
+    exps_inputs = [[0] * len(ids)] if exps is None else exps
     raw_sentence = subtokens if raw_sentence is None else raw_sentence
     subtokens = list(reversed([t[2:] if t.startswith('##') else t for t in subtokens]))
-    exps_input = list(reversed(exps_input))
+    exps_inputs = list(zip(*(list(reversed(e)) for e in exps_inputs)))
     for ref_token in raw_sentence:
-        t, e = '', 0
+        t, es = '', [0] * len(exps_inputs[0])
         while t != ref_token and len(subtokens) > 0:
             t += subtokens.pop()
-            e = max(e, exps_input.pop())
+            es = [max(old, new) for old, new in zip(es, exps_inputs.pop())]
         tokens.append(t)
-        exps_output.append(e)
+        exps_outputs.append(es)
         if len(subtokens) == 0:
             # the last sub-token is incomplete, ditch it directly
             if ref_token != tokens[-1]:
                 tokens = tokens[:-1]
-                exps_output = exps_output[:-1]
+                exps_outputs = exps_outputs[:-1]
             break
     if exps is None:
         return tokens
-    return tokens, exps_output
+    return tokens, exps_outputs
 
-
-def mkdirs(path):
-    if tensorflow.__version__.startswith('2'):
-        tf.io.gfile.makedirs(path)
-    else:
-        tf.gfile.MakeDirs(path)

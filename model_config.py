@@ -1,13 +1,21 @@
 import os
 
 import config
+import logging
+import json
 from metrices import *
 from losses import imbalanced_bce_bayesian, imbalanced_bce_resampling
 from losses import rnr_matrix_loss
 
+logging.basicConfig(level=logging.DEBUG, format='%(relativeCreated)6d %(threadName)s %(message)s')
+logger = logging.getLogger(__name__)
 
 class Config():
     def __init__(self, args):
+        with open(args.model_params, 'r') as fp:
+            logger.info(f'Loading model parameters from {args.model_params}')
+            model_params = json.load(fp)
+            logger.info(f'Params: {json.dumps(model_params, indent=2, sort_keys=True)}')
         self.BATCH_SIZE = args.batch_size
         self.par_lambda = args.par_lambda
         self.NUM_EPOCHS = args.num_epochs

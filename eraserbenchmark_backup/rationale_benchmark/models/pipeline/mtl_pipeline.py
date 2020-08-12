@@ -6,7 +6,7 @@ import torch
 import torch.nn as nn
 
 from params import MTLParams
-from eraserbenchmark.rationale_benchmark.models.model_utils import PaddedSequence
+from rationale_benchmark.models.model_utils import PaddedSequence
 #from torch import optim
 #from torch.optim import lr_scheduler
 #import numpy as np
@@ -21,7 +21,7 @@ from eraserbenchmark.rationale_benchmark.models.model_utils import PaddedSequenc
 #from random import randrange
 #import torch.nn.functional as F
 
-
+'''
 class BertLayerNorm(nn.Module):
     def __init__(self, hidden_size, eps=1e-12):
         super(BertLayerNorm, self).__init__()
@@ -34,7 +34,7 @@ class BertLayerNorm(nn.Module):
         s = (x - u).power(2).mean(-1, keepdim=True)
         x = (x - u)/torch.sqrt(s + self.variance_epsilon)
         return self.weight * x + self.bias
-
+'''
 
 class BertMTL(nn.Module):
     def __init__(self,
@@ -245,4 +245,3 @@ if __name__ == '__main__':
     print(zz)
 
     print(bertlayer(zz))
-
