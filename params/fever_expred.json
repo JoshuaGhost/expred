@@ -1,0 +1,32 @@
+{
+    "max_length": 512,
+    "dim_cls_linear": 256,
+    "dim_exp_gru": 128,
+    "bert_vocab": "bert-base-uncased",
+    "bert_dir": "bert-base-uncased",
+    "exp_structure": "gru",
+    "rebalance_approach": "resampling",
+    "merge_evidences": 1,
+    "classes": [
+        "SUPPORTS",
+        "REFUTES"
+    ],
+    "mtl_token_identifier": {
+        "par_lambda": 2.0,
+        "batch_size": 16,
+        "epochs": 10,
+        "patience": 3,
+        "warmup_steps": 50,
+        "lr": 1e-5,
+        "use_half_precision": 0,
+        "sampling_method": "whole_document"
+    },
+    "evidence_classifier": {
+        "batch_size": 16,
+        "warmup_steps": 50,
+        "epochs": 10,
+        "patience": 3,
+        "lr": 1e-5,
+        "use_half_precision": 0
+    }
+}

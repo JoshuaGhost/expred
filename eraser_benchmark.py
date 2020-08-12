@@ -6,7 +6,9 @@ from copy import deepcopy
 
 from preprocessing import convert_bert_features
 from bert_rational_feature import InputRationalExample, convert_examples_to_features
-from eraserbenchmark.eraser_utils import extract_doc_ids_from_annotations
+from eraser_utils import extract_doc_ids_from_annotations
+
+from rationale_benchmark.utils import Annotation
 from utils import convert_subtoken_ids_to_tokens
 
 
@@ -83,9 +85,9 @@ def add_cls_scores(res, cls, c, s, label_list):
     return res
 
 
-def pred_to_exp_mask(exp_pred, count=None, threshold=0.5):
+def pred_to_exp_mask(exp_pred, count, threshold):
     if count is None:
-        return (np.array(exp_pred) >= threshold).astype(np.int32)
+        return (np.array(exp_pred).astype(np.float) >= threshold).astype(np.int32)
     temp = [(i, p) for i, p in enumerate(exp_pred)]
     temp = sorted(temp, key=lambda x: x[1], reverse=True)
     ret = np.zeros_like(exp_pred).astype(np.int32)
@@ -94,9 +96,13 @@ def pred_to_exp_mask(exp_pred, count=None, threshold=0.5):
     return ret
 
 
-def rational_bits_to_ev_generator(token_list, raw_input, exp_pred, hard_selection_count, hard_selection_threshold):
+def rational_bits_to_ev_generator(token_list, raw_input_or_docid, exp_pred, hard_selection_count=None,
+                                  hard_selection_threshold=0.5):
     in_rationale = False
-    docid = list(extract_doc_ids_from_annotations([raw_input]))[0]
+    if not isinstance(raw_input_or_docid, Annotation):
+        docid = raw_input_or_docid
+    else:
+        docid = list(extract_doc_ids_from_annotations([raw_input_or_docid]))[0]
     ev = {'docid': docid,
           'start_token': -1, 'end_token': -1, 'text': ''}
     exp_masks = pred_to_exp_mask(
@@ -162,7 +168,9 @@ def rnr_matrix_to_rational_mask(rnr_matrix):
     return rational_mask
 
 
-def pred_to_results(raw_input, input_ids, pred, hard_selection_count, hard_selection_threshold, vocab, docs, label_list,
+def pred_to_results(raw_input, input_ids, pred,
+                    hard_selection_count, hard_selection_threshold,
+                    vocab, docs, label_list,
                     exp_output):
     cls_pred, exp_pred = pred
     if exp_output == 'rnr':

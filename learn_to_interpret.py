@@ -4,17 +4,20 @@ from datetime import datetime
 
 import numpy as np
 import shutil
+import logging
+import json
 import torch
 from transformers import BertModel, BertTokenizer
 from rationale_tokenization import FullRationaleTokenizer
 from tqdm import tqdm_notebook
-
+from itertools import chain
 from display_rational import convert_res_to_htmls
 from eraser_benchmark import rnr_matrix_to_rational_mask
 
 from metrices import *
 from utils import *
 from model_config import Config
+from eraserbenchmark.rationale_benchmark.utils import load_datasets, load_documents
 
 from dataset import Dataset
 
@@ -22,22 +25,27 @@ HARD_SELECTION_COUNT = None
 HARD_SELECTION_THRESHOLD = 0.5
 BERT_WARMUP_PROPORTION = 0.1
 
+logging.basicConfig(level=logging.DEBUG, format='%(relativeCreated)6d %(threadName)s %(message)s')
+logger = logging.getLogger(__name__)
 
 def setup_parser():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--data_dir', type=str, default='/home/zzhang/.keras/datasets')
-    parser.add_argument('--par_lambda', type=float)
-    parser.add_argument('--pooling', type=str, default='first', choices=['first', 'mean'])
-    parser.add_argument('--bert_size', type=str, default='base', choices=['base', 'large'])
-    parser.add_argument('--exp_structure', type=str, default='gru', choices='gru rnr'.split())  # gru, rnr
-    parser.add_argument('--rebalance_approach', type=str, default='resampling', choices=['resampling', 'bayesian'])
-    parser.add_argument('--batch_size', type=int, default=16)
-    parser.add_argument('--dataset', type=str, choices='fever multirc movies'.split())  # fever, multirc, movie
-    parser.add_argument('--num_epochs', type=int, default=10)
-    parser.add_argument('--gpu_id', type=str, default=0)
-    parser.add_argument('--use_bucket', action='store_true')
+    parser.add_argument('--data_dir', type=str, required=True)
+    parser.add_argument('--model_params', required=True)
+    parser.add_argument('--output_dir', required=True)
+
+    #parser.add_argument('--par_lambda', type=float)
+    #parser.add_argument('--pooling', type=str, default='first', choices=['first', 'mean'])
+    #parser.add_argument('--bert_size', type=str, default='base', choices=['base', 'large'])
+    #parser.add_argument('--exp_structure', type=str, default='gru', choices='gru rnr'.split())  # gru, rnr
+    #parser.add_argument('--rebalance_approach', type=str, default='resampling', choices=['resampling', 'bayesian'])
+    #parser.add_argument('--batch_size', type=int, default=16)
+    #parser.add_argument('--dataset', type=str, choices='fever multirc movies'.split())  # fever, multirc, movie
+    #parser.add_argument('--num_epochs', type=int, default=10)
+    #parser.add_argument('--gpu_id', type=str, default=0)
+    #parser.add_argument('--use_bucket', action='store_true')
     parser.add_argument('--delete_checkpoints', action='store_true')
-    parser.add_argument('--merge_evidences', action='store_true')
+    #parser.add_argument('--merge_evidences', action='store_true')
 
     parser.add_argument("--do_train", action='store_true')
     parser.add_argument('--train_on_portion', type=float, default=0)
@@ -45,17 +53,17 @@ def setup_parser():
     parser.add_argument('--exp_visualize', action='store_true')
     parser.add_argument('--len_viz_head', type=int, default=100)
 
-    parser.add_argument('--evaluate', action='store_true')
+    #parser.add_argument('--evaluate', action='store_true')
 
-    parser.add_argument('--exp_benchmark', action='store_true')
-    parser.add_argument('--benchmark_split', type=str, default='test', choices='test train val'.split())  # gru, rnr
+    #parser.add_argument('--exp_benchmark', action='store_true')
+    #parser.add_argument('--benchmark_split', type=str, default='test', choices='test train val'.split())  # gru, rnr
 
-    parser.add_argument('--freeze_cls', action='store_true')
-    parser.add_argument('--freeze_exp', action='store_true')
-    parser.add_argument('--train_cls_first', action='store_true')
-    parser.add_argument('--train_exp_first', action='store_true')
-    parser.add_argument('--start_from_phase1', action='store_true')
-    parser.add_argument('--load_phase1', action='store_true')
+    #parser.add_argument('--freeze_cls', action='store_true')
+    #parser.add_argument('--freeze_exp', action='store_true')
+    #parser.add_argument('--train_cls_first', action='store_true')
+    #parser.add_argument('--train_exp_first', action='store_true')
+    #parser.add_argument('--start_from_phase1', action='store_true')
+    #parser.add_argument('--load_phase1', action='store_true')
     return parser
 
 
@@ -67,32 +75,30 @@ def verify_validity(config):
 
 
 if __name__ == '__main__':
-    parser = setup_parser()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--data_dir', type=str, required=True)
+    parser.add_argument('--model_params', required=True)
+    parser.add_argument('--output_dir', required=True)
 
-    args = ['--par_lambda', '5.0',
-            '--gpu_id', '0',
-            '--batch_size', '2',
-            '--num_epochs', '10',
-            '--dataset', 'fever',
-            '--exp_visualize',
-            '--exp_structure', 'gru',
-            '--merge_evidences']
-
-    # args = parser.parse_args(args)
+    parser.add_argument('--delete_checkpoints', action='store_true')
+    parser.add_argument("--do_train", action='store_true')
     args = parser.parse_args()
-    config = Config(args)
+    with open(args.model_params, 'r') as fp:
+        logger.info(f'Loading model parameters from {args.model_params}')
+        config = json.load(fp)
+        logger.info(f'Params: {json.dumps(args.model_params, indent=2, sort_keys=True)}')
+    os.makedirs(args.output_dir, exist_ok=True)
     verify_validity(config)
-
-    if config.DO_DELETE:
-        try:
-            shutil.rmtree(config.OUTPUT_DIR)
-        except:
-            pass
-    mkdirs(config.OUTPUT_DIR)
-    print('***** Model output directory: {} *****'.format(config.OUTPUT_DIR))
+    print('***** Model output directory: {} *****'.format(config.output_dir))
 
     tokenizer = FullRationaleTokenizer()
     vocab = tokenizer.get_vocab()
+
+    train, val, test = load_datasets(args.data_dir)
+    docids = set(e.docid for e in
+                 chain.from_iterable(chain.from_iterable(map(lambda ann: ann.evidences, chain(train, val, test)))))
+    documents = load_documents(args.data_dir, docids)
+    logger.info(f'Loaded {len(documents)} documents')
 
     dataset = Dataset(config)
     dataset.load_dataset()
