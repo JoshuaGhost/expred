@@ -56,6 +56,19 @@ def extract_rations(sentence, rations, tokenizer=None, sub='.', combine_subtoken
     return ' '.join(ret)
 
 
+def extract_rations_collapse_wildcards(sentence, rations, tokenizer=None, sub='.', combine_subtokens=False, rep_count=1):
+    sentence = sentence.lower().split()
+    if isinstance(rations, list): # a list of Evidence-s
+        rations = [e.__dict__ for e in rations]
+    else: # an Annotation
+        rations = rations['rationales'][0]['hard_rationale_predictions']
+    rations = flatten_rations(rations, len(sentence))
+    ret = []
+    for rat_id, rat in enumerate(rations[:-1]):
+        ret += sentence[rat['start_token']: rat['end_token']] + [sub] * (rep_count)
+    return ' '.join(ret)
+
+
 def ce_load_bert_features(rationales, docs, label_list, decorate, max_seq_length, gpu_id, tokenizer):
     #tokenizer = create_tokenizer_from_hub_module(gpu_id)
     input_examples = []
@@ -184,8 +197,10 @@ def rnr_matrix_to_rational_mask(rnr_matrix):
     return rational_mask
 
 
-def pred_to_results(raw_input, input_ids, pred, hard_selection_count, hard_selection_threshold, vocab, docs, label_list,
-                    exp_output):
+def pred_to_results(raw_input, input_ids, pred, \
+                    hard_selection_count, hard_selection_threshold, \
+                    vocab, docs, label_list,
+                    exp_output, tokenizer, identifier='mtl', fix_empty_evidence='doc'):
     cls_pred, exp_pred = pred
     if exp_output == 'rnr':
         exp_pred = rnr_matrix_to_rational_mask(exp_pred)
@@ -194,9 +209,12 @@ def pred_to_results(raw_input, input_ids, pred, hard_selection_count, hard_selec
         docid = list(raw_input.evidences)[0][0].docid
     except IndexError:
         docid = raw_input.annotation_id  # posR_161 of movies reviews has no evidence
-    raw_sentence = ' '.join(list(chain.from_iterable(docs[docid])))
-    raw_sentence = re.sub('\x12', '', raw_sentence)
-    raw_sentence = raw_sentence.lower().split()
+    raw_sentence = []
+    for word in chain.from_iterable(docs[docid]):
+        tokenized = tokenizer.basic_tokenizer.tokenize(word)
+        raw_sentence.append(''.join(tokenized))
+    #raw_sentence = re.sub('\x12', '', raw_sentence)
+    #raw_sentence = raw_sentence.lower().split()
     try:
         token_ids, exp_pred = extract_texts(input_ids, exp_pred, text_a=False, text_b=True)
     except ValueError:
@@ -204,7 +222,9 @@ def pred_to_results(raw_input, input_ids, pred, hard_selection_count, hard_selec
         print(input_ids)
         print(convert_subtoken_ids_to_tokens(input_ids, vocab))
         raise ValueError
+
     token_list, exp_pred = convert_subtoken_ids_to_tokens(token_ids, vocab, exp_pred, raw_sentence)
+
     result = {'annotation_id': raw_input.annotation_id, 'query': raw_input.query}
     ev_groups = []
     result['docids'] = [docid]
@@ -212,10 +232,25 @@ def pred_to_results(raw_input, input_ids, pred, hard_selection_count, hard_selec
     for ev in rational_bits_to_ev_generator(token_list, raw_input, exp_pred, hard_selection_count,
                                             hard_selection_threshold):
         ev_groups.append(ev)
+
+    if len(ev_groups) == 0 and fix_empty_evidence != 'ignore':
+        print(raw_input.annotation_id)
+        if fix_empty_evidence == 'random':
+            bogus_exp_pred = [np.random.randint(2) for i in exp_pred]
+        if fix_empty_evidence == 'doc':
+            bogus_exp_pred = [1] * len(exp_pred)
+
+        for ev in rational_bits_to_ev_generator(token_list, raw_input,
+                                                bogus_exp_pred,
+                                                hard_selection_count,
+                                                hard_selection_threshold):
+            ev_groups.append(ev)
+
     result['rationales'][-1]['hard_rationale_predictions'] = ev_groups
     if exp_output != 'rnr':
         result['rationales'][-1]['soft_rationale_predictions'] = exp_pred + [0] * (len(raw_sentence) - len(token_list))
-    result['classification'] = label_list[int(round(cls_pred[0]))]
+    if identifier == 'mtl':
+        result['classification'] = label_list[int(round(cls_pred[0]))]
     return result, (result['annotation_id'], token_list)
 
 

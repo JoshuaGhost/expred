@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="2d7f4175-46db-4a0f-b88c-31dbc651352b" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/remote-mappings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/deployment.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/deployment.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/interpretation_by_design.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/interpretation_by_design.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bert_data_preprocessing_rational_eraser.py" beforeDir="false" afterPath="$PROJECT_DIR$/bert_data_preprocessing_rational_eraser.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/eraser_benchmark.py" beforeDir="false" afterPath="$PROJECT_DIR$/eraser_benchmark.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/eraserbenchmark/eraser.py" beforeDir="false" afterPath="$PROJECT_DIR$/eraserbenchmark/eraser.py" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectId" id="1fzt5iCc7SdiJ4tTSiPSmX5sYZC" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="true" />
+    <property name="WebServerToolWindowPanel.toolwindow.highlight.mappings" value="true" />
+    <property name="WebServerToolWindowPanel.toolwindow.highlight.symlinks" value="true" />
+    <property name="WebServerToolWindowPanel.toolwindow.show.date" value="false" />
+    <property name="WebServerToolWindowPanel.toolwindow.show.permissions" value="false" />
+    <property name="WebServerToolWindowPanel.toolwindow.show.size" value="false" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="2d7f4175-46db-4a0f-b88c-31dbc651352b" name="Default Changelist" comment="" />
+      <created>1597232567331</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1597232567331</updated>
+      <workItem from="1597232568487" duration="55511000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="2" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="555" y="214" width="1234" height="685" key="#Deployment" timestamp="1597238161811">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state x="555" y="214" width="1234" height="685" key="#Deployment/0.27.1920.1053/165.1080.1600.900@0.27.1920.1053" timestamp="1597238161811" />
+    <state x="418" y="211" width="1116" height="685" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1597232874287">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state x="418" y="211" width="1116" height="685" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.27.1920.1053/165.1080.1600.900@0.27.1920.1053" timestamp="1597232874287" />
+    <state x="426" y="188" width="1067" height="737" key="SettingsEditor" timestamp="1597232788401">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state x="426" y="188" width="1067" height="737" key="SettingsEditor/0.27.1920.1053/165.1080.1600.900@0.27.1920.1053" timestamp="1597232788401" />
+    <state width="960" height="527" key="XDebugger.FullValuePopup" timestamp="1597399482895">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state width="960" height="527" key="XDebugger.FullValuePopup/0.27.1920.1053/165.1080.1600.900@0.27.1920.1053" timestamp="1597399482895" />
+    <state x="396" y="128" width="1118" height="858" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser" timestamp="1597376965553">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state x="396" y="128" width="1118" height="858" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser/0.27.1920.1053/165.1080.1600.900@0.27.1920.1053" timestamp="1597376965553" />
+    <state x="688" y="409" width="1197" height="301" key="com.jetbrains.plugins.remotesdk.ui.RemoteMappingsConfiguration" timestamp="1597232784612">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state x="688" y="409" width="1197" height="301" key="com.jetbrains.plugins.remotesdk.ui.RemoteMappingsConfiguration/0.27.1920.1053/165.1080.1600.900@0.27.1920.1053" timestamp="1597232784612" />
+    <state x="639" y="223" width="721" height="660" key="find.popup" timestamp="1597356146272">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state x="639" y="223" width="721" height="660" key="find.popup/0.27.1920.1053/165.1080.1600.900@0.27.1920.1053" timestamp="1597356146272" />
+    <state x="851" y="199" width="714" height="729" key="ftp.server.browser" timestamp="1597232661157">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state x="851" y="199" width="714" height="729" key="ftp.server.browser/0.27.1920.1053/165.1080.1600.900@0.27.1920.1053" timestamp="1597232661157" />
+    <state x="619" y="259" width="679" height="679" key="search.everywhere.popup" timestamp="1597237672862">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state x="619" y="259" width="679" height="679" key="search.everywhere.popup/0.27.1920.1053/165.1080.1600.900@0.27.1920.1053" timestamp="1597237672862" />
+  </component>
+</project>

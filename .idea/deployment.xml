@@ -1,11 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" autoUpload="Always" serverName="zzhang@n1:22">
+  <component name="PublishConfigData" autoUpload="Always" serverName="zzhang@n1:22 tf">
     <serverData>
-      <paths name="zzhang@n1:22">
+      <paths name="zzhang@n1:22 pytorch">
         <serverdata>
           <mappings>
             <mapping deploy="/home/zzhang/workspace/interpretation_by_design" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="zzhang@n1:22 tf">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/home/zzhang/workspace/interpretation_by_design_protect" local="$PROJECT_DIR$" />
           </mappings>
         </serverdata>
       </paths>
@@ -13,13 +20,6 @@
         <serverdata>
           <mappings>
             <mapping deploy="/home/zzhang/workspace/interpretation_by_design" local="$PROJECT_DIR$" />
-          </mappings>
-        </serverdata>
-      </paths>
-      <paths name="zzhang@n:22">
-        <serverdata>
-          <mappings>
-            <mapping deploy="/tmp/pycharm_learn_to_interprete" local="$PROJECT_DIR$" />
           </mappings>
         </serverdata>
       </paths>

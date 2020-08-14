@@ -3,5 +3,5 @@
   <component name="JavaScriptSettings">
     <option name="languageLevel" value="ES6" />
   </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="Remote Python 3.7.3 (sftp://zzhang@n2:22/home/zzhang/workspace/interpretation_by_design/.venv/bin/python)" project-jdk-type="Python SDK" />
+  <component name="ProjectRootManager" version="2" project-jdk-name="Remote Python 3.7.3 (sftp://zzhang@n1:22/home/zzhang/workspace/interpretation_by_design_protect/.venv3/bin/python3)" project-jdk-type="Python SDK" />
 </project>
