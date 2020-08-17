@@ -298,6 +298,16 @@ def make_mtl_classification_preds_epoch(classifier: nn.Module,
     return epoch_loss, epoch_soft_pred, epoch_hard_pred, epoch_truth
 
 
+def convert_to_global_token_mapping(token_mapping):
+    ret = []
+    sent_offset = 0
+    for sent in token_mapping:
+        for mapping in sent:
+            ret.append((mapping[0]+sent_offset, mapping[1]+sent_offset))
+        sent_offset = ret[-1][-1]
+    return ret
+
+
 def decode(evidence_identifier: nn.Module,
            evidence_classifier: nn.Module,
            train: List[Annotation],
@@ -439,13 +449,19 @@ def decode(evidence_identifier: nn.Module,
                     if token_ids_origin[0] == tokenizer.unk_token_id:
                         raw_document.append('[UNK]')
                     else:
-                        raw_document.extend(tokenizer.basic_tokenizer.tokenize(word))
+                        tokenized = ''.join(tokenizer.basic_tokenizer.tokenize(word)) # dumm ass ˈlʊdvɪɡ_væn_ˈbeɪˌtoʊvən
+                        raw_document.append(tokenized)
+                global_token_mapping = convert_to_global_token_mapping(token_mapping[docid])
                 tokens, exp_outputs = convert_subtoken_ids_to_tokens(subtoken_ids,
                                                                      vocab=vocab,
+                                                                     token_mapping=global_token_mapping,
                                                                      exps=(hard_rationale_predictions,
                                                                            soft_rationale_predictions),
                                                                      raw_sentence=raw_document)
                 hard_rationale_predictions, soft_rationale_predictions = list(zip(*exp_outputs))
+                # if docid == 'Ludwig_van_Beethoven':
+                #     #print(len(hard_rationale_predictions))
+                #     print(len(soft_rationale_predictions))
                 ev_generator = rational_bits_to_ev_generator(tokens,
                                                              docid,
                                                              hard_rationale_predictions)

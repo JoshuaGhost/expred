@@ -61,7 +61,7 @@ def convert_ids_to_token_list(input_ids, vocab=None):
     return token_list
 
 
-def convert_subtoken_ids_to_tokens(ids, vocab, exps=None, raw_sentence=None):
+def convert_subtoken_ids_to_tokens(ids, vocab, token_mapping=None, exps=None, raw_sentence=None):
     subtokens = convert_ids_to_token_list(ids, vocab)
     tokens, exps_outputs = [], []
     if not isinstance(exps[0], list):
@@ -69,20 +69,30 @@ def convert_subtoken_ids_to_tokens(ids, vocab, exps=None, raw_sentence=None):
     exps_inputs = [[0] * len(ids)] if exps is None else exps
     raw_sentence = subtokens if raw_sentence is None else raw_sentence
     subtokens = list(reversed([t[2:] if t.startswith('##') else t for t in subtokens]))
-    exps_inputs = list(zip(*(list(reversed(e)) for e in exps_inputs)))
-    for ref_token in raw_sentence:
-        t, es = '', [0] * len(exps_inputs[0])
-        while t != ref_token and len(subtokens) > 0:
-            t += subtokens.pop()
-            es = [max(old, new) for old, new in zip(es, exps_inputs.pop())]
-        tokens.append(t)
-        exps_outputs.append(es)
-        if len(subtokens) == 0:
-            # the last sub-token is incomplete, ditch it directly
-            if ref_token != tokens[-1]:
-                tokens = tokens[:-1]
-                exps_outputs = exps_outputs[:-1]
-            break
+    if token_mapping is None:
+        exps_inputs = list(zip(*(list(reversed(e)) for e in exps_inputs)))
+        for ref_token in raw_sentence:
+            t, es = '', [0] * len(exps_inputs[0])
+            while t != ref_token and len(subtokens) > 0:
+                t += subtokens.pop()
+                es = [max(old, new) for old, new in zip(es, exps_inputs.pop())]
+            tokens.append(t)
+            exps_outputs.append(es)
+            if len(subtokens) == 0:
+                # the last sub-token is incomplete, ditch it directly
+                if ref_token != tokens[-1]:
+                    tokens = tokens[:-1]
+                    exps_outputs = exps_outputs[:-1]
+                break
+    else:
+        hard_rats, soft_rats = exps
+        for ref_token_idx, (token_piece_start, token_piece_end) in enumerate(token_mapping):
+            if token_piece_start >= len(hard_rats):
+                break
+            tokens.append(raw_sentence[ref_token_idx])
+            max_hard_rat = max(hard_rats[token_piece_start: token_piece_end])
+            max_soft_rat = max(soft_rats[token_piece_start: token_piece_end])
+            exps_outputs.append((max_hard_rat, max_soft_rat))
     if exps is None:
         return tokens
     return tokens, exps_outputs

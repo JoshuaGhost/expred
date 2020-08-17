@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" autoUpload="Always" serverName="zzhang@n1:22">
+  <component name="PublishConfigData" autoUpload="Always">
     <serverData>
-      <paths name="zzhang@n1:22">
+      <paths name="zzhang@n1:22 pytorch">
         <serverdata>
           <mappings>
             <mapping deploy="/workspace/interpretation_by_design" local="$PROJECT_DIR$" web="/" />

@@ -133,3 +133,61 @@ class BertClassifier(nn.Module):
         classes = self.cls_head(classes)
         assert torch.all(classes == classes) # for nans
         return classes
+
+
+class BertClassifier2(nn.Module):
+    """Thin wrapper around BertForSequenceClassification"""
+    def __init__(self,
+                 bert_dir: str,
+                 pad_token_id: int,
+                 cls_token_id: int,
+                 sep_token_id: int,
+                 num_labels: int,
+                 mtl_params: MTLParams,
+                 max_length: int=512,
+                 use_half_precision=True):
+        super(BertClassifier2, self).__init__()
+        bert = BertModel.from_pretrained(bert_dir, num_labels=num_labels)
+        if use_half_precision:
+            import apex
+            bert = bert.half()
+        self.bert = bert
+        self.cls_head = nn.Sequential(
+            #nn.Dropout(0.1),
+            nn.Linear(bert.config.hidden_size, mtl_params.dim_cls_linear, bias=True),
+            nn.Tanh(),
+            nn.Linear(mtl_params.dim_cls_linear, mtl_params.num_labels, bias=True),
+            nn.Softmax(dim=-1)
+        )
+        for layer in self.cls_head:
+            if type(layer) == nn.Linear:
+                nn.init.xavier_normal_(layer.weight)
+        self.pad_token_id = pad_token_id
+        self.cls_token_id = cls_token_id
+        self.sep_token_id = sep_token_id
+        self.max_length = max_length
+
+    def forward(self,
+                query: List[torch.tensor],
+                docids: List[Any],
+                document_batch: List[torch.tensor]):
+        assert len(query) == len(document_batch)
+        # note about device management:
+        # since distributed training is enabled, the inputs to this module can be on *any* device (preferably cpu, since we wrap and unwrap the module)
+        # we want to keep these params on the input device (assuming CPU) for as long as possible for cheap memory access
+        target_device = next(self.parameters()).device
+        cls_token = torch.tensor([self.cls_token_id]).to(device=document_batch[0].device)
+        sep_token = torch.tensor([self.sep_token_id]).to(device=document_batch[0].device)
+        input_tensors = []
+        position_ids = []
+        for q, d in zip(query, document_batch):
+            if len(q) + len(d) + 2 > self.max_length:
+                d = d[:(self.max_length - len(q) - 2)]
+            input_tensors.append(torch.cat([cls_token, q, sep_token, d]))
+            position_ids.append(torch.tensor(list(range(0, len(q) + 1)) + list(range(0, len(d) + 1))))
+        bert_input = PaddedSequence.autopad(input_tensors, batch_first=True, padding_value=self.pad_token_id, device=target_device)
+        positions = PaddedSequence.autopad(position_ids, batch_first=True, padding_value=0, device=target_device)
+        _, classes = self.bert(bert_input.data, attention_mask=bert_input.mask(on=1., off=0., device=target_device), position_ids=positions.data)
+        classes = self.cls_head(classes)
+        assert torch.all(classes == classes) # for nans
+        return classes
