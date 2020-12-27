@@ -2,9 +2,43 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ce4aad73-ccc2-4db5-ba27-4d22efc6a159" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/deployment.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/deployment.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/expred/tokenizer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/interpretation_by_design.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/interpretation_by_design.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/runConfigurations/mtl_pipeline_movies_test.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/runConfigurations/mtl_pipeline_movies_test.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deprecated/bert_rational_feature.py" beforeDir="false" afterPath="$PROJECT_DIR$/expred/bert_rational_feature.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deprecated/dataset.py" beforeDir="false" afterPath="$PROJECT_DIR$/deprecated/dataset.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deprecated/eraser_benchmark.py" beforeDir="false" afterPath="$PROJECT_DIR$/expred/eraser_benchmark.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deprecated/eraser_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/expred/eraser_utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deprecated/eraserbenchmark_backup/rationale_benchmark/models/mlp.py" beforeDir="false" afterPath="$PROJECT_DIR$/deprecated/eraserbenchmark_backup/rationale_benchmark/models/mlp.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deprecated/eraserbenchmark_backup/rationale_benchmark/models/pipeline/evidence_classifier.py" beforeDir="false" afterPath="$PROJECT_DIR$/deprecated/eraserbenchmark_backup/rationale_benchmark/models/pipeline/evidence_classifier.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deprecated/eraserbenchmark_backup/rationale_benchmark/models/pipeline/evidence_identifier.py" beforeDir="false" afterPath="$PROJECT_DIR$/deprecated/eraserbenchmark_backup/rationale_benchmark/models/pipeline/evidence_identifier.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deprecated/eraserbenchmark_backup/rationale_benchmark/models/pipeline/pipeline_train.py" beforeDir="false" afterPath="$PROJECT_DIR$/deprecated/eraserbenchmark_backup/rationale_benchmark/models/pipeline/pipeline_train.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deprecated/params.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deprecated/rationale_tokenization.py" beforeDir="false" afterPath="$PROJECT_DIR$/expred/rationale_tokenization.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/deprecated/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/deprecated/utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rationale_benchmark/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rationale_benchmark/metrics.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rationale_benchmark/models/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rationale_benchmark/models/encode_attend.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rationale_benchmark/models/losses.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rationale_benchmark/models/mlp.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rationale_benchmark/models/mlp_mtl.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rationale_benchmark/models/model_utils.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rationale_benchmark/models/pipeline/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rationale_benchmark/models/pipeline/bert_pipeline.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rationale_benchmark/models/pipeline/evidence_classifier.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rationale_benchmark/models/pipeline/evidence_identifier.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rationale_benchmark/models/pipeline/evidence_token_identifier.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rationale_benchmark/models/pipeline/mtl_evidence_classifier.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rationale_benchmark/models/pipeline/mtl_pipeline.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rationale_benchmark/models/pipeline/mtl_pipeline2.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rationale_benchmark/models/pipeline/mtl_pipeline_utils.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rationale_benchmark/models/pipeline/mtl_token_identifier.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rationale_benchmark/models/pipeline/pipeline_train.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rationale_benchmark/models/pipeline/pipeline_utils.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rationale_benchmark/models/sequence_taggers.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/rationale_benchmark/utils.py" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -35,7 +69,7 @@
     <property name="WebServerToolWindowPanel.toolwindow.show.date" value="false" />
     <property name="WebServerToolWindowPanel.toolwindow.show.permissions" value="false" />
     <property name="WebServerToolWindowPanel.toolwindow.show.size" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/expred/train.py" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
@@ -56,12 +90,15 @@
     </option>
   </component>
   <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/expred" />
+    </key>
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/rationale_benchmark/models/pipeline" />
       <recent name="$PROJECT_DIR$/params" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.mtl_pipeline_multirc_0">
+  <component name="RunManager" selected="Python.mtl_pipeline_movies_test">
     <configuration default="true" type="PythonConfigurationType" factoryName="Python">
       <module name="interpretation_by_design" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -1617,6 +1654,8 @@
       <workItem from="1597424304589" duration="40184000" />
       <workItem from="1597581465667" duration="7529000" />
       <workItem from="1600431765665" duration="8786000" />
+      <workItem from="1608413289656" duration="3019000" />
+      <workItem from="1608733175370" duration="14279000" />
     </task>
     <servers />
   </component>
@@ -1624,119 +1663,46 @@
     <option name="version" value="2" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="555" y="214" width="1196" height="685" key="#Deployment" timestamp="1600683916364">
+    <state x="555" y="214" width="1196" height="685" key="#Deployment" timestamp="1608733415506">
       <screen x="0" y="27" width="1920" height="1053" />
     </state>
     <state x="555" y="214" width="1196" height="685" key="#Deployment/0.27.1920.1053/165.1080.1600.900@0.27.1920.1053" timestamp="1600683916364" />
-    <state x="555" y="214" width="800" height="685" key="#Deployment/0.27.1920.1053/240.1080.1600.900@0.27.1920.1053" timestamp="1593799676929" />
-    <state x="589" y="232" width="732" height="650" key="#Inspections" timestamp="1595888170454">
+    <state x="555" y="214" key="#Deployment/0.27.1920.1053/207.1080.1600.900@0.27.1920.1053" timestamp="1608733415506" />
+    <state x="360" y="133" width="1457" height="685" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1608825213588">
       <screen x="0" y="27" width="1920" height="1053" />
     </state>
-    <state x="589" y="232" width="732" height="650" key="#Inspections/0.27.1920.1053/165.1080.1600.900@0.27.1920.1053" timestamp="1595888170454" />
-    <state x="529" y="208" width="832" height="712" key="#SSH_Configurations" timestamp="1593089609943">
+    <state x="360" y="133" width="1457" height="685" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.27.1920.1053/207.1080.1600.900@0.27.1920.1053" timestamp="1608825213588" />
+    <state x="778" y="230" width="354" height="654" key="EnvironmentVariablesDialog" timestamp="1608744817429">
       <screen x="0" y="27" width="1920" height="1053" />
     </state>
-    <state x="529" y="208" width="832" height="712" key="#SSH_Configurations/0.27.1920.1053/240.1080.1600.900@0.27.1920.1053" timestamp="1593089609943" />
-    <state x="230" y="287" width="1647" height="685" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1596496089784">
+    <state x="778" y="230" width="354" height="654" key="EnvironmentVariablesDialog/0.27.1920.1053/207.1080.1600.900@0.27.1920.1053" timestamp="1608744817429" />
+    <state x="728" y="311" key="FileChooserDialogImpl" timestamp="1608744799455">
       <screen x="0" y="27" width="1920" height="1053" />
     </state>
-    <state x="230" y="287" width="1647" height="685" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.27.1920.1053/165.1080.1600.900@0.27.1920.1053" timestamp="1596496089784" />
-    <state x="418" y="211" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.27.1920.1053/240.1080.1600.900@0.27.1920.1053" timestamp="1592335456793" />
-    <state x="595" y="342" width="719" height="430" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1596120073342">
-      <screen x="0" y="27" width="1920" height="1053" />
-    </state>
-    <state x="595" y="342" width="719" height="430" key="#com.intellij.fileTypes.FileTypeChooser/0.27.1920.1053/165.1080.1600.900@0.27.1920.1053" timestamp="1596120073342" />
-    <state x="717" y="49" width="762" height="918" key="#mtl_pipeline" timestamp="1595938718971">
-      <screen x="0" y="27" width="1920" height="1053" />
-    </state>
-    <state x="717" y="49" width="762" height="918" key="#mtl_pipeline/0.27.1920.1053/165.1080.1600.900@0.27.1920.1053" timestamp="1595938718971" />
-    <state x="574" y="98" width="762" height="918" key="#mtl_pipeline_movies_lambda_0_5" timestamp="1595949677049">
-      <screen x="0" y="27" width="1920" height="1053" />
-    </state>
-    <state x="574" y="98" width="762" height="918" key="#mtl_pipeline_movies_lambda_0_5/0.27.1920.1053/165.1080.1600.900@0.27.1920.1053" timestamp="1595949677049" />
-    <state x="574" y="98" width="762" height="918" key="#mtl_pipeline_movies_lambda_5" timestamp="1595950328574">
-      <screen x="0" y="27" width="1920" height="1053" />
-    </state>
-    <state x="574" y="98" width="762" height="918" key="#mtl_pipeline_movies_lambda_5/0.27.1920.1053/165.1080.1600.900@0.27.1920.1053" timestamp="1595950328574" />
-    <state x="574" y="98" width="762" height="918" key="#mtl_pipeline_movies_test" timestamp="1595938931779">
-      <screen x="0" y="27" width="1920" height="1053" />
-    </state>
-    <state x="574" y="98" width="762" height="918" key="#mtl_pipeline_movies_test/0.27.1920.1053/165.1080.1600.900@0.27.1920.1053" timestamp="1595938931779" />
-    <state x="723" y="296" key="FileChooserDialogImpl" timestamp="1596034159276">
-      <screen x="0" y="27" width="1920" height="1053" />
-    </state>
-    <state x="723" y="296" key="FileChooserDialogImpl/0.27.1920.1053/165.1080.1600.900@0.27.1920.1053" timestamp="1596034159276" />
-    <state x="723" y="296" key="FileChooserDialogImpl/0.27.1920.1053/240.1080.1600.900@0.27.1920.1053" timestamp="1593089580064" />
-    <state width="1860" height="332" key="GridCell.Tab.0.bottom" timestamp="1596055888667">
-      <screen x="0" y="27" width="1920" height="1053" />
-    </state>
-    <state width="1860" height="332" key="GridCell.Tab.0.bottom/0.27.1920.1053/165.1080.1600.900@0.27.1920.1053" timestamp="1596055888667" />
-    <state width="1860" height="332" key="GridCell.Tab.0.center" timestamp="1596055888667">
-      <screen x="0" y="27" width="1920" height="1053" />
-    </state>
-    <state width="1860" height="332" key="GridCell.Tab.0.center/0.27.1920.1053/165.1080.1600.900@0.27.1920.1053" timestamp="1596055888667" />
-    <state width="1860" height="332" key="GridCell.Tab.0.left" timestamp="1596055888667">
-      <screen x="0" y="27" width="1920" height="1053" />
-    </state>
-    <state width="1860" height="332" key="GridCell.Tab.0.left/0.27.1920.1053/165.1080.1600.900@0.27.1920.1053" timestamp="1596055888667" />
-    <state width="1860" height="332" key="GridCell.Tab.0.right" timestamp="1596055888667">
-      <screen x="0" y="27" width="1920" height="1053" />
-    </state>
-    <state width="1860" height="332" key="GridCell.Tab.0.right/0.27.1920.1053/165.1080.1600.900@0.27.1920.1053" timestamp="1596055888667" />
-    <state width="1860" height="332" key="GridCell.Tab.1.bottom" timestamp="1596055888668">
-      <screen x="0" y="27" width="1920" height="1053" />
-    </state>
-    <state width="1860" height="332" key="GridCell.Tab.1.bottom/0.27.1920.1053/165.1080.1600.900@0.27.1920.1053" timestamp="1596055888668" />
-    <state width="1860" height="332" key="GridCell.Tab.1.center" timestamp="1596055888668">
-      <screen x="0" y="27" width="1920" height="1053" />
-    </state>
-    <state width="1860" height="332" key="GridCell.Tab.1.center/0.27.1920.1053/165.1080.1600.900@0.27.1920.1053" timestamp="1596055888668" />
-    <state width="1860" height="332" key="GridCell.Tab.1.left" timestamp="1596055888668">
-      <screen x="0" y="27" width="1920" height="1053" />
-    </state>
-    <state width="1860" height="332" key="GridCell.Tab.1.left/0.27.1920.1053/165.1080.1600.900@0.27.1920.1053" timestamp="1596055888668" />
-    <state width="1860" height="332" key="GridCell.Tab.1.right" timestamp="1596055888668">
-      <screen x="0" y="27" width="1920" height="1053" />
-    </state>
-    <state width="1860" height="332" key="GridCell.Tab.1.right/0.27.1920.1053/165.1080.1600.900@0.27.1920.1053" timestamp="1596055888668" />
-    <state x="398" y="192" width="1114" height="729" key="PyMappingSimpleResolveDialog" timestamp="1596044244051">
-      <screen x="0" y="27" width="1920" height="1053" />
-    </state>
-    <state x="398" y="192" width="1114" height="729" key="PyMappingSimpleResolveDialog/0.27.1920.1053/165.1080.1600.900@0.27.1920.1053" timestamp="1596044244051" />
+    <state x="728" y="311" key="FileChooserDialogImpl/0.27.1920.1053/207.1080.1600.900@0.27.1920.1053" timestamp="1608744799455" />
     <state x="491" y="130" width="1067" height="737" key="SettingsEditor" timestamp="1600431845632">
       <screen x="0" y="27" width="1920" height="1053" />
     </state>
     <state x="491" y="130" key="SettingsEditor/0.27.1920.1053/165.1080.1600.900@0.27.1920.1053" timestamp="1600431845632" />
-    <state x="491" y="130" width="1067" height="737" key="SettingsEditor/0.27.1920.1053/240.1080.1600.900@0.27.1920.1053" timestamp="1593543064193" />
-    <state x="396" y="128" width="1118" height="858" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser" timestamp="1597147974112">
-      <screen x="0" y="27" width="1920" height="1053" />
-    </state>
-    <state x="396" y="128" width="1118" height="858" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser/0.27.1920.1053/165.1080.1600.900@0.27.1920.1053" timestamp="1597147974112" />
-    <state x="396" y="128" width="1118" height="858" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser/0.27.1920.1053@0.27.1920.1053" timestamp="1595614131438" />
-    <state x="469" y="200" width="972" height="713" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2" timestamp="1596044216198">
-      <screen x="0" y="27" width="1920" height="1053" />
-    </state>
-    <state x="469" y="200" width="972" height="713" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2/0.27.1920.1053/165.1080.1600.900@0.27.1920.1053" timestamp="1596044216198" />
     <state x="753" y="348" width="1054" height="301" key="com.jetbrains.plugins.remotesdk.ui.RemoteMappingsConfiguration" timestamp="1600431844342">
       <screen x="0" y="27" width="1920" height="1053" />
     </state>
     <state x="753" y="348" width="1054" height="301" key="com.jetbrains.plugins.remotesdk.ui.RemoteMappingsConfiguration/0.27.1920.1053/165.1080.1600.900@0.27.1920.1053" timestamp="1600431844342" />
-    <state x="118" y="223" width="1641" height="660" key="find.popup" timestamp="1597499856257">
+    <state x="639" y="223" width="642" height="660" key="find.popup" timestamp="1608753166386">
       <screen x="0" y="27" width="1920" height="1053" />
     </state>
-    <state x="118" y="223" width="1641" height="660" key="find.popup/0.27.1920.1053/165.1080.1600.900@0.27.1920.1053" timestamp="1597499856257" />
-    <state x="263" y="1248" width="1368" height="660" key="find.popup/0.27.1920.1053/165.1080.1600.900@165.1080.1600.900" timestamp="1597492522673" />
-    <state x="847" y="199" width="545" height="729" key="ftp.server.browser" timestamp="1597452948160">
-      <screen x="0" y="27" width="1920" height="1053" />
-    </state>
-    <state x="847" y="199" key="ftp.server.browser/0.27.1920.1053/165.1080.1600.900@0.27.1920.1053" timestamp="1597452948160" />
-    <state x="847" y="199" width="545" height="729" key="ftp.server.browser/0.27.1920.1053/240.1080.1600.900@0.27.1920.1053" timestamp="1593799295350" />
-    <state x="619" y="259" width="679" height="679" key="search.everywhere.popup" timestamp="1595956254617">
-      <screen x="0" y="27" width="1920" height="1053" />
-    </state>
-    <state x="619" y="259" width="679" height="679" key="search.everywhere.popup/0.27.1920.1053/165.1080.1600.900@0.27.1920.1053" timestamp="1595956254617" />
-    <state x="619" y="259" width="679" height="679" key="search.everywhere.popup/0.27.1920.1053/240.1080.1600.900@0.27.1920.1053" timestamp="1594923708225" />
-    <state x="619" y="259" width="679" height="679" key="search.everywhere.popup/0.27.1920.1053@0.27.1920.1053" timestamp="1595526248498" />
+    <state x="639" y="223" width="642" height="660" key="find.popup/0.27.1920.1053/207.1080.1600.900@0.27.1920.1053" timestamp="1608753166386" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/deprecated/learn_to_interpret.py</url>
+          <line>1</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/interpretation_by_design$movies_complete_sentence_exp_only_evaluate_exp_benchmark.coverage" NAME="movies_complete_sentence_exp_only_evaluate_exp_benchmark Coverage Results" MODIFIED="1590979364407" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />

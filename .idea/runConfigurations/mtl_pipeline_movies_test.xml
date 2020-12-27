@@ -1,16 +1,19 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="mtl_pipeline_movies_test" type="PythonConfigurationType" factoryName="Python">
+  <configuration default="false" name="mtl_pipeline_movies_test" type="PythonConfigurationType" factoryName="Python" singleton="false">
     <module name="interpretation_by_design" />
     <option name="INTERPRETER_OPTIONS" value="" />
     <option name="PARENT_ENVS" value="true" />
+    <envs>
+      <env name="CUDA_VISIBLE_DEVICES" value="3" />
+    </envs>
     <option name="SDK_HOME" value="" />
-    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/rationale_benchmark/models/pipeline" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
     <option name="IS_MODULE_SDK" value="true" />
     <option name="ADD_CONTENT_ROOTS" value="true" />
     <option name="ADD_SOURCE_ROOTS" value="true" />
     <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-    <option name="SCRIPT_NAME" value="$PROJECT_DIR$/rationale_benchmark/models/pipeline/mtl_pipeline.py" />
-    <option name="PARAMETERS" value="--data_dir $PROJECT_DIR$/../../../zzhang/.keras/datasets/movies --output_dir $PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design/output/experiment --model_params $PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design/params/movies_expred.json" />
+    <option name="SCRIPT_NAME" value="$PROJECT_DIR$/expred/train.py" />
+    <option name="PARAMETERS" value="--data_dir $PROJECT_DIR$/../../../zzhang/.keras/datasets/movies --output_dir output/experiment --conf params/movies_expred.json" />
     <option name="SHOW_COMMAND_LINE" value="true" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="false" />
