@@ -10,6 +10,8 @@ from expred.eraser_utils import extract_doc_ids_from_annotations
 from expred.utils import Annotation
 from expred.utils import convert_subtoken_ids_to_tokens
 
+import re
+
 def remove_rations(sentence, annotation):
     sentence = sentence.lower().split()
     rationales = annotation['rationales'][0]['hard_rationale_predictions']
@@ -58,22 +60,22 @@ def ce_load_bert_features(rationales, docs, label_list, decorate, max_seq_length
     return features
 
 
-def ce_preprocess(rationales, docs, label_list, dataset_name, decorate, max_seq_length, exp_output, gpu_id, tokenizer):
-    features = ce_load_bert_features(rationales, docs, label_list, decorate, max_seq_length, gpu_id, tokenizer)
+# def ce_preprocess(rationales, docs, label_list, dataset_name, decorate, max_seq_length, exp_output, gpu_id, tokenizer):
+#     features = ce_load_bert_features(rationales, docs, label_list, decorate, max_seq_length, gpu_id, tokenizer)
+#
+#     with_rations = ('cls' not in dataset_name)
+#     with_lable_id = ('seq' not in dataset_name)
+#
+#     return convert_bert_features(features, with_lable_id, with_rations, exp_output)
 
-    with_rations = ('cls' not in dataset_name)
-    with_lable_id = ('seq' not in dataset_name)
 
-    return convert_bert_features(features, with_lable_id, with_rations, exp_output)
-
-
-def get_cls_score(model, rationales, docs, label_list, dataset, decorate, max_seq_length, exp_output, gpu_id, tokenizer):
-    rets = ce_preprocess(rationales, docs, label_list, dataset, decorate, max_seq_length, exp_output, gpu_id, tokenizer)
-    _input_ids, _input_masks, _segment_ids, _rations, _labels = rets
-
-    _inputs = [_input_ids, _input_masks, _segment_ids]
-    _pred = model.predict(_inputs)
-    return (np.hstack([1 - _pred[0], _pred[0]]))
+# def get_cls_score(model, rationales, docs, label_list, dataset, decorate, max_seq_length, exp_output, gpu_id, tokenizer):
+#     rets = ce_preprocess(rationales, docs, label_list, dataset, decorate, max_seq_length, exp_output, gpu_id, tokenizer)
+#     _input_ids, _input_masks, _segment_ids, _rations, _labels = rets
+#
+#     _inputs = [_input_ids, _input_masks, _segment_ids]
+#     _pred = model.predict(_inputs)
+#     return (np.hstack([1 - _pred[0], _pred[0]]))
 
 
 def add_cls_scores(res, cls, c, s, label_list):

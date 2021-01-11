@@ -65,44 +65,44 @@ def load_bert_features(data, docs, label_list, max_seq_length, merge_evidences, 
     return features
 
 
-def convert_bert_features(features, with_label_id, with_rations, exp_output='gru'):
-    feature_names = "input_ids input_mask segment_ids".split()
+# def convert_bert_features(features, with_label_id, with_rations, exp_output='gru'):
+#     feature_names = "input_ids input_mask segment_ids".split()
+#
+#     input_ids, input_masks, segment_ids = \
+#         list(map(lambda x: [getattr(f, x) for f in features], feature_names))
+#
+#     rets = [input_ids, input_masks, segment_ids]
+#
+#     if with_rations:
+#         feature_names.append('rations')
+#         rations = [getattr(f, 'rations') for f in features]
+#         rations = np.array(rations).reshape([-1, MAX_SEQ_LENGTH, 1])
+#         if exp_output == 'interval':
+#             rations = np.concatenate([np.zeros((rations.shape[0], 1, 1)),
+#                                       rations,
+#                                       np.zeros((rations.shape[0], 1, 1))], axis=-2)
+#             rations = rations[:, 1:, :] - rations[:, :-1, :]
+#             rations_start = (rations > 0)[:, :-1, :].astype(np.int32)
+#             rations_end = (rations < 0)[:, 1:, :].astype(np.int32)
+#             rations = np.concatenate((rations_start, rations_end), axis=-1)
+#         rets.append(rations)
+#     else:
+#         rets.append(None)
+#
+#     if with_label_id:
+#         feature_names.append('label_id')
+#         label_id = [getattr(f, 'label_id') for f in features]
+#         labels = np.array(label_id).reshape(-1, 1)
+#         rets.append(labels)
+#     else:
+#         rets.append(None)
+#     return rets
 
-    input_ids, input_masks, segment_ids = \
-        list(map(lambda x: [getattr(f, x) for f in features], feature_names))
 
-    rets = [input_ids, input_masks, segment_ids]
-
-    if with_rations:
-        feature_names.append('rations')
-        rations = [getattr(f, 'rations') for f in features]
-        rations = np.array(rations).reshape([-1, MAX_SEQ_LENGTH, 1])
-        if exp_output == 'interval':
-            rations = np.concatenate([np.zeros((rations.shape[0], 1, 1)),
-                                      rations,
-                                      np.zeros((rations.shape[0], 1, 1))], axis=-2)
-            rations = rations[:, 1:, :] - rations[:, :-1, :]
-            rations_start = (rations > 0)[:, :-1, :].astype(np.int32)
-            rations_end = (rations < 0)[:, 1:, :].astype(np.int32)
-            rations = np.concatenate((rations_start, rations_end), axis=-1)
-        rets.append(rations)
-    else:
-        rets.append(None)
-
-    if with_label_id:
-        feature_names.append('label_id')
-        label_id = [getattr(f, 'label_id') for f in features]
-        labels = np.array(label_id).reshape(-1, 1)
-        rets.append(labels)
-    else:
-        rets.append(None)
-    return rets
-
-
-def preprocess(data, docs, label_list, dataset_name, max_seq_length, exp_output, merge_evidences, tokenizer):
-    features = load_bert_features(data, docs, label_list, max_seq_length, merge_evidences, tokenizer)
-
-    with_rations = ('cls' not in dataset_name)
-    with_lable_id = ('seq' not in dataset_name)
-
-    return convert_bert_features(features, with_lable_id, with_rations, exp_output)
+# def preprocess(data, docs, label_list, dataset_name, max_seq_length, exp_output, merge_evidences, tokenizer):
+#     features = load_bert_features(data, docs, label_list, max_seq_length, merge_evidences, tokenizer)
+#
+#     with_rations = ('cls' not in dataset_name)
+#     with_lable_id = ('seq' not in dataset_name)
+#
+#     return convert_bert_features(features, with_lable_id, with_rations, exp_output)
