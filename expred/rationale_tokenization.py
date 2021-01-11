@@ -1,45 +1,24 @@
 import os
-import six
 from transformers.tokenization_bert import WordpieceTokenizer, BertTokenizer, BasicTokenizer, whitespace_tokenize
 from transformers.file_utils import http_get
 
 
 def printable_text(text):
-    if six.PY3:
-        if isinstance(text, str):
-            return text
-        elif isinstance(text, bytes):
-            return text.decode("utf-8", "ignore")
-        else:
-            raise ValueError("Unsupported string type: %s" % (type(text)))
-    elif six.PY2:
-        if isinstance(text, str):
-            return text
-        elif isinstance(text, unicode):
-            return text.encode("utf-8")
-        else:
-            raise ValueError("Unsupported string type: %s" % (type(text)))
+    if isinstance(text, str):
+        return text
+    elif isinstance(text, bytes):
+        return text.decode("utf-8", "ignore")
     else:
-        raise ValueError("Not running on Python2 or Python 3?")
+        raise ValueError("Unsupported string type: %s" % (type(text)))
 
 
 def convert_to_unicode(text):
-    if six.PY3:
-        if isinstance(text, str):
-            return text
-        elif isinstance(text, bytes):
-            return text.decode("utf-8", "ignore")
-        else:
-            raise ValueError("Unsupported string type: %s" % (type(text)))
-    elif six.PY2:
-        if isinstance(text, str):
-            return text.decode("utf-8", "ignore")
-        elif isinstance(text, unicode):
-            return text
-        else:
-            raise ValueError("Unsupported string type: %s" % (type(text)))
+    if isinstance(text, str):
+        return text
+    elif isinstance(text, bytes):
+        return text.decode("utf-8", "ignore")
     else:
-        raise ValueError("Not running on Python2 or Python 3?")
+        raise ValueError("Unsupported string type: %s" % (type(text)))
 
 
 class BasicRationalTokenizer(BasicTokenizer):
