@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ce4aad73-ccc2-4db5-ba27-4d22efc6a159" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/expred/models/pipeline/bert_pipeline.py" beforeDir="false" afterPath="$PROJECT_DIR$/expred/models/pipeline/bert_pipeline.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -1620,7 +1620,7 @@
       <workItem from="1600431765665" duration="8786000" />
       <workItem from="1608413289656" duration="3019000" />
       <workItem from="1608733175370" duration="16997000" />
-      <workItem from="1610396931975" duration="1729000" />
+      <workItem from="1610396931975" duration="3683000" />
     </task>
     <servers />
   </component>
