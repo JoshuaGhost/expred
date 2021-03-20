@@ -7,7 +7,6 @@ import numpy as np
 import random
 
 from itertools import chain
-from transformers import BertTokenizer
 
 from expred.params import MTLParams
 from expred.models.mlp_mtl import BertMTL, BertClassifier
@@ -62,12 +61,11 @@ torch.backends.cudnn.deterministic = True
 torch.backends.cudnn.benchmark = False
 
 
+# or, uncomment the following sentences to make it more than random
 # rand_seed_1 = ord(os.urandom(1)) * ord(os.urandom(1))
 # rand_seed_2 = ord(os.urandom(1)) * ord(os.urandom(1))
 # rand_seed_3 = ord(os.urandom(1)) * ord(os.urandom(1))
-# logger.info(f'seed 1: {rand_seed_1}, seed 2: {rand_seed_2}, seed 3: {rand_seed_3}')
 # random.seed(rand_seed_1)
-#
 # np.random.seed(rand_seed_2)
 # torch.manual_seed(rand_seed_3)
 # torch.backends.cudnn.deterministic = False
@@ -125,7 +123,7 @@ def main():
     logger.info('Beginning training of the MTL identifier')
     mtl_token_identifier = mtl_token_identifier.cuda()
     mtl_token_identifier, mtl_token_identifier_results, \
-    train_machine_annotated, eval_machine_annotated, test_machine_annotated = \
+        train_machine_annotated, eval_machine_annotated, test_machine_annotated = \
         train_mtl_token_identifier(mtl_token_identifier,
                                    args.output_dir,
                                    indexed_train,
@@ -138,7 +136,7 @@ def main():
                                    model_pars=conf,
                                    tensorize_model_inputs=True)
     mtl_token_identifier = mtl_token_identifier.cpu()
-    # train the evidence identifier
+    # evidence identifier ends
 
     logger.info('Beginning training of the evidence classifier')
     evidence_classifier = evidence_classifier.cuda()
@@ -154,8 +152,8 @@ def main():
                                                                                 scheduler=scheduler,
                                                                                 class_interner=labels_mapping,
                                                                                 tensorize_model_inputs=True)
+    # evidence classifier ends
 
-    # decode
     logger.info('Beginning final decoding')
     mtl_token_identifier = mtl_token_identifier.cuda()
     pipeline_batch_size = min(
@@ -173,7 +171,6 @@ def main():
                                                                         token_mapping=tokenized_doc_token_slides,
                                                                         class_interner=labels_mapping,
                                                                         tensorize_modelinputs=True,
-                                                                        vocab=tokenizer.vocab,
                                                                         batch_size=pipeline_batch_size,
                                                                         tokenizer=tokenizer)
     write_jsonl(train_decoded, os.path.join(args.output_dir, 'train_decoded.jsonl'))
@@ -189,6 +186,7 @@ def main():
                 logging.info(f'Pipeline results for {k}, {k1}={v1}')
         else:
             logging.info(f'Pipeline results {k}\t={v}')
+    # decode ends
 
 
 if __name__ == '__main__':

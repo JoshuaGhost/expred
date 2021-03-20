@@ -1,16 +1,12 @@
-from itertools import chain
-
 import numpy as np
+
+from itertools import chain
 from copy import deepcopy
 
-from expred.preprocessing import convert_bert_features
 from expred.bert_rational_feature import InputRationalExample, convert_examples_to_features
 from expred.eraser_utils import extract_doc_ids_from_annotations
-
 from expred.utils import Annotation
-from expred.utils import convert_subtoken_ids_to_tokens
 
-import re
 
 def remove_rations(sentence, annotation):
     sentence = sentence.lower().split()
@@ -168,29 +164,29 @@ def rnr_matrix_to_rational_mask(rnr_matrix):
     return rational_mask
 
 
-def pred_to_results(raw_input, input_ids, pred,
-                    hard_selection_count, hard_selection_threshold,
-                    vocab, docs, label_list,
-                    exp_output):
-    cls_pred, exp_pred = pred
-    if exp_output == 'rnr':
-        exp_pred = rnr_matrix_to_rational_mask(exp_pred)
-    exp_pred = exp_pred.reshape((-1,)).tolist()
-    docid = list(raw_input.evidences)[0][0].docid
-    raw_sentence = ' '.join(list(chain.from_iterable(docs[docid])))
-    raw_sentence = re.sub('\x12', '', raw_sentence)
-    raw_sentence = raw_sentence.lower().split()
-    token_ids, exp_pred = extract_texts(input_ids, exp_pred, text_a=False, text_b=True)
-    token_list, exp_pred = convert_subtoken_ids_to_tokens(token_ids, vocab, exp_pred, raw_sentence)
-    result = {'annotation_id': raw_input.annotation_id, 'query': raw_input.query}
-    ev_groups = []
-    result['docids'] = [docid]
-    result['rationales'] = [{'docid': docid}]
-    for ev in rational_bits_to_ev_generator(token_list, raw_input, exp_pred, hard_selection_count,
-                                            hard_selection_threshold):
-        ev_groups.append(ev)
-    result['rationales'][-1]['hard_rationale_predictions'] = ev_groups
-    if exp_output != 'rnr':
-        result['rationales'][-1]['soft_rationale_predictions'] = exp_pred + [0] * (len(raw_sentence) - len(token_list))
-    result['classification'] = label_list[int(round(cls_pred[0]))]
-    return result
+# def pred_to_results(raw_input, input_ids, pred,
+#                     hard_selection_count, hard_selection_threshold,
+#                     vocab, docs, label_list,
+#                     exp_output):
+#     cls_pred, exp_pred = pred
+#     if exp_output == 'rnr':
+#         exp_pred = rnr_matrix_to_rational_mask(exp_pred)
+#     exp_pred = exp_pred.reshape((-1,)).tolist()
+#     docid = list(raw_input.evidences)[0][0].docid
+#     raw_sentence = ' '.join(list(chain.from_iterable(docs[docid])))
+#     raw_sentence = re.sub('\x12', '', raw_sentence)
+#     raw_sentence = raw_sentence.lower().split()
+#     token_ids, exp_pred = extract_texts(input_ids, exp_pred, text_a=False, text_b=True)
+#     token_list, exp_pred = convert_subtoken_ids_to_tokens(token_ids, vocab, exp_pred, raw_sentence)
+#     result = {'annotation_id': raw_input.annotation_id, 'query': raw_input.query}
+#     ev_groups = []
+#     result['docids'] = [docid]
+#     result['rationales'] = [{'docid': docid}]
+#     for ev in rational_bits_to_ev_generator(token_list, raw_input, exp_pred, hard_selection_count,
+#                                             hard_selection_threshold):
+#         ev_groups.append(ev)
+#     result['rationales'][-1]['hard_rationale_predictions'] = ev_groups
+#     if exp_output != 'rnr':
+#         result['rationales'][-1]['soft_rationale_predictions'] = exp_pred + [0] * (len(raw_sentence) - len(token_list))
+#     result['classification'] = label_list[int(round(cls_pred[0]))]
+#     return result

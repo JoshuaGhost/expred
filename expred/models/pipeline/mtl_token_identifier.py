@@ -2,61 +2,55 @@ import torch
 import os
 import logging
 import numpy as np
+import random
 
 from typing import List, Dict, Tuple, Callable, Union, Any
-import random
 from collections import OrderedDict, namedtuple
 from sklearn.metrics import accuracy_score, classification_report
 from itertools import chain
-
-from rationale_benchmark.models.model_utils import PaddedSequence
-from rationale_benchmark.utils import Annotation
 from torch import nn
-from rationale_benchmark.models.pipeline.pipeline_utils import (
+from torch.nn import Module
+
+from expred.eraser_utils import chain_sentence_evidences
+from expred.models.model_utils import PaddedSequence
+from expred.utils import Annotation
+from expred.models.pipeline.pipeline_utils import (
     SentenceEvidence, score_token_rationales)
-from rationale_benchmark.models.pipeline.mtl_pipeline_utils import (
+from expred.models.pipeline.mtl_pipeline_utils import (
     annotations_to_mtl_token_identification,
     make_mtl_token_preds_epoch
 )
+from expred.models.losses import resampling_rebalanced_crossentropy
 
 AnnotatedDocument = namedtuple('AnnotatedDocument', 'kls evd ann_id query docid index sentence')
-
-
-def chain_sentence_evidences(sentences):
-    kls = list(chain.from_iterable(s.kls for s in sentences))
-    document = list(chain.from_iterable(s.sentence for s in sentences))
-    assert len(kls) == len(document)
-    return SentenceEvidence(kls=kls,
-                            ann_id=sentences[0].ann_id,
-                            sentence=document,
-                            docid=sentences[0].docid,
-                            index=sentences[0].index,
-                            query=sentences[0].query)
 
 
 def _get_sampling_method(params):
     if params['sampling_method'] == 'whole_document':
         def whole_document_sampler(sentences, _):
             return chain_sentence_evidences(sentences)
+
         return whole_document_sampler
     else:
         raise NotImplementedError
 
 
 def train_mtl_token_identifier(mtl_token_identifier: nn.Module,
-                                save_dir: str,
-                                train: List[Annotation],
-                                val: List[Annotation],
-                                test:List[Annotation],
-                                interned_documents: Dict[str, List[List[int]]],
-                                source_documents: Dict[str, List[List[str]]],
-                                token_mapping: Dict[str, List[List[Tuple[int, int]]]],
-                                model_pars: dict,
-                                labels_mapping: Dict[str, int],
-                                optimizer=None,
-                                scheduler=None,
-                                tensorize_model_inputs: bool = True) -> Tuple[
-    nn.Module, Union[Dict[str, list], Any], Tuple[Any, Any, Any], Tuple[Any, Any, Any], Tuple[Any, Any, Any]]:
+                               save_dir: str,
+                               train: List[Annotation],
+                               val: List[Annotation],
+                               test: List[Annotation],
+                               interned_documents: Dict[str, List[List[int]]],
+                               source_documents: Dict[str, List[List[str]]],
+                               token_mapping: Dict[str, List[List[Tuple[int, int]]]],
+                               model_pars: dict,
+                               labels_mapping: Dict[str, int],
+                               optimizer=None,
+                               scheduler=None,
+                               tensorize_model_inputs: bool = True) -> Tuple[
+    Module, Union[Dict[str, list], Any], List[Tuple[Union[SentenceEvidence, List[SentenceEvidence]], Any, Any]], List[
+        Tuple[Union[SentenceEvidence, List[SentenceEvidence]], Any, Any]], List[
+        Tuple[Union[SentenceEvidence, List[SentenceEvidence]], Any, Any]]]:
     """Trains a module for token-level rationale identification.
     This method tracks loss on the entire validation set, saves intermediate
     models, and supports restoring from an unfinished state. The best model on
@@ -64,27 +58,25 @@ def train_mtl_token_identifier(mtl_token_identifier: nn.Module,
     (see below) number of epochs with no improvement is exceeded.
     As there are likely too many negative examples to reasonably train a
     classifier on everything, every epoch we subsample the negatives.
-    Args:
-        evidence_token_identifier: a module like the AttentiveClassifier
-        save_dir: a place to save intermediate and final results and models.
-        train: a List of interned Annotation objects.
-        val: a List of interned Annotation objects.
-        interned_documents: a Dict of interned sentences
-        source_documents:
-        token_mapping:
-        model_pars: Arbitrary parameters directory, assumed to contain an "evidence_identifier" sub-dict with:
-            lr: learning rate
-            batch_size: an int
-            sampling_method: a string, plus additional conf in the dict to define creation of a sampler
-            epochs: the number of epochs to train for
-            patience: how long to wait for an improvement before giving up.
-            max_grad_norm: optional, clip gradients.
-        optimizer: what pytorch optimizer to use, if none, initialize Adam
-        scheduler: optional, do we want a scheduler involved in learning?
-        tensorize_model_inputs: should we convert our data to tensors before passing it to the model?
-                                Useful if we have a model that performs its own tokenization (e.g. BERT as a Service)
-    Returns:
-        the trained evidence token identifier and a dictionary of intermediate results.
+
+    :param mtl_token_identifier: token-wise evidence identifier using Multi-Task Learning
+    :param save_dir: a place to save intermediate and final results and models.
+    :param train: a List of interned Annotation objects.
+    :param val: a List of interned Annotation objects.
+    :param test: a List of interned Annotation objects.
+    :param interned_documents: a Dict of interned sentences
+    :param source_documents: a Dict of original sentences, used for sub-token alignment
+    :param token_mapping: a mapping from original token to sub tokens
+    :param model_pars: model parameters
+    :param labels_mapping: a mapping from str labels to their int ids
+    :param optimizer: what pytorch optimizer to use, if none, initialize Adam
+    :param scheduler: optional, do we want a scheduler involved in learning?
+    :param tensorize_model_inputs: should we convert our data to tensors before passing it to the model?
+                                   Useful if we have a model that performs its own tokenization (e.g. BERT as a Service)
+    :returns
+        the trained MTL evidence token identifier
+        the intermediate results
+        machine-annotated train/eval/test datasets
     """
 
     def _prep_data_for_epoch(evidence_data: Tuple[str, Dict[str, Dict[str, List[SentenceEvidence]]]],
@@ -112,29 +104,26 @@ def train_mtl_token_identifier(mtl_token_identifier: nn.Module,
     if optimizer is None:
         optimizer = torch.optim.Adam(mtl_token_identifier.parameters(), lr=model_pars['mtl_token_identifier']['lr'])
     cls_criterion = nn.BCELoss(reduction='none')
-    from rationale_benchmark.models.losses import resampling_rebalanced_crossentropy
-    exp_criterion = resampling_rebalanced_crossentropy(seq_reduction='none')#nn.CrossEntropyLoss(reduction='none')
+
+    exp_criterion = resampling_rebalanced_crossentropy(seq_reduction='none')  # nn.CrossEntropyLoss(reduction='none')
     sampling_method = _get_sampling_method(model_pars['mtl_token_identifier'])
     batch_size = model_pars['mtl_token_identifier']['batch_size']
     max_length = model_pars['max_length']
     epochs = model_pars['mtl_token_identifier']['epochs']
-    #############################################################################
-    #epochs = 1
-    ###################################################################
 
     patience = model_pars['mtl_token_identifier']['patience']
     max_grad_norm = model_pars['mtl_token_identifier'].get('max_grad_norm', None)
-    use_cose_hack = bool(model_pars['mtl_token_identifier'].get('cose_data_hack', 0))
     par_lambda = model_pars['mtl_token_identifier']['par_lambda']
     # annotation id -> docid -> [SentenceEvidence])
-    evidence_train_data: Dict[str, Tuple[str, Dict[str, List[SentenceEvidence]]]] = annotations_to_mtl_token_identification(train,
-                                                                   source_documents=source_documents,
-                                                                   interned_documents=interned_documents,
-                                                                   token_mapping=token_mapping)
+    evidence_train_data: Dict[
+        str, Tuple[str, Dict[str, List[SentenceEvidence]]]] = annotations_to_mtl_token_identification(train,
+                                                                                                      source_documents=source_documents,
+                                                                                                      interned_documents=interned_documents,
+                                                                                                      token_mapping=token_mapping)
     evidence_val_data = annotations_to_mtl_token_identification(val,
-                                                                 source_documents=source_documents,
-                                                                 interned_documents=interned_documents,
-                                                                 token_mapping=token_mapping)
+                                                                source_documents=source_documents,
+                                                                interned_documents=interned_documents,
+                                                                token_mapping=token_mapping)
 
     evidence_test_data = annotations_to_mtl_token_identification(test,
                                                                  source_documents=source_documents,
@@ -148,9 +137,9 @@ def train_mtl_token_identifier(mtl_token_identifier: nn.Module,
         'epoch_val_total_losses': [],
         'epoch_val_cls_losses': [],
         'epoch_val_exp_losses': [],
-        'epoch_val_exp_acc' : [],
+        'epoch_val_exp_acc': [],
         'epoch_val_exp_f': [],
-        'epoch_val_cls_acc' : [],
+        'epoch_val_cls_acc': [],
         'epoch_val_cls_f': [],
         'full_epoch_val_rationale_scores': []
     }
@@ -184,15 +173,18 @@ def train_mtl_token_identifier(mtl_token_identifier: nn.Module,
             batch_elements = epoch_train_data[batch_start:min(batch_start + batch_size, len(epoch_train_data))]
             # we sample every time to thereoretically get a better representation of instances over the corpus.
             # this might just take more time than doing so in advance.
-            labels, targets, queries, sentences = zip(*[(s[0], s[1].kls, s[1].query, s[1].sentence) for s in batch_elements])
+            labels, targets, queries, sentences = zip(
+                *[(s[0], s[1].kls, s[1].query, s[1].sentence) for s in batch_elements])
             labels = [[i == labels_mapping[label] for i in range(len(labels_mapping))] for label in labels]
             labels = torch.tensor(labels, dtype=torch.float, device=device)
             ids = [(s[1].ann_id, s[1].docid, s[1].index) for s in batch_elements]
 
-            cropped_targets = [[0] * (len(query) + 2) # length of query and overheads such as [cls] and [sep]
-                               + list(target[:(max_length - len(query) - 2)]) for query, target in zip(queries, targets)]
-            cropped_targets = PaddedSequence.autopad([torch.tensor(t, dtype=torch.float, device=device) for t in cropped_targets],
-                                             batch_first=True, device=device)
+            cropped_targets = [[0] * (len(query) + 2)  # length of query and overheads such as [cls] and [sep]
+                               + list(target[:(max_length - len(query) - 2)]) for query, target in
+                               zip(queries, targets)]
+            cropped_targets = PaddedSequence.autopad(
+                [torch.tensor(t, dtype=torch.float, device=device) for t in cropped_targets],
+                batch_first=True, device=device)
             targets = [[0] * (len(query) + 2)  # length of query and overheads such as [cls] and [sep]
                        + list(target) for query, target in zip(queries, targets)]
             targets = PaddedSequence.autopad([torch.tensor(t, dtype=torch.float, device='cpu') for t in targets],
@@ -237,9 +229,9 @@ def train_mtl_token_identifier(mtl_token_identifier: nn.Module,
                                            cls_criterion,
                                            exp_criterion,
                                            tensorize_model_inputs)
-            #epoch_val_soft_pred = list(chain.from_iterable(epoch_val_soft_pred.tolist()))
-            #epoch_val_hard_pred = list(chain.from_iterable(epoch_val_hard_pred))
-            #epoch_val_truth = list(chain.from_iterable(epoch_val_truth))
+            # epoch_val_soft_pred = list(chain.from_iterable(epoch_val_soft_pred.tolist()))
+            # epoch_val_hard_pred = list(chain.from_iterable(epoch_val_hard_pred))
+            # epoch_val_truth = list(chain.from_iterable(epoch_val_truth))
             results['epoch_val_total_losses'].append(epoch_val_total_loss)
             results['epoch_val_cls_losses'].append(epoch_val_cls_loss)
             results['epoch_val_exp_losses'].append(epoch_val_exp_loss)
@@ -249,14 +241,14 @@ def train_mtl_token_identifier(mtl_token_identifier: nn.Module,
                                                                epoch_val_hard_pred_chained))
             results['epoch_val_exp_f'].append(classification_report(epoch_val_token_targets_chained,
                                                                     epoch_val_hard_pred_chained,
-                                                                    labels=[0, 1], # of course rational and irrational
+                                                                    labels=[0, 1],  # of course rational and irrational
                                                                     output_dict=True))
             flattened_epoch_val_pred_labels = [np.argmax(x) for x in epoch_val_pred_labels]
             flattened_epoch_val_labels = [np.argmax(x) for x in epoch_val_labels]
             results['epoch_val_cls_acc'].append(accuracy_score(flattened_epoch_val_pred_labels,
                                                                flattened_epoch_val_labels))
-            #print(flattened_epoch_val_labels)
-            #print(flattened_epoch_val_pred_labels)
+            # print(flattened_epoch_val_labels)
+            # print(flattened_epoch_val_pred_labels)
             results['epoch_val_cls_f'].append(classification_report(flattened_epoch_val_labels,
                                                                     flattened_epoch_val_pred_labels,
                                                                     labels=[v for _, v in labels_mapping.items()],
@@ -267,8 +259,8 @@ def train_mtl_token_identifier(mtl_token_identifier: nn.Module,
                                        token_mapping,
                                        epoch_val_hard_pred,
                                        epoch_val_soft_pred))
-            #epoch_val_soft_pred_for_scoring = [[[1 - z, z] for z in y] for y in epoch_val_soft_pred]
-            #logging.info(
+            # epoch_val_soft_pred_for_scoring = [[[1 - z, z] for z in y] for y in epoch_val_soft_pred]
+            # logging.info(
             #    f'Epoch {epoch} full val loss {epoch_val_total_loss}, accuracy: {results["epoch_val_acc"][-1]}, f: {results["epoch_val_f"][-1]}, rationale scores: look, it\'s already a pain to duplicate this code. What do you want from me.')
 
             # if epoch_val_loss < best_val_loss:
@@ -305,8 +297,8 @@ def train_mtl_token_identifier(mtl_token_identifier: nn.Module,
                                        token_mapping, batch_size, max_length, par_lambda,
                                        device, cls_criterion, exp_criterion, tensorize_model_inputs)
         hard_pred_for_cl = [h.cpu().tolist() for h in hard_pred_for_cl]
-        hard_pred_for_cl = [h[len(d[1].query)+2:] for h, d in zip(hard_pred_for_cl, epoch_input_data)]
-        soft_pred_for_cl = [s[len(d[1].query)+2:] for s, d in zip(soft_pred_for_cl, epoch_input_data)]
+        hard_pred_for_cl = [h[len(d[1].query) + 2:] for h, d in zip(hard_pred_for_cl, epoch_input_data)]
+        soft_pred_for_cl = [s[len(d[1].query) + 2:] for s, d in zip(soft_pred_for_cl, epoch_input_data)]
         train_ids = list(range(len(labels_for_cl)))
         if keep_corrected_only:
             labels_for_cl = [np.argmax(x) for x in labels_for_cl]

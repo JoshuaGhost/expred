@@ -1,12 +1,10 @@
-from transformers import BertModel, BertTokenizer
-import logging
-
-from params import MTLParams
-from typing import Any, List
-
 import torch
 import torch.nn as nn
-from rationale_benchmark.models.model_utils import PaddedSequence
+
+from transformers import BertModel, BertTokenizer
+from expred.params import MTLParams
+from typing import Any, List
+from expred.models.model_utils import PaddedSequence
 
 
 class BertMTL(nn.Module):

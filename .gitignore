@@ -1,5 +1,5 @@
 model_components
-deprecated/*
+*deprecated*
 pipeline_outputs
 *.swp
 # Byte-compiled / optimized / DLL files

@@ -1,9 +1,24 @@
 import json
+import pickle
 import os
+import re
 
 from dataclasses import dataclass, asdict, is_dataclass
 from itertools import chain
 from typing import Dict, List, Set, Tuple, Union, FrozenSet
+
+import transformers
+from bert.tokenization import convert_ids_to_tokens
+
+
+# tensorflow compatibility import, uncomment if needed
+# import tensorflow
+# if tensorflow.__version__.startswith('2'):
+#     import tensorflow.compat.v1 as tf
+#
+#     tf.disable_v2_behavior()
+# else:
+#     import tensorflow as tf
 
 
 @dataclass(eq=True, frozen=True)
@@ -226,20 +241,6 @@ def load_documents_from_file(data_dir: str, docids: Set[str] = None) -> Dict[str
     return res
 
 
-import pickle
-
-import os
-import re
-import tensorflow
-
-if tensorflow.__version__.startswith('2'):
-    import tensorflow.compat.v1 as tf
-
-    tf.disable_v2_behavior()
-else:
-    import tensorflow as tf
-from bert.tokenization import convert_ids_to_tokens
-
 NEG = 0
 POS = 1
 
@@ -283,15 +284,12 @@ def cache_decorator(*dump_fnames):
     return excution_decorator
 
 
-
-def convert_ids_to_token_list(input_ids, vocab=None):
-    iv_vocab = {input_id: wordpiece for wordpiece, input_id in vocab.items()}
-    token_list = convert_ids_to_tokens(iv_vocab, input_ids)
-    return token_list
-
-
-def convert_subtoken_ids_to_tokens(ids, vocab, token_mapping=None, exps=None, raw_sentence=None):
-    subtokens = convert_ids_to_token_list(ids, vocab)
+def convert_subtoken_ids_to_tokens(ids:List[int],
+                                   tokenizer:transformers.BertTokenizer,
+                                   token_mapping=None,
+                                   exps=None,
+                                   raw_sentence=None):
+    subtokens = tokenizer.convert_ids_to_tokens(ids)
     tokens, exps_outputs = [], []
     if not isinstance(exps[0], list):
         exps = [exps]

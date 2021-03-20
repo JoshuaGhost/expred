@@ -1,3 +1,8 @@
+from itertools import chain
+
+from expred.models.pipeline.pipeline_utils import SentenceEvidence
+
+
 def extract_doc_ids_from_annotations(anns):
     ret = set()
     for ann in anns:
@@ -5,3 +10,14 @@ def extract_doc_ids_from_annotations(anns):
             for ev in ev_group:
                 ret.add(ev.docid)
     return ret
+
+def chain_sentence_evidences(sentences):
+    kls = list(chain.from_iterable(s.kls for s in sentences))
+    document = list(chain.from_iterable(s.sentence for s in sentences))
+    assert len(kls) == len(document)
+    return SentenceEvidence(kls=kls,
+                            ann_id=sentences[0].ann_id,
+                            sentence=document,
+                            docid=sentences[0].docid,
+                            index=sentences[0].index,
+                            query=sentences[0].query)

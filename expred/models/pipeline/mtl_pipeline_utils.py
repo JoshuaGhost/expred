@@ -7,14 +7,13 @@ import torch
 import torch.nn as nn
 from sklearn.metrics import classification_report, accuracy_score
 
+from expred.eraser_utils import chain_sentence_evidences
 from expred.models.model_utils import PaddedSequence
 from expred.models.pipeline.pipeline_utils import SentenceEvidence, _grouper, \
     score_rationales
 from expred.utils import Annotation
 from expred.eraser_benchmark import rational_bits_to_ev_generator
 from expred.utils import convert_subtoken_ids_to_tokens
-
-from expred.models.pipeline.mtl_token_identifier import chain_sentence_evidences
 
 
 def mask_annotations_to_evidence_classification(mrs: List[Tuple[Tuple[str, SentenceEvidence], Any]], # mrs for machine rationales
@@ -324,7 +323,6 @@ def decode(evidence_identifier: nn.Module,
            class_interner: Dict[str, int],
            batch_size: int,
            tensorize_modelinputs: bool,
-           vocab,
            interned_documents: bool=None,
            tokenizer=None) -> dict:
     device = None
@@ -456,7 +454,7 @@ def decode(evidence_identifier: nn.Module,
                         raw_document.append(tokenized)
                 global_token_mapping = convert_to_global_token_mapping(token_mapping[docid])
                 tokens, exp_outputs = convert_subtoken_ids_to_tokens(subtoken_ids,
-                                                                     vocab=vocab,
+                                                                     tokenizer=tokenizer,
                                                                      token_mapping=global_token_mapping,
                                                                      exps=(hard_rationale_predictions,
                                                                            soft_rationale_predictions),
