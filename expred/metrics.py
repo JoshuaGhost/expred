@@ -4,7 +4,7 @@ import logging
 import os
 import pprint
 
-from collections import Counter, defaultdict, namedtuple
+from collections import Counter, defaultdict
 from dataclasses import dataclass
 from itertools import chain
 from typing import Any, Callable, Dict, List, Set, Tuple
