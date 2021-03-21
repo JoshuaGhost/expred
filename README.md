@@ -5,4 +5,6 @@ This is the implementation of the paper [Explain and Predict, and then Predict A
 ## Usage:
   1. Install the required packages from the ```requirements.txt``` by ```pip install -r requirements.txt```
   2. The implementation entry is under ```expred/train```. To run the training, simply copy and paste the following commands:
-        ``` export PYTHONPATH=$PYTHONPATH:./ && python expred/train.py --data_dir /dir/to/your/datasets/{movies,fever,multirc} --output_dir /dir/to/your/trained_data --model_params ./params/movies_expred_lambda_5.json ```
+        ``` export PYTHONPATH=$PYTHONPATH:./ && python expred/train.py --data_dir /dir/to/your/datasets/{movies,fever,multirc} --output_dir /dir/to/your/trained_data --conf ./params/{movies,fever,multirc}_expred.json```
+     
+Not that depending on your hardware you may have to change the `batch_size` in the config file. 
