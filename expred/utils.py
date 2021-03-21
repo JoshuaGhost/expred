@@ -8,7 +8,7 @@ from itertools import chain
 from typing import Dict, List, Set, Tuple, Union, FrozenSet
 
 import transformers
-from bert.tokenization import convert_ids_to_tokens
+
 
 
 # tensorflow compatibility import, uncomment if needed
