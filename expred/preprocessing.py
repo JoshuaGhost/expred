@@ -1,7 +1,6 @@
 # preprocessing.py
 from itertools import chain
 
-import numpy as np
 from copy import deepcopy
 from expred.bert_rational_feature import InputRationalExample, convert_examples_to_features
 # from config import *
