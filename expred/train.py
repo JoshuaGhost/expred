@@ -1,5 +1,7 @@
 import argparse
 import logging
+from typing import List, Dict, Set, Tuple
+
 import torch
 import os
 import json
@@ -21,10 +23,23 @@ BATCH_FIRST = True
 
 def initialize_models(conf: dict,
                       tokenizer: BertTokenizerWithMapping,
-                      batch_first: bool):
+                      batch_first: bool) -> Tuple[BertMTL, BertClassifier, Dict[int, str]]:
+    """
+    Does several things:
+    1. Create a mapping from label names to ids
+    2. Configure and create the multi task learner, the first stage of the model (BertMTL)
+    3. Configure and create the evidence classifier, second stage of the model (BertClassifier)
+    :param conf:
+    :param tokenizer:
+    :param batch_first:
+    :return: BertMTL, BertClassifier, label mapping
+    """
     assert batch_first
     max_length = conf['max_length']
+    # label mapping
     labels = dict((y, x) for (x, y) in enumerate(conf['classes']))
+
+    # configure multi task learner
     mtl_params = MTLParams
     mtl_params.num_labels = len(labels)
     mtl_params.dim_exp_gru = conf['dim_exp_gru']
@@ -37,6 +52,7 @@ def initialize_models(conf: dict,
                                   max_length=max_length,
                                   use_half_precision=use_half_precision)
 
+    # set up the evidence classifier
     use_half_precision = bool(conf['evidence_classifier'].get('use_half_precision', 1))
     evidence_classifier = BertClassifier(bert_dir=bert_dir,
                                          pad_token_id=tokenizer.pad_token_id,
@@ -73,6 +89,7 @@ torch.backends.cudnn.benchmark = False
 
 
 def main():
+    # setup the Argument Parser
     parser = argparse.ArgumentParser(description=('Trains a pipeline model.\n'
                                                   '\n'
                                                   'Step 1 is evidence identification, the MTL happens here. It '
@@ -98,17 +115,38 @@ def main():
                         help='Where shall we write intermediate models + final data to?')
     parser.add_argument('--conf', dest='conf', required=True,
                         help='JSoN file for loading arbitrary model parameters (e.g. optimizers, pre-saved files, etc.')
+    parser.add_argument('--batch_size', type=int, required=False, default=None,
+                        help='Overrides the batch_size given in the config file. Helpful for debugging')
     args = parser.parse_args()
+
+    # Configure
     os.makedirs(args.output_dir, exist_ok=True)
 
+    # loads the config
     with open(args.conf, 'r') as fp:
         logger.info(f'Loading configuration from {args.conf}')
         conf = json.load(fp)
+        if args.batch_size is not None:
+            logger.info(
+                'Overwriting batch_sizes'
+                f'(mtl_token_identifier:{conf["mtl_token_identifier"]["batch_size"]}'
+                f'evidence_classifier:{conf["evidence_classifier"]["batch_size"]})'
+                f'provided in config by command line argument({args.batch_size})'
+            )
+            conf['mtl_token_identifier']['batch_size'] = args.batch_size
+            conf['evidence_classifier']['batch_size'] = args.batch_size
         logger.info(f'Configuration: {json.dumps(conf, indent=2, sort_keys=True)}')
+
+    # load the annotation data
     train, val, test = load_datasets(args.data_dir)
-    docids = set(e.docid for e in
-                 chain.from_iterable(chain.from_iterable(map(lambda ann: ann.evidences, chain(train, val, test)))))
-    documents = load_documents(args.data_dir, docids)
+
+    # get's all docids needed that are contained in the loaded splits
+    docids: Set[str] = set(e.docid for e in
+                           chain.from_iterable(
+                               chain.from_iterable(map(lambda ann: ann.evidences, chain(train, val, test))))
+                        )
+
+    documents: Dict[str, List[List[str]]] = load_documents(args.data_dir, docids)
     logger.info(f'Load {len(documents)} documents')
     # this ignores the case where annotations don't align perfectly with token boundaries, but this isn't that important
 
@@ -117,13 +155,15 @@ def main():
         initialize_models(conf, tokenizer, batch_first=BATCH_FIRST)
     # logger.info(f'We have {len(word_interner)} wordpieces')
 
+    # tokenizes and caches tokenized_docs, same for annotations
+    # todo typo here? slides = slices (words?)
     tokenized_docs, tokenized_doc_token_slides = tokenizer.encode_docs(documents, args.output_dir)
     indexed_train, indexed_val, indexed_test = [tokenizer.encode_annotations(data) for data in [train, val, test]]
 
     logger.info('Beginning training of the MTL identifier')
     mtl_token_identifier = mtl_token_identifier.cuda()
     mtl_token_identifier, mtl_token_identifier_results, \
-        train_machine_annotated, eval_machine_annotated, test_machine_annotated = \
+    train_machine_annotated, eval_machine_annotated, test_machine_annotated = \
         train_mtl_token_identifier(mtl_token_identifier,
                                    args.output_dir,
                                    indexed_train,
@@ -142,6 +182,8 @@ def main():
     evidence_classifier = evidence_classifier.cuda()
     optimizer = None
     scheduler = None
+
+    # trains the classifier on the masked (based on rationales) documents
     evidence_classifier, evidence_class_results = train_mtl_evidence_classifier(evidence_classifier,
                                                                                 args.output_dir,
                                                                                 train_machine_annotated,

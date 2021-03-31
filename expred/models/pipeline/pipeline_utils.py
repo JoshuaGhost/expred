@@ -1,6 +1,5 @@
 import itertools
 import logging
-
 from collections import defaultdict, namedtuple
 from itertools import chain
 from typing import Any, Dict, List, Tuple
@@ -8,7 +7,6 @@ from typing import Any, Dict, List, Tuple
 import numpy as np
 import torch
 import torch.nn as nn
-
 from sklearn.metrics import classification_report, accuracy_score
 
 from expred.metrics import (
@@ -18,9 +16,8 @@ from expred.metrics import (
     score_hard_rationale_predictions,
     score_soft_tokens
 )
-
-from expred.utils import Annotation
 from expred.models.model_utils import PaddedSequence
+from expred.utils import Annotation
 
 SentenceEvidence = namedtuple('SentenceEvidence', 'kls ann_id query docid index sentence')
 

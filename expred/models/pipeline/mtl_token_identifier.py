@@ -83,6 +83,12 @@ def train_mtl_token_identifier(mtl_token_identifier: nn.Module,
                              sampler: Callable[
                                  [List[SentenceEvidence], Dict[str, List[SentenceEvidence]]], List[SentenceEvidence]]
                              ) -> List[SentenceEvidence]:
+        """
+        Shuffle the annotations and sample from documents (can also be the whole document depending on the sampler)
+        :param evidence_data:
+        :param sampler:
+        :return:
+        """
         output_annotations = []
         ann_ids = sorted(evidence_data.keys())
         # in place shuffle so we get a different per-epoch ordering
@@ -93,6 +99,7 @@ def train_mtl_token_identifier(mtl_token_identifier: nn.Module,
                 output_annotations.append((evidence_data[ann_id][0], data))
         return output_annotations
 
+    # set up output folder structure
     logging.info(f'Beginning training with {len(train)} annotations, {len(val)} for validation')
     evidence_identifier_output_dir = os.path.join(save_dir, 'evidence_token_identifier')
     os.makedirs(save_dir, exist_ok=True)
@@ -101,6 +108,7 @@ def train_mtl_token_identifier(mtl_token_identifier: nn.Module,
     model_save_file = os.path.join(evidence_identifier_output_dir, 'evidence_token_identifier.pt')
     epoch_save_file = os.path.join(evidence_identifier_output_dir, 'evidence_token_identifier_epoch_data.pt')
 
+    # set up training (optimizer, loss (both), sampling_method, ...)
     if optimizer is None:
         optimizer = torch.optim.Adam(mtl_token_identifier.parameters(), lr=model_pars['mtl_token_identifier']['lr'])
     cls_criterion = nn.BCELoss(reduction='none')
@@ -115,11 +123,11 @@ def train_mtl_token_identifier(mtl_token_identifier: nn.Module,
     max_grad_norm = model_pars['mtl_token_identifier'].get('max_grad_norm', None)
     par_lambda = model_pars['mtl_token_identifier']['par_lambda']
     # annotation id -> docid -> [SentenceEvidence])
-    evidence_train_data: Dict[
-        str, Tuple[str, Dict[str, List[SentenceEvidence]]]] = annotations_to_mtl_token_identification(train,
-                                                                                                      source_documents=source_documents,
-                                                                                                      interned_documents=interned_documents,
-                                                                                                      token_mapping=token_mapping)
+    # calculates the classification of the sequence tokens and some other stuff
+    evidence_train_data = annotations_to_mtl_token_identification(train,
+                                                                  source_documents=source_documents,
+                                                                  interned_documents=interned_documents,
+                                                                  token_mapping=token_mapping)
     evidence_val_data = annotations_to_mtl_token_identification(val,
                                                                 source_documents=source_documents,
                                                                 interned_documents=interned_documents,
@@ -169,16 +177,21 @@ def train_mtl_token_identifier(mtl_token_identifier: nn.Module,
         mtl_token_identifier.train()
         logging.info(
             f'Training with {len(epoch_train_data) // batch_size} batches with {len(epoch_train_data)} examples')
+        # one epoch of training
         for batch_start in range(0, len(epoch_train_data), batch_size):
             batch_elements = epoch_train_data[batch_start:min(batch_start + batch_size, len(epoch_train_data))]
             # we sample every time to thereoretically get a better representation of instances over the corpus.
             # this might just take more time than doing so in advance.
             labels, targets, queries, sentences = zip(
                 *[(s[0], s[1].kls, s[1].query, s[1].sentence) for s in batch_elements])
+
+            # one hot encoding for classification
             labels = [[i == labels_mapping[label] for i in range(len(labels_mapping))] for label in labels]
             labels = torch.tensor(labels, dtype=torch.float, device=device)
+
             ids = [(s[1].ann_id, s[1].docid, s[1].index) for s in batch_elements]
 
+            # truncation
             cropped_targets = [[0] * (len(query) + 2)  # length of query and overheads such as [cls] and [sep]
                                + list(target[:(max_length - len(query) - 2)]) for query, target in
                                zip(queries, targets)]
@@ -196,6 +209,8 @@ def train_mtl_token_identifier(mtl_token_identifier: nn.Module,
                     assert all(q is not None for q in queries)
                     queries = [torch.tensor(q, dtype=torch.long) for q in queries]
                 sentences = [torch.tensor(s, dtype=torch.long) for s in sentences]
+
+            # prediction
             preds = mtl_token_identifier(queries, ids, sentences)
             cls_preds, exp_preds, attention_masks = preds
             cls_loss = cls_criterion(cls_preds, labels).mean(dim=-1).sum()
@@ -213,6 +228,7 @@ def train_mtl_token_identifier(mtl_token_identifier: nn.Module,
         results['sampled_epoch_train_losses'].append(sampled_epoch_train_loss)
         logging.info(f'Epoch {epoch} training loss {sampled_epoch_train_loss}')
 
+        # validation
         with torch.no_grad():
             mtl_token_identifier.eval()
             epoch_val_total_loss, epoch_val_cls_loss, epoch_val_exp_loss, \
@@ -290,6 +306,13 @@ def train_mtl_token_identifier(mtl_token_identifier: nn.Module,
     mtl_token_identifier.eval()
 
     def prepare_for_cl(input_data, keep_corrected_only=False):
+        """
+        Extract rationale prediction from document only.
+        If keep_corrected_only=True keep only the annotation where the classification was correct
+        :param input_data:
+        :param keep_corrected_only:
+        :return:
+        """
         epoch_input_data = _prep_data_for_epoch(input_data, sampling_method)
         _, _, _, soft_pred_for_cl, hard_pred_for_cl, _, \
         pred_labels_for_cl, labels_for_cl = \
