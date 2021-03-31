@@ -1,3 +1,5 @@
+import sys
+
 import argparse
 import logging
 from typing import List, Dict, Set, Tuple
@@ -88,7 +90,7 @@ torch.backends.cudnn.benchmark = False
 # torch.backends.cudnn.benchmark = True
 
 
-def main():
+def main(args : List[str]):
     # setup the Argument Parser
     parser = argparse.ArgumentParser(description=('Trains a pipeline model.\n'
                                                   '\n'
@@ -117,7 +119,7 @@ def main():
                         help='JSoN file for loading arbitrary model parameters (e.g. optimizers, pre-saved files, etc.')
     parser.add_argument('--batch_size', type=int, required=False, default=None,
                         help='Overrides the batch_size given in the config file. Helpful for debugging')
-    args = parser.parse_args()
+    args = parser.parse_args(args)
 
     # Configure
     os.makedirs(args.output_dir, exist_ok=True)
@@ -232,4 +234,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv[1:])
