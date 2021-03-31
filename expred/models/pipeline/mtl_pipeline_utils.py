@@ -73,7 +73,7 @@ def annotations_to_evidence_token_identification(annotations: List[Annotation],
     negative_tokens = 0
     for ann in annotations:
         annid = ann.annotation_id
-        docids = set(ev.docid for ev in chain.from_iterable(ann.evidences))
+        docids = ann.docids
         sentence_offsets = defaultdict(list)  # docid -> [(start, end)]
         classes = defaultdict(list)  # docid -> [token is yea or nay]
         absolute_word_mapping = defaultdict(list)  # docid -> [(absolute wordpiece start, absolute wordpiece end)]

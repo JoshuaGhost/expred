@@ -148,7 +148,7 @@ def decorate_with_docs_ids(annotation : Annotation):
     docids = [annotation.annotation_id]
     new_annotation = asdict(annotation)
     new_annotation['docids'] = docids
-
+    assert docids is not None
     return Annotation(**new_annotation)
 
 def load_datasets(data_dir: str) -> Tuple[List[Annotation], List[Annotation], List[Annotation]]:

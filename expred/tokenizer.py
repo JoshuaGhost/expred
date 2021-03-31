@@ -104,5 +104,6 @@ class BertTokenizerWithMapping(BertTokenizer):
                                   query=tuple(query),
                                   evidences=frozenset(ev_groups),
                                   classification=ann.classification,
-                                  query_type=ann.query_type))
+                                  query_type=ann.query_type,
+                                  docids=ann.docids))
         return ret

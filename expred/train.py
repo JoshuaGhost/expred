@@ -1,3 +1,5 @@
+from dataclasses import asdict
+
 import sys
 
 import argparse
@@ -16,7 +18,7 @@ from expred.params import MTLParams
 from expred.models.mlp_mtl import BertMTL, BertClassifier
 from expred.tokenizer import BertTokenizerWithMapping
 from expred.models.pipeline.mtl_pipeline_utils import decode
-from expred.utils import load_datasets, load_documents, write_jsonl
+from expred.utils import load_datasets, load_documents, write_jsonl, Annotation
 from expred.models.pipeline.mtl_token_identifier import train_mtl_token_identifier
 from expred.models.pipeline.mtl_evidence_classifier import train_mtl_evidence_classifier
 
@@ -143,10 +145,7 @@ def main(args : List[str]):
     train, val, test = load_datasets(args.data_dir)
 
     # get's all docids needed that are contained in the loaded splits
-    docids: Set[str] = set(e.docid for e in
-                           chain.from_iterable(
-                               chain.from_iterable(map(lambda ann: ann.evidences, chain(train, val, test))))
-                        )
+    docids: Set[str] = set(chain.from_iterable(map(lambda ann: ann.docids, chain(train, val, test))))
 
     documents: Dict[str, List[List[str]]] = load_documents(args.data_dir, docids)
     logger.info(f'Load {len(documents)} documents')
