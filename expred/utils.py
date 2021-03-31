@@ -135,6 +135,22 @@ def annotations_from_jsonl(fp: str) -> List[Annotation]:
     return ret
 
 
+def decorate_with_docs_ids(annotation : Annotation):
+    """
+    Extracts the docids if not already set from the annotations_id.
+    Warning does not work for esnli. For esnli_flat it works!
+    :param annotation:
+    :return: annotation
+    """
+    if annotation.docids is not None and len(annotation.docids) > 0:
+        return annotation
+
+    docids = [annotation.annotation_id]
+    new_annotation = asdict(annotation)
+    new_annotation['docids'] = docids
+
+    return Annotation(**new_annotation)
+
 def load_datasets(data_dir: str) -> Tuple[List[Annotation], List[Annotation], List[Annotation]]:
     """Loads a training, validation, and test dataset
 
@@ -144,7 +160,10 @@ def load_datasets(data_dir: str) -> Tuple[List[Annotation], List[Annotation], Li
     train_data = annotations_from_jsonl(os.path.join(data_dir, 'train.jsonl'))
     val_data = annotations_from_jsonl(os.path.join(data_dir, 'val.jsonl'))
     test_data = annotations_from_jsonl(os.path.join(data_dir, 'test.jsonl'))
-    return train_data, val_data, test_data
+
+    splits = train_data, val_data, test_data
+    splits = tuple([decorate_with_docs_ids(ann) for ann in split] for split in splits)
+    return splits
 
 
 def load_documents(data_dir: str, docids: Set[str] = None) -> Dict[str, List[List[str]]]:
