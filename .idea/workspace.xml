@@ -2,55 +2,24 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ce4aad73-ccc2-4db5-ba27-4d22efc6a159" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/deployment.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/deployment.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/interpretation_by_design.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/interpretation_by_design.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/runConfigurations/mtl_pipeline_movies_test.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/runConfigurations/mtl_pipeline_movies_test.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/expred/eraser_benchmark.py" beforeDir="false" afterPath="$PROJECT_DIR$/expred/eraser_benchmark.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/expred/eraser_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/expred/eraser_utils.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/expred/metrics.py" beforeDir="false" afterPath="$PROJECT_DIR$/expred/metrics.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/expred/models/encode_attend.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/expred/models/mlp.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/expred/models/mlp_mtl.py" beforeDir="false" afterPath="$PROJECT_DIR$/expred/models/mlp_mtl.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/expred/models/pipeline/bert_pipeline.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/expred/models/pipeline/evidence_classifier.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/expred/models/pipeline/evidence_identifier.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/expred/models/pipeline/evidence_token_identifier.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/expred/models/pipeline/mtl_pipeline_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/expred/models/pipeline/mtl_pipeline_utils.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/expred/models/pipeline/mtl_token_identifier.py" beforeDir="false" afterPath="$PROJECT_DIR$/expred/models/pipeline/mtl_token_identifier.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/expred/models/pipeline/pipeline_train.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/expred/models/sequence_taggers.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/expred/tokenizer.py" beforeDir="false" afterPath="$PROJECT_DIR$/expred/tokenizer.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/expred/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/expred/train.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/expred/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/expred/utils.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graphics/learningrate.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/params/boolq.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/params/boolq_baas.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/params/boolq_bert.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/params/boolq_soft.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/params/cose_bert.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/params/esnli_bert.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/params/evidence_inference.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/params/evidence_inference_bert.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/params/evidence_inference_soft.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/params/fever.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/params/fever_baas.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/params/fever_bert.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/params/fever_soft.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/params/movies.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/params/movies_baas.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/params/movies_bert.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/params/movies_bert_token.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/params/movies_soft.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/params/multirc.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/params/multirc_baas.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/params/multirc_bert.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/params/multirc_soft.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/expred/models/pipeline/mtl_evidence_classifier.py" beforeDir="false" afterPath="$PROJECT_DIR$/expred/models/pipeline/mtl_evidence_classifier.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../fresh/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/../fresh/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../fresh/Rationale_Analysis/data/dataset_readers/eraser_reader.py" beforeDir="false" afterPath="$PROJECT_DIR$/../fresh/Rationale_Analysis/data/dataset_readers/eraser_reader.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="DjangoConsoleOptions" custom-start-script="import sys; print('Python %s on %s' % (sys.version, sys.platform))&#10;import django; print('Django %s' % django.get_version())&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;if 'setup' in dir(django): django.setup()&#10;import django_manage_shell; django_manage_shell.run(PROJECT_ROOT)">
+    <option name="myCustomStartScript" value="import sys; print('Python %s on %s' % (sys.version, sys.platform))&#10;import django; print('Django %s' % django.get_version())&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;if 'setup' in dir(django): django.setup()&#10;import django_manage_shell; django_manage_shell.run(PROJECT_ROOT)" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -59,11 +28,32 @@
       </list>
     </option>
   </component>
+  <component name="FlaskConsoleOptions" custom-start-script="import sys&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;from flask.cli import ScriptInfo&#10;locals().update(ScriptInfo(create_app=None).load_app().make_shell_context())&#10;print(&quot;Python %s on %s\nApp: %s [%s]\nInstance: %s&quot; % (sys.version, sys.platform, app.import_name, app.env, app.instance_path))">
+    <envs>
+      <env key="FLASK_APP" value="app" />
+    </envs>
+    <option name="myCustomStartScript" value="import sys&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;from flask.cli import ScriptInfo&#10;locals().update(ScriptInfo(create_app=None).load_app().make_shell_context())&#10;print(&quot;Python %s on %s\nApp: %s [%s]\nInstance: %s&quot; % (sys.version, sys.platform, app.import_name, app.env, app.instance_path))" />
+    <option name="myEnvs">
+      <map>
+        <entry key="FLASK_APP" value="app" />
+      </map>
+    </option>
+  </component>
   <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="pytorch" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../fresh" />
+    <option name="ROOT_SYNC" value="DONT_SYNC" />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$USER_HOME$/.cache/JetBrains/PyCharm2020.3/remote_sources/337269974/-733401303/bert/__init__.py" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="JupyterTrust" id="627f5b7d-d54e-4c91-bc05-6cb3c84b3d20" />
   <component name="ProjectId" id="1dPlUMyl6Grcv8ggGIOI1FrrMT0" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -76,7 +66,7 @@
     <property name="WebServerToolWindowPanel.toolwindow.show.date" value="false" />
     <property name="WebServerToolWindowPanel.toolwindow.show.permissions" value="false" />
     <property name="WebServerToolWindowPanel.toolwindow.show.size" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../fresh_reimplemented" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
@@ -96,12 +86,17 @@
       </console-settings>
     </option>
   </component>
+  <component name="ReaderModeSettings">
+    <option name="enabled" value="false" />
+  </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/../fresh_reimplemented" />
       <recent name="$PROJECT_DIR$/rationale_benchmark/models/pipeline" />
       <recent name="$PROJECT_DIR$/params" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/../fresh_reimplemented/eraser_utils" />
       <recent name="$PROJECT_DIR$/expred/models/pipeline" />
       <recent name="$PROJECT_DIR$/expred" />
     </key>
@@ -1634,9 +1629,12 @@
         <item itemvalue="Python.mtl_pipeline_utils" />
         <item itemvalue="Python.model" />
         <item itemvalue="Python.test" />
+        <item itemvalue="Python.mtl_pipeline_utils" />
+        <item itemvalue="Python.model" />
       </list>
     </recent_temporary>
   </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="SvnConfiguration">
     <configuration />
   </component>
@@ -1666,59 +1664,69 @@
       <workItem from="1608733175370" duration="16997000" />
       <workItem from="1610396931975" duration="3683000" />
       <workItem from="1616148659379" duration="7594000" />
+      <workItem from="1616427546290" duration="3481000" />
+      <workItem from="1616488296225" duration="512000" />
+      <workItem from="1616691958163" duration="595000" />
+      <workItem from="1616747358924" duration="8000" />
+      <workItem from="1617007184552" duration="7301000" />
+      <workItem from="1617017442821" duration="6843000" />
+      <workItem from="1617089728569" duration="645000" />
+      <workItem from="1617090390266" duration="322000" />
+      <workItem from="1617109940522" duration="3970000" />
+      <workItem from="1617177901553" duration="842000" />
     </task>
+    <task id="LOCAL-00001" summary="Fixed some minor bugs regarding installation: &#10;1. Removed unused import that caused an import error (utils.py)&#10;2. Added scikit-learn to requirements.txt&#10;3. Changed README.md">
+      <created>1616345992337</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1616345992337</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Removed unused imports">
+      <created>1616346102347</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1616346102347</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Added comments and docstrings">
+      <created>1617178303004</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1617178303004</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Added gitignore">
+      <created>1617178720978</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1617178720978</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
-    <option name="version" value="2" />
+    <option name="version" value="3" />
   </component>
-  <component name="WindowStateProjectService">
-    <state x="555" y="214" width="1196" height="685" key="#Deployment" timestamp="1608733415506">
-      <screen x="0" y="27" width="1920" height="1053" />
-    </state>
-    <state x="555" y="214" key="#Deployment/0.27.1920.1053/207.1080.1600.900@0.27.1920.1053" timestamp="1608733415506" />
-    <state x="589" y="232" width="732" height="650" key="#Inspections" timestamp="1610397136056">
-      <screen x="0" y="27" width="1920" height="1053" />
-    </state>
-    <state x="589" y="232" width="732" height="650" key="#Inspections/0.27.1920.1053/0.1080.1920.1080@0.27.1920.1053" timestamp="1610397136056" />
-    <state x="360" y="133" width="1457" height="685" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1616248582892">
-      <screen x="0" y="27" width="1920" height="1053" />
-    </state>
-    <state x="360" y="133" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.27.1920.1053/180.1080.1440.810@0.27.1920.1053" timestamp="1616248582892" />
-    <state x="360" y="133" width="1457" height="685" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.27.1920.1053/207.1080.1600.900@0.27.1920.1053" timestamp="1608825213588" />
-    <state x="778" y="230" width="354" height="654" key="EnvironmentVariablesDialog" timestamp="1608744817429">
-      <screen x="0" y="27" width="1920" height="1053" />
-    </state>
-    <state x="778" y="230" width="354" height="654" key="EnvironmentVariablesDialog/0.27.1920.1053/207.1080.1600.900@0.27.1920.1053" timestamp="1608744817429" />
-    <state x="728" y="311" key="FileChooserDialogImpl" timestamp="1608744799455">
-      <screen x="0" y="27" width="1920" height="1053" />
-    </state>
-    <state x="728" y="311" key="FileChooserDialogImpl/0.27.1920.1053/207.1080.1600.900@0.27.1920.1053" timestamp="1608744799455" />
-    <state width="1860" height="224" key="GridCell.Tab.0.bottom" timestamp="1616248665160">
-      <screen x="0" y="27" width="1920" height="1053" />
-    </state>
-    <state width="1860" height="224" key="GridCell.Tab.0.bottom/0.27.1920.1053/180.1080.1440.810@0.27.1920.1053" timestamp="1616248665160" />
-    <state width="1860" height="224" key="GridCell.Tab.0.center" timestamp="1616248665159">
-      <screen x="0" y="27" width="1920" height="1053" />
-    </state>
-    <state width="1860" height="224" key="GridCell.Tab.0.center/0.27.1920.1053/180.1080.1440.810@0.27.1920.1053" timestamp="1616248665159" />
-    <state width="1860" height="224" key="GridCell.Tab.0.left" timestamp="1616248665159">
-      <screen x="0" y="27" width="1920" height="1053" />
-    </state>
-    <state width="1860" height="224" key="GridCell.Tab.0.left/0.27.1920.1053/180.1080.1440.810@0.27.1920.1053" timestamp="1616248665159" />
-    <state width="1860" height="224" key="GridCell.Tab.0.right" timestamp="1616248665160">
-      <screen x="0" y="27" width="1920" height="1053" />
-    </state>
-    <state width="1860" height="224" key="GridCell.Tab.0.right/0.27.1920.1053/180.1080.1440.810@0.27.1920.1053" timestamp="1616248665160" />
-    <state x="426" y="188" width="1067" height="737" key="SettingsEditor" timestamp="1616149138981">
-      <screen x="0" y="27" width="1920" height="1053" />
-    </state>
-    <state x="426" y="188" width="1067" height="737" key="SettingsEditor/0.27.1920.1053/180.1080.1440.810@0.27.1920.1053" timestamp="1616149138981" />
-    <state x="639" y="223" width="642" height="660" key="find.popup" timestamp="1616248638932">
-      <screen x="0" y="27" width="1920" height="1053" />
-    </state>
-    <state x="639" y="223" width="642" height="660" key="find.popup/0.27.1920.1053/180.1080.1440.810@0.27.1920.1053" timestamp="1616248638932" />
-    <state x="639" y="223" width="642" height="660" key="find.popup/0.27.1920.1053/207.1080.1600.900@0.27.1920.1053" timestamp="1608753166386" />
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Fixed some minor bugs regarding installation: &#10;1. Removed unused import that caused an import error (utils.py)&#10;2. Added scikit-learn to requirements.txt&#10;3. Changed README.md" />
+    <MESSAGE value="Removed unused imports" />
+    <MESSAGE value="Added comments and docstrings" />
+    <MESSAGE value="Added gitignore" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added gitignore" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1728,82 +1736,113 @@
           <line>1</line>
           <option name="timeStamp" value="1" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/expred/models/losses.py</url>
+          <line>15</line>
+          <option name="timeStamp" value="4" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/expred/models/losses.py</url>
+          <line>20</line>
+          <option name="timeStamp" value="6" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/expred/train.py</url>
+          <line>160</line>
+          <option name="timeStamp" value="8" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/expred/models/pipeline/mtl_token_identifier.py</url>
+          <line>130</line>
+          <option name="timeStamp" value="9" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/expred/models/pipeline/mtl_token_identifier.py</url>
+          <line>188</line>
+          <option name="timeStamp" value="10" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/expred/train.py</url>
+          <line>143</line>
+          <option name="timeStamp" value="12" />
+        </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/interpretation_by_design$movies_complete_sentence_exp_only_evaluate_exp_benchmark.coverage" NAME="movies_complete_sentence_exp_only_evaluate_exp_benchmark Coverage Results" MODIFIED="1590979364407" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$multirc_complete_sentence_cls_only.coverage" NAME="multirc_complete_sentence_cls_only Coverage Results" MODIFIED="1589898466000" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$fever_exp_only_anecdotal.coverage" NAME="fever_exp_only_anecdotal Coverage Results" MODIFIED="1590848096270" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$movies.coverage" NAME="movies Coverage Results" MODIFIED="1589393094929" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$multirc_hard_lambda_2_anecdotal.coverage" NAME="multirc_hard_lambda_2_anecdotal Coverage Results" MODIFIED="1591005635324" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$bert_utils.coverage" NAME="bert_utils Coverage Results" MODIFIED="1588611625463" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$movies_output_machine_rationale_par_lambda_50_soft.coverage" NAME="movies_output_machine_rationale_par_lambda_50_soft Coverage Results" MODIFIED="1590555401462" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$fever_complete_sentence_exp_only_evaluate_exp_benchmark.coverage" NAME="fever_complete_sentence_exp_only_evaluate_exp_benchmark Coverage Results" MODIFIED="1590979370383" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$fever_machine_rationale_only_mtl_soft_lambda_5.coverage" NAME="fever_machine_rationale_only_mtl_soft_lambda_5 Coverage Results" MODIFIED="1590607373124" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$multirc_human_annotation_only.coverage" NAME="multirc_human_annotation_only Coverage Results" MODIFIED="1589907505006" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$multirc_output_machine_rationale_par_lambda_2_soft_hard_eval_test.coverage" NAME="multirc_output_machine_rationale_par_lambda_2_soft_hard_eval_test Coverage Results" MODIFIED="1590981655753" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$model.coverage" NAME="model Coverage Results" MODIFIED="1588748378561" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$movies_exp_only_anecdotal.coverage" NAME="movies_exp_only_anecdotal Coverage Results" MODIFIED="1590895610553" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$multirc_machine_rationale_only_mtl_soft_hard_lambda_2.coverage" NAME="multirc_machine_rationale_only_mtl_soft_hard_lambda_2 Coverage Results" MODIFIED="1590596999439" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$fever_output_machine_rationale_par_lambda_20_hard_eval_test.coverage" NAME="fever_output_machine_rationale_par_lambda_20_hard_eval_test Coverage Results" MODIFIED="1590980880038" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$multirc_complete_sentence_exp_only.coverage" NAME="multirc_complete_sentence_exp_only Coverage Results" MODIFIED="1590082142411" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$exp_output__1_.coverage" NAME="multirc Coverage Results" MODIFIED="1589393205716" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$fever_no_machine_rationale_mtl_soft_lambda_5.coverage" NAME="fever_no_machine_rationale_mtl_soft_lambda_5 Coverage Results" MODIFIED="1590608047241" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$multirc_output_machine_rationale_par_lambda_2_soft_hard.coverage" NAME="multirc_output_machine_rationale_par_lambda_2_soft_hard Coverage Results" MODIFIED="1590942461907" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$movies_machine_rationale_only.coverage" NAME="movies_machine_rationale_only Coverage Results" MODIFIED="1590433642734" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$movies_no_human_annotation.coverage" NAME="movies_no_human_annotation Coverage Results" MODIFIED="1589907831577" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$fever_human_annotation_only.coverage" NAME="fever_human_annotation_only Coverage Results" MODIFIED="1589909019819" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$fever_output_machine_rationale_par_lambda_5_soft_eval_test.coverage" NAME="fever_output_machine_rationale_par_lambda_5_soft_eval_test Coverage Results" MODIFIED="1590606421690" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$fever_machine_rationale_only.coverage" NAME="fever_machine_rationale_only Coverage Results" MODIFIED="1590486059543" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$multirc_exp_only_anecdotal.coverage" NAME="multirc_exp_only_anecdotal Coverage Results" MODIFIED="1590897437577" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$movies_par_lambda_50_soft_benchmark.coverage" NAME="movies_par_lambda_50_soft_benchmark Coverage Results" MODIFIED="1590726058062" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$mtl_pipeline_movies_test.coverage" NAME="mtl_pipeline_movies_test Coverage Results" MODIFIED="1616248465404" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$fever_mtl_hard_lambda_20_machine_rationale_cls_only.coverage" NAME="fever_mtl_hard_lambda_20_machine_rationale_cls_only Coverage Results" MODIFIED="1590978712147" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$multirc_exp_machine_rationale_cls_only.coverage" NAME="multirc_exp_machine_rationale_cls_only Coverage Results" MODIFIED="1590979078438" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$fever_machine_no_annotation.coverage" NAME="fever_machine_no_annotation Coverage Results" MODIFIED="1589900916017" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$multirc_exp_only_save_machine_rationales.coverage" NAME="multirc_exp_only_save_machine_rationales Coverage Results" MODIFIED="1590942356403" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$movies_human_annotation_only.coverage" NAME="movies_human_annotation_only Coverage Results" MODIFIED="1590746653922" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$fever_par_lambda_20_hard_benchmark.coverage" NAME="fever_par_lambda_20_hard_benchmark Coverage Results" MODIFIED="1590771784832" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$movies_no_machine_rationale.coverage" NAME="movies_no_machine_rationale Coverage Results" MODIFIED="1590434036692" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$fever_machine_annotation_only.coverage" NAME="fever_machine_annotation_only Coverage Results" MODIFIED="1589900912394" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$movies_output_machine_rationale_par_lambda_50_soft_eval_test.coverage" NAME="movies_output_machine_rationale_par_lambda_50_soft_eval_test Coverage Results" MODIFIED="1590598505566" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$fever_output_machine_rationale_par_lambda_20_hard.coverage" NAME="fever_output_machine_rationale_par_lambda_20_hard Coverage Results" MODIFIED="1590942450060" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$fever_hard_lambda_20_anecdotal.coverage" NAME="fever_hard_lambda_20_anecdotal Coverage Results" MODIFIED="1590848625212" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$fever_complete_sentence_exp_only.coverage" NAME="fever_complete_sentence_exp_only Coverage Results" MODIFIED="1590152313899" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$multirc_mtl_hard_lambda_2_machine_rationale_cls_only.coverage" NAME="multirc_mtl_hard_lambda_2_machine_rationale_cls_only Coverage Results" MODIFIED="1590979022027" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$movies_par_lambda_5_hard_benchmark.coverage" NAME="movies_par_lambda_5_hard_benchmark Coverage Results" MODIFIED="1590979394237" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$fever_no_human_annotation.coverage" NAME="fever_no_human_annotation Coverage Results" MODIFIED="1589909043302" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$multirc_machine_annotation_only.coverage" NAME="multirc_machine_annotation_only Coverage Results" MODIFIED="1589900949478" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$multirc_exp_only_save_machine_rationales_eval_test.coverage" NAME="multirc_exp_only_save_machine_rationales_eval_test Coverage Results" MODIFIED="1590602696668" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$movies_exp_only_save_machine_rationales.coverage" NAME="movies_exp_only_save_machine_rationales Coverage Results" MODIFIED="1590942083158" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$movies_complete_sentence_cls_only.coverage" NAME="movies_complete_sentence_cls_only Coverage Results" MODIFIED="1589910139498" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$fever_output_machine_rationale_par_lambda_5_soft.coverage" NAME="fever_output_machine_rationale_par_lambda_5_soft Coverage Results" MODIFIED="1590554969900" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$movies_output_machine_rationale_par_lambda_5_hard.coverage" NAME="movies_output_machine_rationale_par_lambda_5_hard Coverage Results" MODIFIED="1590942431201" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$movies_machine_no_annotation.coverage" NAME="movies_machine_no_annotation Coverage Results" MODIFIED="1589900648174" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$multirc_par_lambda_2_soft_hard_benchmark.coverage" NAME="multirc_par_lambda_2_soft_hard_benchmark Coverage Results" MODIFIED="1590723954260" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$movies_no_machine_rationale_mtl_hard_lambda_5.coverage" NAME="movies_no_machine_rationale_mtl_hard_lambda_5 Coverage Results" MODIFIED="1590570254610" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$fever_exp_only_save_machine_rationales_eval_test.coverage" NAME="fever_exp_only_save_machine_rationales_eval_test Coverage Results" MODIFIED="1590601705042" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$mtl_pipeline_movies_lambda_5.coverage" NAME="mtl_pipeline_movies_lambda_5 Coverage Results" MODIFIED="1596049990737" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/rationale_benchmark/models/pipeline" />
     <SUITE FILE_PATH="coverage/interpretation_by_design$fever_exp_machine_rationale_cls_only.coverage" NAME="fever_exp_machine_rationale_cls_only Coverage Results" MODIFIED="1590979090192" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$fever_exp_only_save_machine_rationales.coverage" NAME="fever_exp_only_save_machine_rationales Coverage Results" MODIFIED="1590942349850" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$exp_output.coverage" NAME="fever Coverage Results" MODIFIED="1589393209079" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$multirc_machine_rationale_only.coverage" NAME="multirc_machine_rationale_only Coverage Results" MODIFIED="1590373660653" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$movies_machine_rationale_only_mtl_hard_lambda_5.coverage" NAME="movies_machine_rationale_only_mtl_hard_lambda_5 Coverage Results" MODIFIED="1590557961315" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$fever_no_machine_rationale.coverage" NAME="fever_no_machine_rationale Coverage Results" MODIFIED="1590486557985" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$movies_exp_only_save_machine_rationales_eval_test.coverage" NAME="movies_exp_only_save_machine_rationales_eval_test Coverage Results" MODIFIED="1590600373500" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
     <SUITE FILE_PATH="coverage/interpretation_by_design$test.coverage" NAME="test Coverage Results" MODIFIED="1590363569987" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$multirc_no_machine_rationale_mtl_soft_hard_lambda_2.coverage" NAME="multirc_no_machine_rationale_mtl_soft_hard_lambda_2 Coverage Results" MODIFIED="1590599355467" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$mtl_pipeline_fever.coverage" NAME="mtl_pipeline_fever Coverage Results" MODIFIED="1596054055390" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/rationale_benchmark/models/pipeline" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$fever_complete_sentence_cls_only.coverage" NAME="fever_complete_sentence_cls_only Coverage Results" MODIFIED="1589833566063" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$multirc_output_machine_rationale_par_lambda_2_soft_hard_eval_test.coverage" NAME="multirc_output_machine_rationale_par_lambda_2_soft_hard_eval_test Coverage Results" MODIFIED="1590981655753" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$movies_machine_no_annotation.coverage" NAME="movies_machine_no_annotation Coverage Results" MODIFIED="1589900648174" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$fever_complete_sentence_exp_only_evaluate_exp_benchmark.coverage" NAME="fever_complete_sentence_exp_only_evaluate_exp_benchmark Coverage Results" MODIFIED="1590979370383" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$fever_output_machine_rationale_par_lambda_5_soft.coverage" NAME="fever_output_machine_rationale_par_lambda_5_soft Coverage Results" MODIFIED="1590554969900" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$multirc_exp_machine_rationale_cls_only.coverage" NAME="multirc_exp_machine_rationale_cls_only Coverage Results" MODIFIED="1590979078438" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$movies_exp_only_save_machine_rationales.coverage" NAME="movies_exp_only_save_machine_rationales Coverage Results" MODIFIED="1590942083158" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$movies_machine_rationale_only_mtl_hard_lambda_5.coverage" NAME="movies_machine_rationale_only_mtl_hard_lambda_5 Coverage Results" MODIFIED="1590557961315" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$movies_human_annotation_only.coverage" NAME="movies_human_annotation_only Coverage Results" MODIFIED="1590746653922" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$movies_exp_only_save_machine_rationales_eval_test.coverage" NAME="movies_exp_only_save_machine_rationales_eval_test Coverage Results" MODIFIED="1590600373500" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
     <SUITE FILE_PATH="coverage/interpretation_by_design$movies_exp_machine_rationale_cls_only.coverage" NAME="movies_exp_machine_rationale_cls_only Coverage Results" MODIFIED="1590942126160" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$multirc_no_machine_rationale.coverage" NAME="multirc_no_machine_rationale Coverage Results" MODIFIED="1590373676241" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$movies_machine_annotation_only.coverage" NAME="movies_machine_rationale_only Coverage Results" MODIFIED="1589906564482" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$multirc_complete_sentence_exp_only_evaluate_exp_benchmark.coverage" NAME="multirc_complete_sentence_exp_only_evaluate_exp_benchmark Coverage Results" MODIFIED="1590979373877" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$movies_mtl_hard_lambda_5_machine_rationale_cls_only.coverage" NAME="movies_mtl_hard_lambda_5_machine_rationale_cls_only Coverage Results" MODIFIED="1590793215758" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$fever_no_human_annotation.coverage" NAME="fever_no_human_annotation Coverage Results" MODIFIED="1589909043302" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$fever_machine_annotation_only.coverage" NAME="fever_machine_annotation_only Coverage Results" MODIFIED="1589900912394" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$fever_exp_only_anecdotal.coverage" NAME="fever_exp_only_anecdotal Coverage Results" MODIFIED="1590848096270" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$movies_exp_only_anecdotal.coverage" NAME="movies_exp_only_anecdotal Coverage Results" MODIFIED="1590895610553" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$fever_output_machine_rationale_par_lambda_20_hard_eval_test.coverage" NAME="fever_output_machine_rationale_par_lambda_20_hard_eval_test Coverage Results" MODIFIED="1590980880038" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$movies_par_lambda_5_hard_benchmark.coverage" NAME="movies_par_lambda_5_hard_benchmark Coverage Results" MODIFIED="1590979394237" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$mtl_pipeline_fever.coverage" NAME="mtl_pipeline_fever Coverage Results" MODIFIED="1596054055390" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/rationale_benchmark/models/pipeline" />
     <SUITE FILE_PATH="coverage/interpretation_by_design$multirc_no_human_annotation.coverage" NAME="multirc_no_human_annotation Coverage Results" MODIFIED="1589907882547" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$fever_output_machine_rationale_par_lambda_5_soft_eval_test.coverage" NAME="fever_output_machine_rationale_par_lambda_5_soft_eval_test Coverage Results" MODIFIED="1590606421690" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$movies_mtl_hard_lambda_5_machine_rationale_cls_only.coverage" NAME="movies_mtl_hard_lambda_5_machine_rationale_cls_only Coverage Results" MODIFIED="1590793215758" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$fever_exp_only_save_machine_rationales.coverage" NAME="fever_exp_only_save_machine_rationales Coverage Results" MODIFIED="1590942349850" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$fever_no_machine_rationale.coverage" NAME="fever_no_machine_rationale Coverage Results" MODIFIED="1590486557985" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
+    <SUITE FILE_PATH="coverage/expred$mtl_pipeline_movies_test.coverage" NAME="mtl_pipeline_movies_test Coverage Results" MODIFIED="1617117533192" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/interpretation_by_design$multirc_machine_no_annotation.coverage" NAME="multirc_machine_no_annotation Coverage Results" MODIFIED="1589900945456" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$movies_output_machine_rationale_par_lambda_5_hard_eval_test.coverage" NAME="movies_output_machine_rationale_par_lambda_5_hard_eval_test Coverage Results" MODIFIED="1590591100638" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$mtl_pipeline_movies_test.coverage" NAME="mtl_pipeline_movies_test Coverage Results" MODIFIED="1616248465404" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$multirc_no_machine_rationale_mtl_soft_hard_lambda_2.coverage" NAME="multirc_no_machine_rationale_mtl_soft_hard_lambda_2 Coverage Results" MODIFIED="1590599355467" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$multirc_exp_only_save_machine_rationales_eval_test.coverage" NAME="multirc_exp_only_save_machine_rationales_eval_test Coverage Results" MODIFIED="1590602696668" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$multirc_human_annotation_only.coverage" NAME="multirc_human_annotation_only Coverage Results" MODIFIED="1589907505006" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$mtl_pipeline_movies_lambda_5.coverage" NAME="mtl_pipeline_movies_lambda_5 Coverage Results" MODIFIED="1596049990737" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/rationale_benchmark/models/pipeline" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$model.coverage" NAME="model Coverage Results" MODIFIED="1588748378561" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$movies_output_machine_rationale_par_lambda_50_soft.coverage" NAME="movies_output_machine_rationale_par_lambda_50_soft Coverage Results" MODIFIED="1590555401462" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$movies_complete_sentence_cls_only.coverage" NAME="movies_complete_sentence_cls_only Coverage Results" MODIFIED="1589910139498" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$bert_utils.coverage" NAME="bert_utils Coverage Results" MODIFIED="1588611625463" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$fever_output_machine_rationale_par_lambda_20_hard.coverage" NAME="fever_output_machine_rationale_par_lambda_20_hard Coverage Results" MODIFIED="1590942450060" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$multirc_par_lambda_2_soft_hard_benchmark.coverage" NAME="multirc_par_lambda_2_soft_hard_benchmark Coverage Results" MODIFIED="1590723954260" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$fever_hard_lambda_20_anecdotal.coverage" NAME="fever_hard_lambda_20_anecdotal Coverage Results" MODIFIED="1590848625212" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$multirc_complete_sentence_exp_only.coverage" NAME="multirc_complete_sentence_exp_only Coverage Results" MODIFIED="1590082142411" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$fever_complete_sentence_cls_only.coverage" NAME="fever_complete_sentence_cls_only Coverage Results" MODIFIED="1589833566063" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$multirc_complete_sentence_exp_only_evaluate_exp_benchmark.coverage" NAME="multirc_complete_sentence_exp_only_evaluate_exp_benchmark Coverage Results" MODIFIED="1590979373877" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$fever_no_machine_rationale_mtl_soft_lambda_5.coverage" NAME="fever_no_machine_rationale_mtl_soft_lambda_5 Coverage Results" MODIFIED="1590608047241" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$multirc_complete_sentence_cls_only.coverage" NAME="multirc_complete_sentence_cls_only Coverage Results" MODIFIED="1589898466000" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$multirc_output_machine_rationale_par_lambda_2_soft_hard.coverage" NAME="multirc_output_machine_rationale_par_lambda_2_soft_hard Coverage Results" MODIFIED="1590942461907" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$multirc_exp_only_save_machine_rationales.coverage" NAME="multirc_exp_only_save_machine_rationales Coverage Results" MODIFIED="1590942356403" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$movies_par_lambda_50_soft_benchmark.coverage" NAME="movies_par_lambda_50_soft_benchmark Coverage Results" MODIFIED="1590726058062" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$multirc_machine_rationale_only.coverage" NAME="multirc_machine_rationale_only Coverage Results" MODIFIED="1590373660653" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$fever_complete_sentence_exp_only.coverage" NAME="fever_complete_sentence_exp_only Coverage Results" MODIFIED="1590152313899" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$multirc_no_machine_rationale.coverage" NAME="multirc_no_machine_rationale Coverage Results" MODIFIED="1590373676241" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$fever_human_annotation_only.coverage" NAME="fever_human_annotation_only Coverage Results" MODIFIED="1589909019819" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$movies_machine_annotation_only.coverage" NAME="movies_machine_rationale_only Coverage Results" MODIFIED="1589906564482" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$multirc_hard_lambda_2_anecdotal.coverage" NAME="multirc_hard_lambda_2_anecdotal Coverage Results" MODIFIED="1591005635324" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$movies_output_machine_rationale_par_lambda_5_hard.coverage" NAME="movies_output_machine_rationale_par_lambda_5_hard Coverage Results" MODIFIED="1590942431201" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$fever_machine_rationale_only_mtl_soft_lambda_5.coverage" NAME="fever_machine_rationale_only_mtl_soft_lambda_5 Coverage Results" MODIFIED="1590607373124" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$multirc_machine_rationale_only_mtl_soft_hard_lambda_2.coverage" NAME="multirc_machine_rationale_only_mtl_soft_hard_lambda_2 Coverage Results" MODIFIED="1590596999439" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$movies_complete_sentence_exp_only_evaluate_exp_benchmark.coverage" NAME="movies_complete_sentence_exp_only_evaluate_exp_benchmark Coverage Results" MODIFIED="1590979364407" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$movies_no_machine_rationale_mtl_hard_lambda_5.coverage" NAME="movies_no_machine_rationale_mtl_hard_lambda_5 Coverage Results" MODIFIED="1590570254610" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$exp_output.coverage" NAME="fever Coverage Results" MODIFIED="1589393209079" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$movies_output_machine_rationale_par_lambda_50_soft_eval_test.coverage" NAME="movies_output_machine_rationale_par_lambda_50_soft_eval_test Coverage Results" MODIFIED="1590598505566" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
     <SUITE FILE_PATH="coverage/interpretation_by_design$movies_hard_lambda_5_anecdotal.coverage" NAME="movies_hard_lambda_5_anecdotal Coverage Results" MODIFIED="1591058854021" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$movies.coverage" NAME="movies Coverage Results" MODIFIED="1589393094929" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$fever_machine_rationale_only.coverage" NAME="fever_machine_rationale_only Coverage Results" MODIFIED="1590486059543" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$fever_mtl_hard_lambda_20_machine_rationale_cls_only.coverage" NAME="fever_mtl_hard_lambda_20_machine_rationale_cls_only Coverage Results" MODIFIED="1590978712147" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$fever_par_lambda_20_hard_benchmark.coverage" NAME="fever_par_lambda_20_hard_benchmark Coverage Results" MODIFIED="1590771784832" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$movies_output_machine_rationale_par_lambda_5_hard_eval_test.coverage" NAME="movies_output_machine_rationale_par_lambda_5_hard_eval_test Coverage Results" MODIFIED="1590591100638" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$exp_output__1_.coverage" NAME="multirc Coverage Results" MODIFIED="1589393205716" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$fever_exp_only_save_machine_rationales_eval_test.coverage" NAME="fever_exp_only_save_machine_rationales_eval_test Coverage Results" MODIFIED="1590601705042" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$multirc_exp_only_anecdotal.coverage" NAME="multirc_exp_only_anecdotal Coverage Results" MODIFIED="1590897437577" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$multirc_mtl_hard_lambda_2_machine_rationale_cls_only.coverage" NAME="multirc_mtl_hard_lambda_2_machine_rationale_cls_only Coverage Results" MODIFIED="1590979022027" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$movies_no_machine_rationale.coverage" NAME="movies_no_machine_rationale Coverage Results" MODIFIED="1590434036692" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$multirc_machine_annotation_only.coverage" NAME="multirc_machine_annotation_only Coverage Results" MODIFIED="1589900949478" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$movies_no_human_annotation.coverage" NAME="movies_no_human_annotation Coverage Results" MODIFIED="1589907831577" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$movies_machine_rationale_only.coverage" NAME="movies_machine_rationale_only Coverage Results" MODIFIED="1590433642734" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$fever_machine_no_annotation.coverage" NAME="fever_machine_no_annotation Coverage Results" MODIFIED="1589900916017" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
   </component>
 </project>

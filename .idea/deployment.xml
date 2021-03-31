@@ -1,39 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" autoUpload="Always" serverName="zzhang@n1:22 pytorch">
+  <component name="PublishConfigData" autoUpload="Always" serverName="mreimer@deken:22 agent">
     <serverData>
-      <paths name="zzhang@n1:22 pytorch">
+      <paths name="mreimer@deken:22 agent">
         <serverdata>
           <mappings>
-            <mapping deploy="/workspace/interpretation_by_design" local="$PROJECT_DIR$" web="/" />
-          </mappings>
-        </serverdata>
-      </paths>
-      <paths name="zzhang@n2:22">
-        <serverdata>
-          <mappings>
-            <mapping deploy="/home/zzhang/workspace/interpretation_by_design" local="$PROJECT_DIR$" />
-          </mappings>
-        </serverdata>
-      </paths>
-      <paths name="zzhang@n2:22 (1)">
-        <serverdata>
-          <mappings>
-            <mapping deploy="/home/zzhang/workspace/interpretation_by_design" local="$PROJECT_DIR$" />
-          </mappings>
-        </serverdata>
-      </paths>
-      <paths name="zzhang@n2:22 (2)">
-        <serverdata>
-          <mappings>
-            <mapping deploy="/home/zzhang/workspace/interpretation_by_design" local="$PROJECT_DIR$" />
-          </mappings>
-        </serverdata>
-      </paths>
-      <paths name="zzhang@n2:22 (3)">
-        <serverdata>
-          <mappings>
-            <mapping deploy="/home/zzhang/workspace/interpretation_by_design" local="$PROJECT_DIR$" />
+            <mapping deploy="/tmp/pycharm_project_393" local="$PROJECT_DIR$" />
           </mappings>
         </serverdata>
       </paths>

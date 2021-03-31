@@ -20,23 +20,39 @@ from expred.models.pipeline.mtl_pipeline_utils import (
 
 
 def train_mtl_evidence_classifier(evidence_classifier: nn.Module,
-                              save_dir: str,
-                              train: Tuple[List[Tuple[str, SentenceEvidence]], Any],
-                              val: Tuple[List[Tuple[str, SentenceEvidence]], Any],
-                              documents: Dict[str, List[List[int]]],
-                              model_pars: dict,
-                              class_interner: Dict[str, int],
-                              optimizer=None,
-                              scheduler=None,
-                              tensorize_model_inputs: bool = True) -> Tuple[nn.Module, dict]:
+                                  save_dir: str,
+                                  train: Tuple[List[Tuple[str, SentenceEvidence]], Any],
+                                  val: Tuple[List[Tuple[str, SentenceEvidence]], Any],
+                                  documents: Dict[str, List[List[int]]],
+                                  model_pars: dict,
+                                  class_interner: Dict[str, int],
+                                  optimizer=None,
+                                  scheduler=None,
+                                  tensorize_model_inputs: bool = True) -> Tuple[nn.Module, dict]:
+    """
 
-    logging.info(f'Beginning training evidence classifier with {len(train[0])} annotations, {len(val[0])} for validation')
+    :param evidence_classifier:
+    :param save_dir:
+    :param train:
+    :param val:
+    :param documents:
+    :param model_pars:
+    :param class_interner:
+    :param optimizer:
+    :param scheduler:
+    :param tensorize_model_inputs:
+    :return:
+    """
+    logging.info(
+        f'Beginning training evidence classifier with {len(train[0])} annotations, {len(val[0])} for validation')
+    # set up output directories
     evidence_classifier_output_dir = os.path.join(save_dir, 'evidence_classifier')
     os.makedirs(save_dir, exist_ok=True)
     os.makedirs(evidence_classifier_output_dir, exist_ok=True)
     model_save_file = os.path.join(evidence_classifier_output_dir, 'evidence_classifier.pt')
     epoch_save_file = os.path.join(evidence_classifier_output_dir, 'evidence_classifier_epoch_data.pt')
 
+    # set up training (optimizer, loss, patience, ...)
     device = next(evidence_classifier.parameters()).device
     if optimizer is None:
         optimizer = torch.optim.Adam(evidence_classifier.parameters(), lr=model_pars['evidence_classifier']['lr'])
@@ -46,6 +62,7 @@ def train_mtl_evidence_classifier(evidence_classifier: nn.Module,
     patience = model_pars['evidence_classifier']['patience']
     max_grad_norm = model_pars['evidence_classifier'].get('max_grad_norm', None)
 
+    # mask out the hard prediction (token 0) and convert to [SentenceEvidence...]
     evidence_train_data = mask_annotations_to_evidence_classification(train, class_interner)
     evidence_val_data = mask_annotations_to_evidence_classification(val, class_interner)
 
