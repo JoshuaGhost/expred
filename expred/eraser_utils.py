@@ -20,4 +20,5 @@ def chain_sentence_evidences(sentences):
                             sentence=document,
                             docid=sentences[0].docid,
                             index=sentences[0].index,
-                            query=sentences[0].query)
+                            query=sentences[0].query,
+                            has_evidence=any(map(lambda s: s.has_evidence, sentences)))
