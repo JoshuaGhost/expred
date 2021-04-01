@@ -182,8 +182,8 @@ def train_mtl_token_identifier(mtl_token_identifier: nn.Module,
             batch_elements = epoch_train_data[batch_start:min(batch_start + batch_size, len(epoch_train_data))]
             # we sample every time to thereoretically get a better representation of instances over the corpus.
             # this might just take more time than doing so in advance.
-            labels, targets, queries, sentences = zip(
-                *[(s[0], s[1].kls, s[1].query, s[1].sentence) for s in batch_elements])
+            labels, targets, queries, sentences, has_evidence = zip(
+                *[(s[0], s[1].kls, s[1].query, s[1].sentence, s[1].has_evidence) for s in batch_elements])
 
             # one hot encoding for classification
             labels = [[i == labels_mapping[label] for i in range(len(labels_mapping))] for label in labels]
@@ -214,7 +214,11 @@ def train_mtl_token_identifier(mtl_token_identifier: nn.Module,
             preds = mtl_token_identifier(queries, ids, sentences)
             cls_preds, exp_preds, attention_masks = preds
             cls_loss = cls_criterion(cls_preds, labels).mean(dim=-1).sum()
-            exp_loss = exp_criterion(exp_preds, cropped_targets.data.squeeze()).mean(dim=-1).sum()
+
+            exp_loss_per_instance = exp_criterion(exp_preds, cropped_targets.data.squeeze()).mean(dim=-1)
+            has_evidence_mask = torch.tensor(has_evidence, dtype=float, device=exp_loss_per_instance.device)
+
+            exp_loss = (exp_loss_per_instance * has_evidence_mask).sum()
             loss = cls_loss + par_lambda * exp_loss
             sampled_epoch_train_loss += loss.item()
             loss.backward()

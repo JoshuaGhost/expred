@@ -43,7 +43,8 @@ def mask_annotations_to_evidence_classification(mrs: List[Tuple[Tuple[str, Sente
                                    ann_id=evidence.ann_id,
                                    docid=evidence.docid,
                                    index=-1,
-                                   sentence=masked_sentence))
+                                   sentence=masked_sentence,
+                                    has_evidence=evidence.has_evidence))
     return ret
 
 
@@ -133,7 +134,8 @@ def annotations_to_evidence_token_identification(annotations: List[Annotation],
                                                           ann_id=ann.annotation_id,
                                                           docid=docid,
                                                           index=s,
-                                                          sentence=sent))
+                                                          sentence=sent,
+                                                          has_evidence=len(ann.evidences) > 0))
     logging.info(f"Have {positive_tokens} positive wordpiece tokens, {negative_tokens} negative wordpiece tokens")
     return ret
 

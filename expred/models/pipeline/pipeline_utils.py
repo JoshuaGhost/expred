@@ -19,7 +19,7 @@ from expred.metrics import (
 from expred.models.model_utils import PaddedSequence
 from expred.utils import Annotation
 
-SentenceEvidence = namedtuple('SentenceEvidence', 'kls ann_id query docid index sentence')
+SentenceEvidence = namedtuple('SentenceEvidence', 'kls ann_id query docid index sentence, has_evidence')
 
 
 def token_annotations_to_evidence_classification(annotations: List[Annotation],
@@ -51,7 +51,9 @@ def token_annotations_to_evidence_classification(annotations: List[Annotation],
                                         ann_id=ann.annotation_id,
                                         docid=docid,
                                         index=-1,
-                                        sentence=tuple(text)))
+                                        sentence=tuple(text)),
+                                        has_evidence=len(evidences) > 0
+                       )
     return ret
 
 
@@ -72,7 +74,7 @@ def annotations_to_evidence_classification(annotations: List[Annotation],
     ret = []
     for ann in annotations:
         ann_id = ann.annotation_id
-        docids = set(ev.docid for ev in chain.from_iterable(ann.evidences))
+        docids = ann.docids
         annotations_for_doc = defaultdict(list)
         for d in docids:
             for index, sent in enumerate(documents[d]):
@@ -83,7 +85,9 @@ def annotations_to_evidence_classification(annotations: List[Annotation],
                         ann_id=ann.annotation_id,
                         docid=d,
                         index=index,
-                        sentence=tuple(sent)))
+                        sentence=tuple(sent)),
+                        has_evidence=len(ann.evidences) > 0
+                )
         if include_all:
             ret.extend(chain.from_iterable(annotations_for_doc.values()))
         else:
@@ -125,7 +129,9 @@ def annotations_to_evidence_identification(annotations: List[Annotation],
                             ann_id=ann.annotation_id,
                             docid=ev.docid,
                             index=index,
-                            sentence=sent))
+                            sentence=sent,
+                            has_evidence=len(ann.evidences) > 0
+                        ))
                 # define the evidence sections of the document
                 for s in range(ev.start_sentence, ev.end_sentence):
                     ret[ann.annotation_id][ev.docid][s] = SentenceEvidence(
@@ -134,7 +140,9 @@ def annotations_to_evidence_identification(annotations: List[Annotation],
                         query=ann.query,
                         docid=ev.docid,
                         index=ret[ann.annotation_id][ev.docid][s].index,
-                        sentence=ret[ann.annotation_id][ev.docid][s].sentence)
+                        sentence=ret[ann.annotation_id][ev.docid][s].sentence,
+                        has_evidence=len(ann.evidences) > 0
+                    )
     return ret
 
 
@@ -206,7 +214,8 @@ def annotations_to_evidence_token_identification(annotations: List[Annotation],
                                                           ann_id=ann.annotation_id,
                                                           docid=docid,
                                                           index=s,
-                                                          sentence=sent))
+                                                          sentence=sent,
+                                                          has_evidence=len(ann.evidences) > 0))
     logging.info(f"Have {positive_tokens} positive wordpiece tokens, {negative_tokens} negative wordpiece tokens")
     return ret
 
@@ -769,7 +778,9 @@ def decode_evidence_tokens_and_classify(evidence_token_identifier: nn.Module,
                                                 cls_data.query,
                                                 cls_data.docid,
                                                 cls_data.index,
-                                                tuple(sent))
+                                                tuple(sent),
+                                                has_evidence=cls_data.has_evidence)
+
                 evidence_only_cls.append(new_cls_data)
             _, soft_classification_preds, hard_classification_preds, classification_truth = make_preds_epoch(
                 evidence_classifier, evidence_only_cls, batch_size, device,
