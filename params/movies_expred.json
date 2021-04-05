@@ -14,7 +14,7 @@
     "mtl_token_identifier": {
         "par_lambda": 5.0,
         "batch_size": 16,
-        "epochs": 10,
+        "epochs": 1,
         "patience": 3,
         "warmup_steps": 50,
         "lr": 1e-5,
@@ -24,7 +24,7 @@
     "evidence_classifier": {
         "batch_size": 16,
         "warmup_steps": 50,
-        "epochs": 10,
+        "epochs": 1,
         "patience": 3,
         "lr": 1e-5,
         "use_half_precision": 0

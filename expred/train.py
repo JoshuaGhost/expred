@@ -4,6 +4,7 @@ import sys
 
 import argparse
 import logging
+import wandb as wandb
 from typing import List, Dict, Set, Tuple
 
 import torch
@@ -14,6 +15,7 @@ import random
 
 from itertools import chain
 
+from expred import metrics
 from expred.params import MTLParams
 from expred.models.mlp_mtl import BertMTL, BertClassifier
 from expred.tokenizer import BertTokenizerWithMapping
@@ -123,6 +125,7 @@ def main(args : List[str]):
                         help='Overrides the batch_size given in the config file. Helpful for debugging')
     args = parser.parse_args(args)
 
+    wandb.init(project="expred")
     # Configure
     os.makedirs(args.output_dir, exist_ok=True)
 
@@ -140,6 +143,10 @@ def main(args : List[str]):
             conf['mtl_token_identifier']['batch_size'] = args.batch_size
             conf['evidence_classifier']['batch_size'] = args.batch_size
         logger.info(f'Configuration: {json.dumps(conf, indent=2, sort_keys=True)}')
+
+    # todo add seeds
+    wandb.config.update(conf)
+    wandb.config.update(args)
 
     # load the annotation data
     train, val, test = load_datasets(args.data_dir)
@@ -230,6 +237,20 @@ def main(args : List[str]):
         else:
             logging.info(f'Pipeline results {k}\t={v}')
     # decode ends
+
+    scores = metrics.main(
+        [
+            '--data_dir', args.data_dir,
+            '--split', 'test',
+            '--results', os.path.join(args.output_dir, 'test_decoded.jsonl'),
+            '--score_file', os.path.join(args.output_dir, 'test_scores.jsonl')
+        ]
+    )
+
+    wandb.log(scores)
+
+    wandb.save(os.path.join(args.output_dir, '*.jsonl'))
+
 
 
 if __name__ == '__main__':
