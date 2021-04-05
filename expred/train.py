@@ -11,6 +11,7 @@ import random
 
 from itertools import chain
 
+from expred import metrics
 from expred.params import MTLParams
 from expred.models.mlp_mtl import BertMTL, BertClassifier
 from expred.tokenizer import BertTokenizerWithMapping
@@ -236,7 +237,16 @@ def main():
             logging.info(f'Pipeline results {k}\t={v}')
     # decode ends
 
+    scores = metrics.main(
+        [
+            '--data_dir', args.data_dir,
+            '--split', 'test',
+            '--results', os.path.join(args.output_dir, 'test_decoded.jsonl'),
+            '--score_file', os.path.join(args.output_dir, 'test_scores.jsonl')
+        ]
+    )
 
+    wandb.log(scores)
 
     wandb.save(os.path.join(args.output_dir, '*.jsonl'))
 
