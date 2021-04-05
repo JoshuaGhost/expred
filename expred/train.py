@@ -1,5 +1,6 @@
 import argparse
 import logging
+import wandb as wandb
 from typing import List, Dict, Set, Tuple
 
 import torch
@@ -119,6 +120,7 @@ def main():
                         help='Overrides the batch_size given in the config file. Helpful for debugging')
     args = parser.parse_args()
 
+    wandb.init(project="expred")
     # Configure
     os.makedirs(args.output_dir, exist_ok=True)
 
@@ -136,6 +138,10 @@ def main():
             conf['mtl_token_identifier']['batch_size'] = args.batch_size
             conf['evidence_classifier']['batch_size'] = args.batch_size
         logger.info(f'Configuration: {json.dumps(conf, indent=2, sort_keys=True)}')
+
+    # todo add seeds
+    wandb.config.update(conf)
+    wandb.config.update(args)
 
     # load the annotation data
     train, val, test = load_datasets(args.data_dir)
@@ -229,6 +235,9 @@ def main():
         else:
             logging.info(f'Pipeline results {k}\t={v}')
     # decode ends
+
+    wandb.save(os.path.join(args.output_dir, '*.jsonl'))
+
 
 
 if __name__ == '__main__':
