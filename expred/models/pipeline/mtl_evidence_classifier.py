@@ -3,6 +3,8 @@ import os
 import random
 
 from collections import OrderedDict
+
+import wandb
 from typing import Dict, List, Tuple, Any
 
 import torch
@@ -165,6 +167,10 @@ def train_mtl_evidence_classifier(evidence_classifier: nn.Module,
             logging.info(f'Epoch {epoch} val loss {epoch_val_loss}')
             logging.info(f'Epoch {epoch} val acc {results["val_acc"][-1]}')
             logging.info(f'Epoch {epoch} val f1 {results["val_f1"][-1]}')
+
+            epoch_metrics = {metric: values[-1] for metric, values in results.items()}
+            epoch_metrics['epoch'] = epoch
+            wandb.log(epoch_metrics)
 
             if epoch_val_loss < best_val_loss:
                 best_model_state_dict = OrderedDict({k: v.cpu() for k, v in evidence_classifier.state_dict().items()})
