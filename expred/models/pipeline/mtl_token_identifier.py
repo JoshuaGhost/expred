@@ -3,9 +3,10 @@ import os
 import logging
 import numpy as np
 import random
+import wandb
 
 from typing import List, Dict, Tuple, Callable, Union, Any
-from collections import OrderedDict, namedtuple
+from collections import OrderedDict, namedtuple, defaultdict
 from sklearn.metrics import accuracy_score, classification_report
 from itertools import chain
 from torch import nn
@@ -174,6 +175,7 @@ def train_mtl_token_identifier(mtl_token_identifier: nn.Module,
         epoch_train_data = _prep_data_for_epoch(evidence_train_data, sampling_method)
         epoch_val_data = _prep_data_for_epoch(evidence_val_data, sampling_method)
         sampled_epoch_train_loss = 0
+        losses = defaultdict(lambda: [])
         mtl_token_identifier.train()
         logging.info(
             f'Training with {len(epoch_train_data) // batch_size} batches with {len(epoch_train_data)} examples')
@@ -216,6 +218,11 @@ def train_mtl_token_identifier(mtl_token_identifier: nn.Module,
             cls_loss = cls_criterion(cls_preds, labels).mean(dim=-1).sum()
             exp_loss = exp_criterion(exp_preds, cropped_targets.data.squeeze()).mean(dim=-1).sum()
             loss = cls_loss + par_lambda * exp_loss
+
+            losses['cls_loss'].append(cls_loss.item())
+            losses['exp_loss'].append(exp_loss.item())
+            losses['loss'].append(loss.item())
+
             sampled_epoch_train_loss += loss.item()
             loss.backward()
             if max_grad_norm:
@@ -226,6 +233,11 @@ def train_mtl_token_identifier(mtl_token_identifier: nn.Module,
             optimizer.zero_grad()
         sampled_epoch_train_loss /= len(epoch_train_data)
         results['sampled_epoch_train_losses'].append(sampled_epoch_train_loss)
+
+        mean_losses = {f'train_{key}':np.mean(loss) for key, loss in losses.items()}
+        mean_losses['epoch'] = epoch
+        wandb.log(mean_losses)
+
         logging.info(f'Epoch {epoch} training loss {sampled_epoch_train_loss}')
 
         # validation
@@ -275,6 +287,9 @@ def train_mtl_token_identifier(mtl_token_identifier: nn.Module,
                                        token_mapping,
                                        epoch_val_hard_pred,
                                        epoch_val_soft_pred))
+
+            validation_metrics = {metric:values[-1] for metric, values in results.items()}
+            validation_metrics['epoch'] = epoch
             # epoch_val_soft_pred_for_scoring = [[[1 - z, z] for z in y] for y in epoch_val_soft_pred]
             # logging.info(
             #    f'Epoch {epoch} full val loss {epoch_val_total_loss}, accuracy: {results["epoch_val_acc"][-1]}, f: {results["epoch_val_f"][-1]}, rationale scores: look, it\'s already a pain to duplicate this code. What do you want from me.')
