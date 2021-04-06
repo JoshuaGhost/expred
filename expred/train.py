@@ -125,7 +125,7 @@ def main(args : List[str]):
                         help='Overrides the batch_size given in the config file. Helpful for debugging')
     args = parser.parse_args(args)
 
-    wandb.init(project="expred")
+    wandb.init(entity="explainable-nlp", project="expred")
     # Configure
     os.makedirs(args.output_dir, exist_ok=True)
 
