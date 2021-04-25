@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="mtl_pipeline_movies_test" type="PythonConfigurationType" factoryName="Python" singleton="false">
+  <configuration default="false" name="mtl_pipeline_movies_regression_test" type="PythonConfigurationType" factoryName="Python" singleton="false">
     <module name="interpretation_by_design" />
     <option name="INTERPRETER_OPTIONS" value="" />
     <option name="PARENT_ENVS" value="true" />

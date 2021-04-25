@@ -2,50 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ce4aad73-ccc2-4db5-ba27-4d22efc6a159" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/runConfigurations/mtl_pipeline_movies_test.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/runConfigurations/mtl_pipeline_movies_test.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/runConfigurations/mtl_pipeline_movies_test.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/runConfigurations/mtl_pipeline_movies_regression_test.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/expred/eraser_benchmark.py" beforeDir="false" afterPath="$PROJECT_DIR$/expred/eraser_benchmark.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/expred/eraser_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/expred/eraser_utils.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/expred/metrics.py" beforeDir="false" afterPath="$PROJECT_DIR$/expred/metrics.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/expred/models/encode_attend.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/expred/models/mlp.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/expred/models/mlp_mtl.py" beforeDir="false" afterPath="$PROJECT_DIR$/expred/models/mlp_mtl.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/expred/models/pipeline/bert_pipeline.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/expred/models/pipeline/evidence_classifier.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/expred/models/pipeline/evidence_identifier.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/expred/models/pipeline/evidence_token_identifier.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/expred/models/pipeline/mtl_pipeline_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/expred/models/pipeline/mtl_pipeline_utils.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/expred/models/pipeline/mtl_token_identifier.py" beforeDir="false" afterPath="$PROJECT_DIR$/expred/models/pipeline/mtl_token_identifier.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/expred/models/pipeline/pipeline_train.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/expred/models/sequence_taggers.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/expred/tokenizer.py" beforeDir="false" afterPath="$PROJECT_DIR$/expred/tokenizer.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/expred/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/expred/train.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/expred/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/expred/utils.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/graphics/learningrate.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/params/boolq.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/params/boolq_baas.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/params/boolq_bert.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/params/boolq_soft.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/params/cose_bert.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/params/esnli_bert.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/params/evidence_inference.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/params/evidence_inference_bert.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/params/evidence_inference_soft.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/params/fever.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/params/fever_baas.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/params/fever_bert.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/params/fever_soft.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/params/movies.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/params/movies_baas.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/params/movies_bert.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/params/movies_bert_token.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/params/movies_soft.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/params/multirc.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/params/multirc_baas.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/params/multirc_bert.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/params/multirc_soft.json" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -76,7 +34,7 @@
     <property name="WebServerToolWindowPanel.toolwindow.show.date" value="false" />
     <property name="WebServerToolWindowPanel.toolwindow.show.permissions" value="false" />
     <property name="WebServerToolWindowPanel.toolwindow.show.size" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../e2expred" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
@@ -106,7 +64,7 @@
       <recent name="$PROJECT_DIR$/expred" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.mtl_pipeline_movies_test">
+  <component name="RunManager" selected="Python.mtl_pipeline_movies_regression_test">
     <configuration default="true" type="PythonConfigurationType" factoryName="Python">
       <module name="interpretation_by_design" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -1620,7 +1578,7 @@
       <item itemvalue="Python.movies_exp_machine_rationale_cls_only" />
       <item itemvalue="Python.movies_exp_only_save_machine_rationales_eval_test" />
       <item itemvalue="Python.movies_exp_only_anecdotal" />
-      <item itemvalue="Python.mtl_pipeline_movies_test" />
+      <item itemvalue="Python.mtl_pipeline_movies_regression_test" />
       <item itemvalue="Python.mtl_pipeline_movies_lambda_5" />
       <item itemvalue="Python.mtl_pipeline_fever" />
       <item itemvalue="Python.mtl_pipeline_multirc_0" />
@@ -1665,7 +1623,9 @@
       <workItem from="1608413289656" duration="3019000" />
       <workItem from="1608733175370" duration="16997000" />
       <workItem from="1610396931975" duration="3683000" />
-      <workItem from="1616148659379" duration="7594000" />
+      <workItem from="1616148659379" duration="9222000" />
+      <workItem from="1617281397248" duration="1531000" />
+      <workItem from="1619180873033" duration="703000" />
     </task>
     <servers />
   </component>
@@ -1673,52 +1633,38 @@
     <option name="version" value="2" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="555" y="214" width="1196" height="685" key="#Deployment" timestamp="1608733415506">
+    <state x="360" y="133" width="1457" height="685" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1619184809932">
       <screen x="0" y="27" width="1920" height="1053" />
     </state>
-    <state x="555" y="214" key="#Deployment/0.27.1920.1053/207.1080.1600.900@0.27.1920.1053" timestamp="1608733415506" />
-    <state x="589" y="232" width="732" height="650" key="#Inspections" timestamp="1610397136056">
+    <state x="360" y="133" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.27.1920.1053/180.1080.1440.810@0.27.1920.1053" timestamp="1619184809932" />
+    <state x="728" y="311" key="FileChooserDialogImpl" timestamp="1619180969085">
       <screen x="0" y="27" width="1920" height="1053" />
     </state>
-    <state x="589" y="232" width="732" height="650" key="#Inspections/0.27.1920.1053/0.1080.1920.1080@0.27.1920.1053" timestamp="1610397136056" />
-    <state x="360" y="133" width="1457" height="685" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1616248582892">
+    <state x="728" y="311" key="FileChooserDialogImpl/0.27.1920.1053/180.1080.1440.810@0.27.1920.1053" timestamp="1619180969085" />
+    <state width="1860" height="332" key="GridCell.Tab.0.bottom" timestamp="1616411347048">
       <screen x="0" y="27" width="1920" height="1053" />
     </state>
-    <state x="360" y="133" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.27.1920.1053/180.1080.1440.810@0.27.1920.1053" timestamp="1616248582892" />
-    <state x="360" y="133" width="1457" height="685" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.27.1920.1053/207.1080.1600.900@0.27.1920.1053" timestamp="1608825213588" />
-    <state x="778" y="230" width="354" height="654" key="EnvironmentVariablesDialog" timestamp="1608744817429">
+    <state width="1860" height="332" key="GridCell.Tab.0.bottom/0.27.1920.1053/180.1080.1440.810@0.27.1920.1053" timestamp="1616411347048" />
+    <state width="1860" height="332" key="GridCell.Tab.0.center" timestamp="1616411347048">
       <screen x="0" y="27" width="1920" height="1053" />
     </state>
-    <state x="778" y="230" width="354" height="654" key="EnvironmentVariablesDialog/0.27.1920.1053/207.1080.1600.900@0.27.1920.1053" timestamp="1608744817429" />
-    <state x="728" y="311" key="FileChooserDialogImpl" timestamp="1608744799455">
+    <state width="1860" height="332" key="GridCell.Tab.0.center/0.27.1920.1053/180.1080.1440.810@0.27.1920.1053" timestamp="1616411347048" />
+    <state width="1860" height="332" key="GridCell.Tab.0.left" timestamp="1616411347048">
       <screen x="0" y="27" width="1920" height="1053" />
     </state>
-    <state x="728" y="311" key="FileChooserDialogImpl/0.27.1920.1053/207.1080.1600.900@0.27.1920.1053" timestamp="1608744799455" />
-    <state width="1860" height="224" key="GridCell.Tab.0.bottom" timestamp="1616248665160">
+    <state width="1860" height="332" key="GridCell.Tab.0.left/0.27.1920.1053/180.1080.1440.810@0.27.1920.1053" timestamp="1616411347048" />
+    <state width="1860" height="332" key="GridCell.Tab.0.right" timestamp="1616411347048">
       <screen x="0" y="27" width="1920" height="1053" />
     </state>
-    <state width="1860" height="224" key="GridCell.Tab.0.bottom/0.27.1920.1053/180.1080.1440.810@0.27.1920.1053" timestamp="1616248665160" />
-    <state width="1860" height="224" key="GridCell.Tab.0.center" timestamp="1616248665159">
-      <screen x="0" y="27" width="1920" height="1053" />
-    </state>
-    <state width="1860" height="224" key="GridCell.Tab.0.center/0.27.1920.1053/180.1080.1440.810@0.27.1920.1053" timestamp="1616248665159" />
-    <state width="1860" height="224" key="GridCell.Tab.0.left" timestamp="1616248665159">
-      <screen x="0" y="27" width="1920" height="1053" />
-    </state>
-    <state width="1860" height="224" key="GridCell.Tab.0.left/0.27.1920.1053/180.1080.1440.810@0.27.1920.1053" timestamp="1616248665159" />
-    <state width="1860" height="224" key="GridCell.Tab.0.right" timestamp="1616248665160">
-      <screen x="0" y="27" width="1920" height="1053" />
-    </state>
-    <state width="1860" height="224" key="GridCell.Tab.0.right/0.27.1920.1053/180.1080.1440.810@0.27.1920.1053" timestamp="1616248665160" />
+    <state width="1860" height="332" key="GridCell.Tab.0.right/0.27.1920.1053/180.1080.1440.810@0.27.1920.1053" timestamp="1616411347048" />
     <state x="426" y="188" width="1067" height="737" key="SettingsEditor" timestamp="1616149138981">
       <screen x="0" y="27" width="1920" height="1053" />
     </state>
     <state x="426" y="188" width="1067" height="737" key="SettingsEditor/0.27.1920.1053/180.1080.1440.810@0.27.1920.1053" timestamp="1616149138981" />
-    <state x="639" y="223" width="642" height="660" key="find.popup" timestamp="1616248638932">
+    <state x="509" y="389" width="852" height="660" key="find.popup" timestamp="1616250067170">
       <screen x="0" y="27" width="1920" height="1053" />
     </state>
-    <state x="639" y="223" width="642" height="660" key="find.popup/0.27.1920.1053/180.1080.1440.810@0.27.1920.1053" timestamp="1616248638932" />
-    <state x="639" y="223" width="642" height="660" key="find.popup/0.27.1920.1053/207.1080.1600.900@0.27.1920.1053" timestamp="1608753166386" />
+    <state x="509" y="389" width="852" height="660" key="find.popup/0.27.1920.1053/180.1080.1440.810@0.27.1920.1053" timestamp="1616250067170" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1758,7 +1704,7 @@
     <SUITE FILE_PATH="coverage/interpretation_by_design$fever_machine_rationale_only.coverage" NAME="fever_machine_rationale_only Coverage Results" MODIFIED="1590486059543" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
     <SUITE FILE_PATH="coverage/interpretation_by_design$multirc_exp_only_anecdotal.coverage" NAME="multirc_exp_only_anecdotal Coverage Results" MODIFIED="1590897437577" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
     <SUITE FILE_PATH="coverage/interpretation_by_design$movies_par_lambda_50_soft_benchmark.coverage" NAME="movies_par_lambda_50_soft_benchmark Coverage Results" MODIFIED="1590726058062" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
-    <SUITE FILE_PATH="coverage/interpretation_by_design$mtl_pipeline_movies_test.coverage" NAME="mtl_pipeline_movies_test Coverage Results" MODIFIED="1616248465404" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/interpretation_by_design$mtl_pipeline_movies_test.coverage" NAME="mtl_pipeline_movies_regression_test Coverage Results" MODIFIED="1616249714908" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/interpretation_by_design$fever_mtl_hard_lambda_20_machine_rationale_cls_only.coverage" NAME="fever_mtl_hard_lambda_20_machine_rationale_cls_only Coverage Results" MODIFIED="1590978712147" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
     <SUITE FILE_PATH="coverage/interpretation_by_design$multirc_exp_machine_rationale_cls_only.coverage" NAME="multirc_exp_machine_rationale_cls_only Coverage Results" MODIFIED="1590979078438" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
     <SUITE FILE_PATH="coverage/interpretation_by_design$fever_machine_no_annotation.coverage" NAME="fever_machine_no_annotation Coverage Results" MODIFIED="1589900916017" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../../../zzhang/workspace/interpretation_by_design" />
