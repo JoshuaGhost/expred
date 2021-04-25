@@ -18,6 +18,12 @@ from expred.utils import convert_subtoken_ids_to_tokens
 
 def mask_annotations_to_evidence_classification(mrs: List[Tuple[Tuple[str, SentenceEvidence], Any]], # mrs for machine rationales
                                                 class_interner: dict) -> List[SentenceEvidence]:
+    """
+
+    :param mrs:
+    :param class_interner:
+    :return:
+    """
     ret = []
     for mr, _, hard_prediction in mrs:
         kls = class_interner[mr[0]]
@@ -37,7 +43,8 @@ def mask_annotations_to_evidence_classification(mrs: List[Tuple[Tuple[str, Sente
                                    ann_id=evidence.ann_id,
                                    docid=evidence.docid,
                                    index=-1,
-                                   sentence=masked_sentence))
+                                   sentence=masked_sentence,
+                                    has_evidence=evidence.has_evidence))
     return ret
 
 
@@ -46,6 +53,20 @@ def annotations_to_evidence_token_identification(annotations: List[Annotation],
                                                  interned_documents: Dict[str, List[List[int]]],
                                                  token_mapping: Dict[str, List[List[Tuple[int, int]]]]
                                                  ) -> Dict[str, Dict[str, List[SentenceEvidence]]]:
+    """
+    Calculates the start and end positions for
+        * tokens
+        * sentences
+        * rationales
+    and create a classification map for the tokens.
+
+
+    :param annotations:
+    :param source_documents:
+    :param interned_documents:
+    :param token_mapping:
+    :return: dict[ann_id]dict[doc_id][SentenceEvidence, ...]
+    """
     # TODO document
     # TODO should we simplify to use only source text?
     ret = defaultdict(lambda: defaultdict(list))  # annotation id -> docid -> sentences
@@ -53,10 +74,13 @@ def annotations_to_evidence_token_identification(annotations: List[Annotation],
     negative_tokens = 0
     for ann in annotations:
         annid = ann.annotation_id
-        docids = set(ev.docid for ev in chain.from_iterable(ann.evidences))
+        docids = ann.docids
         sentence_offsets = defaultdict(list)  # docid -> [(start, end)]
         classes = defaultdict(list)  # docid -> [token is yea or nay]
         absolute_word_mapping = defaultdict(list)  # docid -> [(absolute wordpiece start, absolute wordpiece end)]
+
+        # chain the sentences and store start and of each token same for each sentence
+        # also prepare classes (list of zeros for each word piece token)
         for docid in docids:
             start = 0
             assert len(source_documents[docid]) == len(interned_documents[docid])
@@ -70,6 +94,7 @@ def annotations_to_evidence_token_identification(annotations: List[Annotation],
                                                      for relative_wp_start,
                                                          relative_wp_end in token_mapping[docid][sentence_id]])
                 start = end
+        # calculate the start and end tokens for the evidence spans and set classes to 1 respectively
         for ev in chain.from_iterable(ann.evidences):
             if len(ev.text) == 0:
                 continue
@@ -109,7 +134,8 @@ def annotations_to_evidence_token_identification(annotations: List[Annotation],
                                                           ann_id=ann.annotation_id,
                                                           docid=docid,
                                                           index=s,
-                                                          sentence=sent))
+                                                          sentence=sent,
+                                                          has_evidence=len(ann.evidences) > 0))
     logging.info(f"Have {positive_tokens} positive wordpiece tokens, {negative_tokens} negative wordpiece tokens")
     return ret
 
@@ -119,8 +145,21 @@ def annotations_to_mtl_token_identification(annotations: object,
                                             interned_documents: object,
                                             token_mapping: object
                                             ) -> object:
-    rets = annotations_to_evidence_token_identification(annotations, source_documents, interned_documents,
-                                                        token_mapping)
+    """
+    See annotations_to_evidence_token_identification for more details
+    :param annotations:
+    :param source_documents:
+    :param interned_documents:
+    :param token_mapping:
+    :return: dict[ann_id][classification ,dict[doc_id][SentenceEvidence, ...]]
+    """
+    rets = annotations_to_evidence_token_identification(
+        annotations,
+        source_documents,
+        interned_documents,
+        token_mapping
+    )
+    # adds the final sequence classification
     for ann in annotations:
         ann_id = ann.annotation_id
         ann_kls = ann.classification

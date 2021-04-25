@@ -1,10 +1,12 @@
+import sys
+
 import argparse
 import json
 import logging
 import os
 import pprint
 
-from collections import Counter, defaultdict, namedtuple
+from collections import Counter, defaultdict
 from dataclasses import dataclass
 from itertools import chain
 from typing import Any, Callable, Dict, List, Set, Tuple
@@ -612,7 +614,7 @@ def _has_classifications(results: List[dict]) -> bool:
     return 'classification' in results[0] and results[0]['classification'] is not None
 
 
-def main():
+def main(args):
     parser = argparse.ArgumentParser(description="""Computes rationale and final class classification scores""",
                                      formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('--data_dir', dest='data_dir', required=True,
@@ -683,7 +685,7 @@ def main():
     parser.add_argument('--score_file', dest='score_file', required=False, default=None, help='Where to write results?')
     parser.add_argument('--aopc_thresholds', nargs='+', required=False, type=float, default=[0.01, 0.05, 0.1, 0.2, 0.5],
                         help='Thresholds for AOPC Thresholds')
-    args = parser.parse_args()
+    args = parser.parse_args(args)
     results = load_jsonl(args.results)
     docids = set(chain.from_iterable([rat['docid'] for rat in res['rationales']] for res in results))
     docs = load_flattened_documents(args.data_dir, docids)
@@ -746,6 +748,7 @@ def main():
         with open(args.score_file, 'w') as of:
             json.dump(scores, of, indent=4, sort_keys=True)
 
+    return scores
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv[1:])
