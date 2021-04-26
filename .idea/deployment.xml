@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" autoUpload="Always" serverName="mreimer@deken:22 agent">
+  <component name="PublishConfigData" autoUpload="Always">
     <serverData>
-      <paths name="mreimer@deken:22 agent">
+      <paths name="zzhang@n1:22">
         <serverdata>
           <mappings>
-            <mapping deploy="/tmp/pycharm_project_393" local="$PROJECT_DIR$" />
+            <mapping deploy="/workspace/interpretation_by_design" local="$PROJECT_DIR$" web="/" />
           </mappings>
+          <excludedPaths>
+            <excludedPath local="true" path="$PROJECT_DIR$/deprecated" />
+          </excludedPaths>
         </serverdata>
       </paths>
     </serverData>

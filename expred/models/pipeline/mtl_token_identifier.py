@@ -36,6 +36,27 @@ def _get_sampling_method(params):
         raise NotImplementedError
 
 
+def _prep_data_for_epoch(evidence_data: Tuple[str, Dict[str, Dict[str, List[SentenceEvidence]]]],
+                         sampler: Callable[
+                             [List[SentenceEvidence], Dict[str, List[SentenceEvidence]]], List[SentenceEvidence]]
+                         ) -> List[SentenceEvidence]:
+    """
+    Shuffle the annotations and sample from documents (can also be the whole document depending on the sampler)
+    :param evidence_data:
+    :param sampler:
+    :return:
+    """
+    output_annotations = []
+    ann_ids = sorted(evidence_data.keys())
+    # in place shuffle so we get a different per-epoch ordering
+    random.shuffle(ann_ids)
+    for ann_id in ann_ids:
+        for docid, sentences in evidence_data[ann_id][1].items():
+            data = sampler(sentences, None)
+            output_annotations.append((evidence_data[ann_id][0], data))
+    return output_annotations
+
+
 def train_mtl_token_identifier(mtl_token_identifier: nn.Module,
                                save_dir: str,
                                train: List[Annotation],
@@ -80,25 +101,7 @@ def train_mtl_token_identifier(mtl_token_identifier: nn.Module,
         machine-annotated train/eval/test datasets
     """
 
-    def _prep_data_for_epoch(evidence_data: Tuple[str, Dict[str, Dict[str, List[SentenceEvidence]]]],
-                             sampler: Callable[
-                                 [List[SentenceEvidence], Dict[str, List[SentenceEvidence]]], List[SentenceEvidence]]
-                             ) -> List[SentenceEvidence]:
-        """
-        Shuffle the annotations and sample from documents (can also be the whole document depending on the sampler)
-        :param evidence_data:
-        :param sampler:
-        :return:
-        """
-        output_annotations = []
-        ann_ids = sorted(evidence_data.keys())
-        # in place shuffle so we get a different per-epoch ordering
-        random.shuffle(ann_ids)
-        for ann_id in ann_ids:
-            for docid, sentences in evidence_data[ann_id][1].items():
-                data = sampler(sentences, None)
-                output_annotations.append((evidence_data[ann_id][0], data))
-        return output_annotations
+
 
     # set up output folder structure
     logging.info(f'Beginning training with {len(train)} annotations, {len(val)} for validation')

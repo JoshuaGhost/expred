@@ -23,6 +23,7 @@ from expred.models.pipeline.mtl_pipeline_utils import decode
 from expred.utils import load_datasets, load_documents, write_jsonl, Annotation
 from expred.models.pipeline.mtl_token_identifier import train_mtl_token_identifier
 from expred.models.pipeline.mtl_evidence_classifier import train_mtl_evidence_classifier
+from expred.eraser_utils import get_docids
 
 BATCH_FIRST = True
 
@@ -152,7 +153,8 @@ def main(args : List[str]):
     train, val, test = load_datasets(args.data_dir)
 
     # get's all docids needed that are contained in the loaded splits
-    docids: Set[str] = set(chain.from_iterable(map(lambda ann: ann.docids, chain(train, val, test))))
+    docids: Set[str] = set(chain.from_iterable(map(lambda ann: get_docids(ann),
+                                               chain(train, val, test))))
 
     documents: Dict[str, List[List[str]]] = load_documents(args.data_dir, docids)
     logger.info(f'Load {len(documents)} documents')
@@ -165,7 +167,7 @@ def main(args : List[str]):
 
     # tokenizes and caches tokenized_docs, same for annotations
     # todo typo here? slides = slices (words?)
-    tokenized_docs, tokenized_doc_token_slides = tokenizer.encode_docs(documents, args.output_dir)
+    tokenized_docs, tokenized_doc_token_slices = tokenizer.encode_docs(documents, args.output_dir)
     indexed_train, indexed_val, indexed_test = [tokenizer.encode_annotations(data) for data in [train, val, test]]
 
     logger.info('Beginning training of the MTL identifier')
@@ -180,7 +182,7 @@ def main(args : List[str]):
                                    labels_mapping=labels_mapping,
                                    interned_documents=tokenized_docs,
                                    source_documents=documents,
-                                   token_mapping=tokenized_doc_token_slides,
+                                   token_mapping=tokenized_doc_token_slices,
                                    model_pars=conf,
                                    tensorize_model_inputs=True)
     mtl_token_identifier = mtl_token_identifier.cpu()
@@ -218,7 +220,7 @@ def main(args : List[str]):
                                                                         mrs_test=test_machine_annotated,
                                                                         source_documents=documents,
                                                                         interned_documents=tokenized_docs,
-                                                                        token_mapping=tokenized_doc_token_slides,
+                                                                        token_mapping=tokenized_doc_token_slices,
                                                                         class_interner=labels_mapping,
                                                                         tensorize_modelinputs=True,
                                                                         batch_size=pipeline_batch_size,

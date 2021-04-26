@@ -7,7 +7,7 @@ import torch
 import torch.nn as nn
 from sklearn.metrics import classification_report, accuracy_score
 
-from expred.eraser_utils import chain_sentence_evidences
+from expred.eraser_utils import chain_sentence_evidences, get_docids
 from expred.models.model_utils import PaddedSequence
 from expred.models.pipeline.pipeline_utils import SentenceEvidence, _grouper, \
     score_rationales
@@ -74,7 +74,7 @@ def annotations_to_evidence_token_identification(annotations: List[Annotation],
     negative_tokens = 0
     for ann in annotations:
         annid = ann.annotation_id
-        docids = ann.docids
+        docids = list(set(get_docids(ann)))
         sentence_offsets = defaultdict(list)  # docid -> [(start, end)]
         classes = defaultdict(list)  # docid -> [token is yea or nay]
         absolute_word_mapping = defaultdict(list)  # docid -> [(absolute wordpiece start, absolute wordpiece end)]

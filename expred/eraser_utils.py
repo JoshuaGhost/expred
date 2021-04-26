@@ -2,13 +2,17 @@ from itertools import chain
 
 from expred.models.pipeline.pipeline_utils import SentenceEvidence
 
+def get_docids(ann):
+    ret = []
+    for ev_group in ann.evidences:
+        for ev in ev_group:
+            ret.append(ev.docid)
+    return ret
 
 def extract_doc_ids_from_annotations(anns):
     ret = set()
     for ann in anns:
-        for ev_group in ann.evidences:
-            for ev in ev_group:
-                ret.add(ev.docid)
+        ret |= set(get_docids(ann))
     return ret
 
 def chain_sentence_evidences(sentences):
